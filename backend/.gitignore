@@ -1,0 +1,39 @@
+# Archivos y carpetas de configuración del editor
+.vscode/
+
+# Dependencias
+node_modules/
+
+# Archivos de lock
+package-lock.json
+
+
+# Archivos de entorno
+.env
+
+
+# Reportes de cobertura de tests
+coverage/
+lcov-report/
+
+# Archivos de logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Build (por si tenés un frontend que compile)
+dist/
+build/
+
+# Carpetas temporales
+tmp/
+temp/
+
+# Otros
+*.local
