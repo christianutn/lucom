@@ -1,4 +1,4 @@
-# 📋 LUCOM - Sistema de Gestión de Ventas Multicanal
+# 📋 LUCOM - Formulario de Venta
 
 [![Estado del proyecto](https://img.shields.io/badge/Estado-En%20desarrollo-yellow)](#)
 [![Tecnologías](https://img.shields.io/badge/Stack-Node.js%20%7C%20React%20%7C%20Google%20Sheets%20API%20%7C%20MySQL-blue)](#)
