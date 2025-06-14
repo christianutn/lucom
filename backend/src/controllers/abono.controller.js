@@ -18,10 +18,7 @@ export const getAbonos = async (req, res, next) => {
         if (abonos.length === 0) {
             return next(new AppError('No se encontraron abonos', 404));
         }
-        res.json(abonos.map(abono => ({
-            descripcion: abono.descripcion,
-            activo: abono.activo,
-        })));
+        res.status(200).json(abonos);
     } catch (error) {
         next(new AppError('Error al obtener los abonos', 500));
     }

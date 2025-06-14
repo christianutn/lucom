@@ -30,6 +30,7 @@ describe('Rutas de Abono', () => {
                 .set('Authorization', `Bearer ${token_adm}`);
             expect(res.statusCode).toBe(200);
             expect(Array.isArray(res.body)).toBe(true);
+
         });
 
         // consultas con filtros
@@ -43,13 +44,13 @@ describe('Rutas de Abono', () => {
 
 
         //Consultas que devuelven lista vacía, error 404
-        it('debe devolver 404 y un array vacio', async () => {
+        it('debe devolver 404', async () => {
             const res = await request(app)
                 .get('/api/abonos?descripcion=abc&activo=1')
                 .set('Authorization', `Bearer ${token_adm}`);
             expect(res.statusCode).toBe(404);
 
-        })
+        });
     });
 
     // Validamos ruta /api/abonos/:id
@@ -152,6 +153,6 @@ describe('Rutas de Abono', () => {
         });
     })
 
-    
+
 
 });

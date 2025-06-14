@@ -20,6 +20,7 @@ describe('Rutas de Abono', () => {
         token_adm = loginRes.body.token;
     });
 
+   
     // alta de nuevo barrio de prueba
     describe('POST /api/barrios', () => {
         it('debe devolver 201 y un barrio', async () => {
@@ -95,7 +96,7 @@ describe('Rutas de Abono', () => {
             expect(res.body).toHaveProperty('activo');
         });
 
-       
+
         //Error se envia id inválido para actualizar
         it('debe devolver 400 cuando un id es inválido', async () => {
             const res = await request(app)
@@ -138,7 +139,7 @@ describe('Rutas de Abono', () => {
 
 
     afterAll(async () => {
-        
+
         await sequelize.close();
     });
 

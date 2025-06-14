@@ -33,12 +33,16 @@ Domicilio.belongsTo(Barrio, { foreignKey: 'barrio', as: 'barrioAsociado' });
 Barrio.hasMany(Domicilio, { foreignKey: 'barrio', as: 'domiciliosAsociados' });
 
 // Venta - Cliente
-Venta.belongsTo(Cliente, { 
-  foreignKey: ['tipo_documento_cliente', 'numero_documento_cliente'],
+Venta.belongsTo(Cliente, {
+  foreignKey: 'numero_documento_cliente',
+  targetKey: 'numero_documento',
   as: 'cliente'
 });
-Cliente.hasMany(Venta, { foreignKey: ['tipo_documento_cliente', 'numero_documento_cliente'], as: 'ventas' });
-
+Cliente.hasMany(Venta, {
+  foreignKey: 'numero_documento_cliente',
+  sourceKey: 'numero_documento',
+  as: 'ventas'
+});
 // Venta - TipoNegocio
 Venta.belongsTo(TipoNegocio, { foreignKey: 'tipo_negocio_id', as: 'tipoNegocio' });
 TipoNegocio.hasMany(Venta, { foreignKey: 'tipo_negocio_id', as: 'ventas' });

@@ -6,6 +6,7 @@ import clienteRouter from './cliente.routes.js';
 import companiaRouter from './compania.routes.js';
 import datoServicioConvergenciaRouter from './dato_servicio_convergencia.routes.js'
 import detalleBaf from './detalle_baf.routes.js'
+import detallePortaRouter from './detalle_porta.routes.js'
 
 
 const router = Router();
@@ -17,6 +18,7 @@ router.use('/clientes', clienteRouter);
 router.use('/companias', companiaRouter);
 router.use('/datos-servicios-convergencias', datoServicioConvergenciaRouter);
 router.use('/detalles-baf', detalleBaf);
+router.use('/detalles-porta', detallePortaRouter);
 
 
 export default router;
