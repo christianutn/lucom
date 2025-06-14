@@ -21,6 +21,7 @@
                 "PORT":"4001",
                 "SALT": "11",
                 "JWT_SECRET":"klskdjweorfoqnaoqkwje$%kjs47*-asdw",
+                "NODE_ENV":"produccion"
               }
         }
     ]
