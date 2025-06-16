@@ -19,7 +19,7 @@ export const getDetallesBaf = async (req, res, next) => {
     if(req.query.hasOwnProperty('tipos_domicilio_id')) where.tipos_domicilios_id = req.query.tipos_domicilio_id;
     if(req.query.hasOwnProperty('tvhd')) where.TVHD = req.query.tvhd;
     if(req.query.hasOwnProperty('cantidad_decos')) where.cantidad_decos = req.query.cantidad_decos;
-    if(req.query.hasOwnProperty('tipo_convergencia')) where.tipo_convergencia = req.query.tipo_convergencia;
+    if(req.query.hasOwnProperty('tipo_convergencia_id')) where.tipo_convergencia = req.query.tipo_convergencia;
     try {
         const detallesBaf = await Detalle_Baf.findAll({
             include: [
@@ -65,10 +65,8 @@ export const getDetallesBaf = async (req, res, next) => {
             if (detalle.venta) {
                 const cliente = await Cliente.findOne({
                     where: {
-                        tipo_documento: detalle.venta.tipo_documento_cliente,
-                        numero_documento: detalle.venta.numero_documento_cliente
+                        id: detalle.venta.cliente_id
                     },
-                    attributes: ['tipo_documento', 'numero_documento', 'nombre', 'apellido']
                 });
                 detalle.venta.dataValues.cliente = cliente;
             }

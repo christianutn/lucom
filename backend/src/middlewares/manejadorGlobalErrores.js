@@ -46,7 +46,7 @@ const globalErrorHandler = (err, req, res, next) => {
     err.status = err.status || 'error';
 
     // Determina si estamos en desarrollo o producción
-    if (process.env.NODE_ENV === 'desarrollo') {
+    if (process.env.NODE_ENV === 'desarrollo' || process.env.NODE_ENV === 'test') {
         sendErrorDev(err, res);
     } else if (process.env.NODE_ENV === 'produccion') {
         // Aquí puedes copiar propiedades del error original si quieres,

@@ -3,6 +3,7 @@ import Giga from "../models/giga.models.js";
 import Compania from "../models/compania.models.js";
 import Venta from "../models/venta.models.js";
 import AppError from "../utils/appError.js";
+import Cliente from "../models/cliente.models.js";
 
 
 
@@ -23,15 +24,11 @@ export const getDetallesPorta = async (req, res, next) => {
                     {
                         model: Venta,
                         as: "venta",
-                        attributes: [
-                            "id",
-                            "comentario_horario_contacto",
-                            "convergencia",
-                            "tipo_negocio_id",
-                            "fecha_realizacion",
-                            "activo",
-                            "numero_documento_cliente",
-                            "tipo_documento_cliente"
+                        include: [
+                            {
+                                model: Cliente,
+                                as: "cliente"
+                            }
                         ]
                     },
                     {
@@ -53,7 +50,7 @@ export const getDetallesPorta = async (req, res, next) => {
         }
         res.status(200).json(detallesPorta);
     } catch (error) {
-        next(error);
+        next(new AppError('Error al obtener los detalles de porta', 500));
     }
 };
 
@@ -93,7 +90,7 @@ export const actualizarDetallePorta = async (req, res, next) => {
 
         res.status(200).json(dataModificada);
     } catch (error) {
-        next(error);
+        next(new AppError('Error al actualizar el detalle porta', 500));
     }
 };
 

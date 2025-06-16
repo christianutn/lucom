@@ -24,25 +24,19 @@ import Venta from './venta.models.js';
 Cliente.belongsTo(TipoDocumento, { foreignKey: 'tipo_documento', as: 'tipoDocumento' });
 TipoDocumento.hasMany(Cliente, { foreignKey: 'tipo_documento', as: 'clientes' });
 
+
 // Domicilio - Cliente
-Domicilio.belongsTo(Cliente, { foreignKey: ['tipo_documento_cliente', 'numero_documento_cliente'], as: 'cliente' });
-Cliente.hasMany(Domicilio, { foreignKey: ['tipo_documento_cliente', 'numero_documento_cliente'], as: 'domicilios' });
+Domicilio.belongsTo(Cliente, { foreignKey: 'cliente_id', as: 'cliente' });
+Cliente.hasMany(Domicilio, { foreignKey: 'cliente_id', as: 'domicilios' });
 
 // Domicilio - Barrio
-Domicilio.belongsTo(Barrio, { foreignKey: 'barrio', as: 'barrioAsociado' });
-Barrio.hasMany(Domicilio, { foreignKey: 'barrio', as: 'domiciliosAsociados' });
+Domicilio.belongsTo(Barrio, { foreignKey: 'barrio_id', as: 'barrio' });
+Barrio.hasMany(Domicilio, { foreignKey: 'barrio_id', as: 'domiciliosAsociados' });
 
 // Venta - Cliente
-Venta.belongsTo(Cliente, {
-  foreignKey: 'numero_documento_cliente',
-  targetKey: 'numero_documento',
-  as: 'cliente'
-});
-Cliente.hasMany(Venta, {
-  foreignKey: 'numero_documento_cliente',
-  sourceKey: 'numero_documento',
-  as: 'ventas'
-});
+Venta.belongsTo(Cliente, { foreignKey: 'cliente_id', as: 'cliente' });
+Cliente.hasMany(Venta, { foreignKey: 'cliente_id', as: 'ventas' });
+
 // Venta - TipoNegocio
 Venta.belongsTo(TipoNegocio, { foreignKey: 'tipo_negocio_id', as: 'tipoNegocio' });
 TipoNegocio.hasMany(Venta, { foreignKey: 'tipo_negocio_id', as: 'ventas' });
@@ -60,8 +54,8 @@ DetalleBaf.belongsTo(Abono, { foreignKey: 'abono_id', as: 'abono' });
 Abono.hasMany(DetalleBaf, { foreignKey: 'abono_id', as: 'detallesBaf' });
 
 // DetalleBaf - TipoConvergencia
-DetalleBaf.belongsTo(TipoConvergencia, { foreignKey: 'tipo_convergencia', as: 'tipoConvergencia' });
-TipoConvergencia.hasMany(DetalleBaf, { foreignKey: 'tipo_convergencia', as: 'detallesBaf' });
+DetalleBaf.belongsTo(TipoConvergencia, { foreignKey: 'tipo_convergencia_id', as: 'tipoConvergencia' });
+TipoConvergencia.hasMany(DetalleBaf, { foreignKey: 'tipo_convergencia_id', as: 'detallesBaf' });
 
 // DetallePorta - Venta
 DetallePorta.belongsTo(Venta, { foreignKey: 'venta_id', as: 'venta' });
@@ -76,12 +70,12 @@ DetallePorta.belongsTo(Compania, { foreignKey: 'compania', as: 'companiaAsociada
 Compania.hasMany(DetallePorta, { foreignKey: 'compania', as: 'detallesPorta' });
 
 // TelefonoPrincipal - Cliente
-TelefonoPrincipal.belongsTo(Cliente, { foreignKey: ['tipo_documento', 'numero_documento'], as: 'cliente' });
-Cliente.hasMany(TelefonoPrincipal, { foreignKey: ['tipo_documento', 'numero_documento'], as: 'telefonosPrincipales' });
+TelefonoPrincipal.belongsTo(Cliente, { foreignKey: 'cliente_id', as: 'cliente' });
+Cliente.hasMany(TelefonoPrincipal, { foreignKey: 'cliente_id', as: 'telefonosPrincipales' });
 
 // Usuario - Empleado
-Usuario.belongsTo(Empleado, { foreignKey: 'id_empleado', as: 'empleado' });
-Empleado.hasOne(Usuario, { foreignKey: 'id_empleado', as: 'usuario' });
+Usuario.belongsTo(Empleado, { foreignKey: 'empleado_id', as: 'empleado' });
+Empleado.hasOne(Usuario, { foreignKey: 'empleado_id', as: 'usuario' });
 
 // Exportar todos los modelos
 export default {

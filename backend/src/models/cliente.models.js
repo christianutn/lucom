@@ -2,8 +2,13 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/base_datos.js";
 
 const Cliente = sequelize.define('clientes', {
-    tipo_documento: { type: DataTypes.INTEGER, primaryKey: true },
-    numero_documento: { type: DataTypes.STRING(15), primaryKey: true },
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    tipo_documento: { type: DataTypes.INTEGER, allowNull: false },
+    numero_documento: { type: DataTypes.STRING(15), allowNull: false },
     nombre: { type: DataTypes.STRING(50), allowNull: false },
     apellido: { type: DataTypes.STRING(50), allowNull: false },
     fecha_nacimiento: { type: DataTypes.DATE },

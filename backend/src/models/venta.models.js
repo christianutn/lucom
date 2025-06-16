@@ -14,15 +14,8 @@ const Venta = sequelize.define('ventas', {
         { type: DataTypes.DATE, allowNull: false },
     activo:
         { type: DataTypes.TINYINT(1), defaultValue: 1 },
-    numero_documento_cliente: {
-        type: DataTypes.STRING(15),
- 
-
-    },
-    tipo_documento_cliente: {
-        type: DataTypes.INTEGER,
-     
-    }
+    cliente_id:
+        { type: DataTypes.INTEGER },
 }, { timestamps: false });
 
 export default Venta;

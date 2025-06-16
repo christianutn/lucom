@@ -8,7 +8,7 @@ import manejerValidacionErrores from '../middlewares/manejarValidacionErrores.js
 const router = Router();
 
 router.post('/login', limitarIntentos, [
-    check('id_empleado').isInt({ min: 1 }),
+    check('empleado_id').isInt({ min: 1 }),
     check('contrasena').isLength({ min: 4 })
 ],
     manejerValidacionErrores,

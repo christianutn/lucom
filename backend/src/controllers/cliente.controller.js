@@ -3,16 +3,16 @@ import AppError from '../utils/appError.js';
 import { Op } from 'sequelize';
 import TipoDocumento from '../models/tipo_documento.models.js';
 export const getClientes = async (req, res, next) => {
-    const { tipo_documento, numero_documento, nombre, apellido, activo } = req.query;
+  
 
     try {
         const where = {};
 
-        if (tipo_documento) where.tipo_documento = tipo_documento;
-        if (numero_documento) where.numero_documento = { [Op.like]: `%${numero_documento}%` };
-        if (nombre) where.nombre = { [Op.like]: `%${nombre}%` };
-        if (apellido) where.apellido = { [Op.like]: `%${apellido}%` };
-        if (activo) where.activo = activo;
+        if (req.query.hasOwnProperty('tipo_documento')) where.tipo_documento = req.query.tipo_documento;
+        if (req.query.hasOwnProperty('numero_documento')) where.numero_documento = req.query.numero_documento;
+        if (req.query.hasOwnProperty('activo')) where.activo = req.query.activo;
+        if (req.query.hasOwnProperty('nombre')) where.nombre = { [Op.like]: `%${req.query.nombre}%` };
+        if (req.query.hasOwnProperty('apellido')) where.apellido = { [Op.like]: `%${req.query.apellido}%` };
 
         const clientes = await Cliente.findAll({
             where,
@@ -20,7 +20,7 @@ export const getClientes = async (req, res, next) => {
                 {
                     model: TipoDocumento,
                     as: 'tipoDocumento',
-                    attributes: ['codigo', 'descripcion']
+                    attributes: ['id', 'descripcion']
                 }
             ]
         });
@@ -40,23 +40,15 @@ export const getClientes = async (req, res, next) => {
 
 
 export const createCliente = async (req, res, next) => {
-    const {
-        tipo_documento,
-        numero_documento,
-        nombre,
-        apellido,
-        telefono_secundario,
-        fecha_nacimiento
-    } = req.body;
 
     const nuevoClliente = {}
 
-    if (tipo_documento) nuevoClliente.tipo_documento = tipo_documento;
-    if (numero_documento) nuevoClliente.numero_documento = numero_documento;
-    if (nombre) nuevoClliente.nombre = nombre;
-    if (apellido) nuevoClliente.apellido = apellido;
-    if (telefono_secundario) nuevoClliente.telefono_secundario = telefono_secundario;
-    if (fecha_nacimiento) nuevoClliente.fecha_nacimiento = fecha_nacimiento;
+    if (req.body.hasOwnProperty('tipo_documento')) nuevoClliente.tipo_documento = req.body.tipo_documento;
+    if (req.body.hasOwnProperty('numero_documento')) nuevoClliente.numero_documento = req.body.numero_documento;
+    if (req.body.hasOwnProperty('nombre')) nuevoClliente.nombre = req.body.nombre;
+    if (req.body.hasOwnProperty('apellido')) nuevoClliente.apellido = req.body.apellido;
+    if (req.body.hasOwnProperty('telefono_secundario')) nuevoClliente.telefono_secundario = req.body.telefono_secundario;
+    if (req.body.hasOwnProperty('fecha_nacimiento')) nuevoClliente.fecha_nacimiento = req.body.fecha_nacimiento;
 
     try {
         const cliente = await Cliente.create(nuevoClliente);
@@ -67,13 +59,12 @@ export const createCliente = async (req, res, next) => {
 };
 
 
-export const deleteCliente = async (req, res, next) => {
-    const { tipo_documento, numero_documento } = req.body;
+export const eliminarCliente = async (req, res, next) => {
+    const { id } = req.params;
     try {
         await Cliente.destroy({
             where: {
-                tipo_documento,
-                numero_documento
+                id: id
             }
         });
         res.status(204).json();
@@ -84,29 +75,21 @@ export const deleteCliente = async (req, res, next) => {
 
 export const actualizarCliente = async (req, res, next) => {
     try {
-        const { 
-            tipo_documento,
-            numero_documento,
-            nombre,
-            apellido,
-            telefono_secundario,
-            fecha_nacimiento,
-            activo
-         } = req.body;
+
+        const { id } = req.params;
         const clienteActualizado = {};
 
-        if (req.body.hasOwnProperty('nombre')) clienteActualizado.nombre = nombre;
-        if (req.body.hasOwnProperty('apellido')) clienteActualizado.apellido = apellido;
-        if (req.body.hasOwnProperty('telefono_secundario')) clienteActualizado.telefono_secundario = telefono_secundario;
-        if (req.body.hasOwnProperty('fecha_nacimiento')) clienteActualizado.fecha_nacimiento = fecha_nacimiento;
-        if (req.body.hasOwnProperty('activo')) clienteActualizado.activo = activo;
+        if (req.body.hasOwnProperty('nombre')) clienteActualizado.nombre = req.body.nombre;
+        if (req.body.hasOwnProperty('apellido')) clienteActualizado.apellido = req.body.apellido;
+        if (req.body.hasOwnProperty('telefono_secundario')) clienteActualizado.telefono_secundario = req.body.telefono_secundario;
+        if (req.body.hasOwnProperty('fecha_nacimiento')) clienteActualizado.fecha_nacimiento = req.body.fecha_nacimiento;
+        if (req.body.hasOwnProperty('activo')) clienteActualizado.activo = req.body.activo;
 
 
         const [actualizado] = await Cliente.update(clienteActualizado,
             {
                 where: {
-                    tipo_documento,
-                    numero_documento
+                    id: id,
                 }
             }
         );
@@ -117,8 +100,7 @@ export const actualizarCliente = async (req, res, next) => {
 
         const clienteModificado = await Cliente.findOne({
             where: {
-                tipo_documento,
-                numero_documento
+                id : id
             }
         })
         res.status(200).json(clienteModificado);

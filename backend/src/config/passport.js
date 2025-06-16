@@ -46,14 +46,14 @@ const inicializarPassport = () => {
     }))
 
     passport.use("login", new LocalStrategy({
-        usernameField: 'id_empleado', // Cambia esto al campo que usas para el nombre de usuario
+        usernameField: 'empleado_id', // Cambia esto al campo que usas para el nombre de usuario
         passwordField: 'contrasena', // Cambia esto al campo que usas para la contraseña
         passReqToCallback: true //Opción para tomar datos del body
-    }, async function (req, id_empleado, contrasena, done) {
+    }, async function (req, empleado_id, contrasena, done) {
         // Login
         try {
 
-            const usuario = await Usuario.findOne({ where: { id_empleado: id_empleado } });
+            const usuario = await Usuario.findOne({ where: { empleado_id: empleado_id } });
             if (!usuario) {
 
                 done(null, false);
@@ -69,7 +69,7 @@ const inicializarPassport = () => {
                 done(null, false);
             }
 
-            const empelado = await Empleado.findOne({ where: { id: id_empleado } });
+            const empelado = await Empleado.findOne({ where: { id: empleado_id } });
             if (!empelado) {
                 done(null, false);
             }

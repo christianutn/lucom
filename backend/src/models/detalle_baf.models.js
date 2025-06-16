@@ -8,7 +8,7 @@ const DetalleBaf = sequelize.define('detalles_baf', {
     TVHD: { type: DataTypes.TINYINT(1) },
     cantidad_decos: { type: DataTypes.INTEGER },
     horario_contacto: { type: DataTypes.STRING(150) },
-    tipo_convergencia: { type: DataTypes.INTEGER }
+    tipo_convergencia_id: { type: DataTypes.INTEGER }
 }, { timestamps: false });
 
 export default DetalleBaf;
