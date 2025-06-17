@@ -4,6 +4,9 @@ import autorizar from '../utils/autorizar.js';
 import { body, param, query } from 'express-validator';
 import manejarValidacionErrores from '../middlewares/manejarValidacionErrores.js';
 import { getUsuarios, createUsuario, getUsuarioPorId, actualizarUsuario, eliminarUsuario} from '../controllers/usuario.controller.js'
+import Rol from "../models/rol.models.js";
+import Empleado from "../models/empleado.models.js";
+import Usuario from "../models/usuario.models.js";
 
 const router = Router();
 
@@ -14,7 +17,7 @@ router.get('/',
     [
         query('empleado_id').optional().isInt({ min: 1 }).withMessage('El id del cliente debe ser un entero positivo'),
         query('activo').optional().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1'),
-        query('rol').optional().isString().length({ min: 2, max: 45 }).isIn(['VEND', 'ADM']).withMessage('El campo rol debe ser VEND o ADM')
+        query('rol').optional().isString().isLength({ min: 2, max: 45 }).withMessage('El campo rol debe ser VEND o ADM')
     ],
     manejarValidacionErrores,
     getUsuarios);
@@ -32,9 +35,26 @@ router.post('/',
     passport.authenticate('jwt', { session: false }),
     autorizar(['ADM']),
     [
-        body('empleado_id').isInt({ min: 1 }).withMessage('El id del empleado debe ser un entero positivo'),
-        body('rol').isString().length({ min: 2, max: 45 }).withMessage('El campo rol debe ser VEND o ADM'),
-        body('activo').isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1')
+        body('empleado_id').exists().isInt({ min: 1 }).withMessage('El id del empleado debe ser un entero positivo')
+        .custom(async (empleado_id) => {
+            const empleado = await Empleado.findByPk(empleado_id);
+            if (!empleado) {
+                throw new Error('El empleado no existe');
+            }
+
+            const usuario = await Usuario.findByPk(empleado_id);
+            if (usuario) {
+                throw new Error('El empleado ya tiene un usuario');
+            }
+        }),
+        body('rol').exists().isString().isLength({ min: 2, max: 45 }).withMessage('El campo rol debe ser VEND o ADM')
+        .custom(async (rol) => {
+            const rolExistente = await Rol.findOne({ where: { codigo: rol } });
+            if (!rolExistente) {
+                throw new Error('El rol no existe');
+            }
+        }),
+        body('contrasena').exists().isString().isLength({ min: 4, max: 200 }).withMessage('La contrasena debe ser un string de 4 a 45 caracteres')
     ],
     manejarValidacionErrores,
     createUsuario);
@@ -44,8 +64,8 @@ router.put('/:empleado_id',
     autorizar(['ADM']),
     [
         param('empleado_id').exists().isInt({ min: 1 }).withMessage('El ID de emleado debe ser un número entero positivo'),
-        body('descripcion').optional().isString().isLength({ min: 1, max: 50 }).withMessage('La descripcion debe ser una cadena de texto de un.maxcdn de 50 caracteres'),
-        body('activo').optional().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1')
+        body('activo').optional().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1'),
+        body('rol').optional().isString().isLength({ min: 2, max: 45 }).withMessage('El campo rol debe ser VEND o ADM'),
     ],
     manejarValidacionErrores,
     actualizarUsuario);

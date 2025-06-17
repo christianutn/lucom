@@ -16,7 +16,7 @@ import telefonoPrincipalRouter from './telefono_principal.routes.js';
 import tipoConvergenciaRouter from './tipo_convergencia.routes.js';
 import tipoDomicilioRouter from './tipo_domicilio.routes.js';
 import tipoNegocioRouter from './tipo_negocio.routes.js';
-//import usuarioRouter from './usuario.routes.js';
+import usuarioRouter from './usuario.routes.js';
 const router = Router();
 
 router.use('/abonos', abonoRouter);
@@ -36,7 +36,7 @@ router.use('/telefonos-principales', telefonoPrincipalRouter);
 router.use('/tipos-convergencias', tipoConvergenciaRouter);
 router.use('/tipos-domicilios', tipoDomicilioRouter);
 router.use('/tipos-negocios', tipoNegocioRouter);
-//router.use('/usuarios', usuarioRouter);
+router.use('/usuarios', usuarioRouter);
 
 
 export default router; 
