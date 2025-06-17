@@ -30,16 +30,6 @@ export const getDetallesBaf = async (req, res, next) => {
                 {
                     model: Venta,
                     as: 'venta',
-                    attributes: [
-                        'id',
-                        'comentario_horario_contacto',
-                        'convergencia',
-                        'tipo_negocio_id',
-                        'fecha_realizacion',
-                        'activo',
-                        'numero_documento_cliente',
-                        'tipo_documento_cliente'
-                    ],
                     include: [
                         {
                             model: TipoNegocio,
@@ -83,3 +73,62 @@ export const getDetallesBaf = async (req, res, next) => {
 };
 
 
+export const createDetalleBaf = async (req, res, next) => {
+    try {
+        const detalleBaf = await Detalle_Baf.create(req.body);
+        res.status(201).json(detalleBaf);
+    } catch (error) {
+        next(new AppError('Error al crear detalle de BAF', 500));
+    }
+};
+
+export const actualizarDetalleBaf = async (req, res, next) => {
+    const { venta_id } = req.params;
+
+    const detalleActualizado = {};
+
+
+    try {
+        if (req.query.hasOwnProperty('venta_id')) where.venta_id = req.query.venta_id;
+        if (req.body.hasOwnProperty('tipos_domicilio_id')) detalleActualizado.tipos_domicilio_id = req.body.tipos_domicilio_id
+        if (req.body.hasOwnProperty('abono_id')) detalleActualizado.abono_id = req.body.abono_id;
+        if (req.body.hasOwnProperty('tvhd')) detalleActualizado.tvhd = req.body.tvhd;
+        if (req.body.hasOwnProperty('cantidad_decos')) detalleActualizado.cantidad_decos = req.body.cantidad_decos;
+        if (req.body.hasOwnProperty('tipo_convergencia')) detalleActualizado.tipo_convergencia = req.body.tipo_convergencia;
+        if (req.body.hasOwnProperty('horario_contacto')) detalleActualizado.horario_contacto = req.body.horario_contacto;
+
+        const [actualizado] = await Detalle_Baf.update(
+            detalleActualizado,
+            {
+                where: {
+                    venta_id: venta_id
+                }
+            });
+
+        if (actualizado == 0) {
+            return res.status(200).json({ message: 'No hubo atributos para actualizar' });
+        }
+
+        const dataModificada = await Detalle_Baf.findByPk(venta_id);
+
+        res.status(200).json(dataModificada);
+    } catch (error) {
+        next(new AppError('Error al actualizar el detalle BAF', 500));
+    }
+};
+
+
+
+export const eliminarDetalleBaf = async (req, res, next) => {
+    const { venta_id } = req.params;
+    try {
+        const detalleBaf = await Detalle_Baf.findByPk(venta_id);
+        if (!detalleBaf) {
+            return next(new AppError(`Detalle BAF con ID ${venta_id} no encontrado`, 404));
+        }
+        await detalleBaf.destroy();
+        res.status(204).send({message: 'Detalle BAF eliminado'});
+    } catch (error) {
+        next(new AppError('Error al eliminar el detalle BAF', 500));
+    }
+};
