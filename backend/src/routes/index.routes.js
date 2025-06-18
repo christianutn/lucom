@@ -18,6 +18,7 @@ import tipoDomicilioRouter from './tipo_domicilio.routes.js';
 import tipoNegocioRouter from './tipo_negocio.routes.js';
 import usuarioRouter from './usuario.routes.js';
 import ventaRouter from './venta.routes.js';
+import tipoDocumentoRouter from './tipo_documento.routes.js';
 const router = Router();
 
 router.use('/abonos', abonoRouter);
@@ -39,6 +40,6 @@ router.use('/tipos-domicilios', tipoDomicilioRouter);
 router.use('/tipos-negocios', tipoNegocioRouter);
 router.use('/usuarios', usuarioRouter);
 router.use('/ventas', ventaRouter);
-
+router.use('/tipos-documentos', tipoDocumentoRouter);
 
 export default router; 

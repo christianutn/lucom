@@ -10,20 +10,6 @@ import AppError from "../utils/appError.js";
 const router = Router();
 
 router.get('/',
-    [
-        check('activo').optional().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1'),
-        check('id').optional().isInt({ min: 1 }).withMessage('El ID debe ser un número entero positivo'),
-        check('nombre').optional().isString().withMessage('El campo nombre debe ser una cadena de texto'),
-        check('apellido').optional().isString().withMessage('El campo apellido debe ser una cadena de texto'),
-        check('numero_documento').optional().isString({ min: 5, max: 15 }).withMessage('El campo dni debe ser una cadena de texto'),
-        check('tipo_documento')
-            .optional()
-            .isInt({ min: 1 })
-            .withMessage('El campo tipo_documento debe ser una cadena de texto')
-
-
-    ],
-    manejerValidacionErrores,
     passport.authenticate('jwt', { session: false }),
     autorizar(["VEND", "ADM"]),
     getClientes);
@@ -44,7 +30,8 @@ router.post('/',
                 if (cliente) throw new AppError('El cliente ya existe', 400);
             }),
         body('telefono_secundario').optional().isString().withMessage('El campo telefono_secundario debe ser una cadena de texto'),
-        body('fecha_nacimiento').optional().isString().withMessage('El campo fecha_nacimiento debe ser una cadena de texto')
+        body('fecha_nacimiento').optional().isString().withMessage('El campo fecha_nacimiento debe ser una cadena de texto'),
+        body('correo_electronico').optional().isEmail().withMessage('El campo correo_electronico debe ser una cadena de texto'),
     ],
     manejerValidacionErrores,
     passport.authenticate('jwt', { session: false }),
@@ -80,7 +67,8 @@ router.put('/:id',
         check('apellido').optional().isString().isLength({ min: 1, max: 50 }).withMessage('El campo apellido debe ser una cadena de texto'),
         check('telefono_secundario').optional().isString().withMessage('El campo telefono_secundario debe ser una cadena de texto'),
         check('fecha_nacimiento').optional().isString().matches(/^\d{4}-\d{2}-\d{2}$/).withMessage('El campo fecha_nacimiento debe ser una cadena de texto con formato yyyy-mm-dd'),
-        check('activo').optional().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1')
+        check('activo').optional().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1'),
+        check('correo_electronico').optional().isEmail().withMessage('El campo correo_electronico debe ser una cadena de texto')
     ],
     manejerValidacionErrores,
     actualizarCliente);

@@ -14,6 +14,7 @@ export const getDomicilios = async (req, res, next) => {
         if (req.query.hasOwnProperty('barrio_id')) where.barrio_id = req.query.barrio_id;
         if (req.query.hasOwnProperty('nombre_calle')) where.activo = req.query.nombre_calle;
         if (req.query.hasOwnProperty('numero_calle')) where.activo = req.query.numero_calle;
+       
         
         const domicilios = await Domicilio.findAll({
             include: [

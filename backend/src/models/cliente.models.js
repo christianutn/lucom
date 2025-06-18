@@ -13,7 +13,8 @@ const Cliente = sequelize.define('clientes', {
     apellido: { type: DataTypes.STRING(50), allowNull: false },
     fecha_nacimiento: { type: DataTypes.DATE },
     telefono_secundario: { type: DataTypes.STRING(20) },
-    activo: { type: DataTypes.TINYINT(1), defaultValue: 1 }
+    activo: { type: DataTypes.TINYINT(1), defaultValue: 1 },
+    correo_electronico: { type: DataTypes.STRING(100) }
 }, { timestamps: false });
 
 export default Cliente;

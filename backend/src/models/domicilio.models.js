@@ -9,7 +9,9 @@ const Domicilio = sequelize.define('domicilios', {
     entre_calle_1: { type: DataTypes.STRING(150) },
     entre_calle_2: { type: DataTypes.STRING(150) },
     barrio_id: { type: DataTypes.INTEGER, allowNull: false },
-    activo: { type: DataTypes.TINYINT(1), defaultValue: 1 }
+    activo: { type: DataTypes.TINYINT(1), defaultValue: 1 },
+    piso: { type: DataTypes.INTEGER },
+    departamento: { type: DataTypes.STRING(2) },
 }, { timestamps: false });
 
 export default Domicilio;

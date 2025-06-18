@@ -1,0 +1,42 @@
+
+import React, { useContext } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom'; // Removed HashRouter import
+import LoginPage from './pages/LoginPage';
+import SalesPage from './pages/SalesPage';
+import { AuthContext } from './contexts/AuthContext';
+import Notification from './components/common/Notification';
+import { useNotification } from './hooks/useNotification';
+
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const auth = useContext(AuthContext);
+  if (!auth?.isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+};
+
+const App: React.FC = () => {
+  const { notification } = useNotification();
+
+  return (
+    // <HashRouter> Removed from here
+    <div className="relative min-h-screen">
+      {notification && <Notification message={notification.message} type={notification.type} />}
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route 
+          path="/sales" 
+          element={
+            <ProtectedRoute>
+              <SalesPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </div>
+    // </HashRouter> Removed from here
+  );
+};
+
+export default App;

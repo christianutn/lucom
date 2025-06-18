@@ -1,0 +1,5 @@
+{
+  "name": "Sales Management App",
+  "description": "A web application for managing sales, clients, and business operations, featuring sections for initial sale selection, client data management, and specific forms for different business types like Internet/BAF and Portability.",
+  "requestFramePermissions": []
+}

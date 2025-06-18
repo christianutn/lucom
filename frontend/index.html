@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'brand-blue': '#007bff',
+              'dark-bg': '#1a202c',
+              'dark-card': '#2d3748',
+              'dark-input': '#2d3748', // Often same as card for cohesive look
+              'dark-border': '#4a5568',
+              'dark-text': '#e2e8f0', // General text color on dark backgrounds
+              'gray-100': '#f7fafc',
+              'gray-200': '#edf2f7',
+              'gray-300': '#e2e8f0',
+              'gray-400': '#cbd5e0',
+              'gray-500': '#a0aec0',
+              'gray-600': '#718096',
+              'gray-700': '#4a5568',
+              'gray-800': '#2d3748',
+              'gray-900': '#1a202c',
+              'red-400': '#f87171',
+              'red-500': '#ef4444',
+              'red-600': '#dc2626',
+              'red-700': '#b91c1c',
+              'green-500': '#22c55e',
+              'green-600': '#16a34a',
+              'green-700': '#15803d',
+              'blue-500': '#3b82f6',
+              'blue-700': '#1d4ed8',
+              'sky-500': '#0ea5e9',
+            }
+          }
+        }
+      }
+    </script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.6.2"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-dark-bg">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>

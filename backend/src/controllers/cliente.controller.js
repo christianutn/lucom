@@ -2,6 +2,9 @@ import Cliente from '../models/cliente.models.js';
 import AppError from '../utils/appError.js';
 import { Op } from 'sequelize';
 import TipoDocumento from '../models/tipo_documento.models.js';
+import Domicilio from '../models/domicilio.models.js';
+import TelefonoPrincipal from '../models/telefono_principal.models.js';
+import Barrio from '../models/barrio.models.js';
 export const getClientes = async (req, res, next) => {
   
 
@@ -13,6 +16,7 @@ export const getClientes = async (req, res, next) => {
         if (req.query.hasOwnProperty('activo')) where.activo = req.query.activo;
         if (req.query.hasOwnProperty('nombre')) where.nombre = { [Op.like]: `%${req.query.nombre}%` };
         if (req.query.hasOwnProperty('apellido')) where.apellido = { [Op.like]: `%${req.query.apellido}%` };
+        if (req.query.hasOwnProperty('correo_electronico')) where.correo_electronico = { [Op.like]: `%${req.query.correo_electronico}%` };
 
         const clientes = await Cliente.findAll({
             where,
@@ -21,6 +25,20 @@ export const getClientes = async (req, res, next) => {
                     model: TipoDocumento,
                     as: 'tipoDocumento',
                     attributes: ['id', 'descripcion']
+                },
+                {
+                    model: Domicilio,
+                    as: 'domicilios',
+                    include: [
+                        {
+                            model: Barrio,
+                            as: 'barrio'
+                        }
+                    ]
+                },
+                {
+                    model: TelefonoPrincipal,
+                    as: 'telefonosPrincipales',
                 }
             ]
         });

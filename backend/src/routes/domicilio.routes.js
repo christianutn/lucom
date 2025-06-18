@@ -34,6 +34,8 @@ router.post('/',
         body('entre_calle_1').exists().isString().isLength({ min: 1, max: 150 }).withMessage('El nombre entre calle (1) debe ser un string como máximo de 150 caracteres'),
         body('entre_calle_2').exists().isString().isLength({ min: 1, max: 150 }).withMessage('El nombre entre calle (2) debe ser un string como máximo de 150 caracteres'),
         body('barrio_id').exists().isInt({ min: 1 }).withMessage('El barrio es obligatorio, debe ser un entero'),
+        body('piso').optional().isInt({ min: 1 }).withMessage('El piso debe ser un entero'),
+        body('departamento').optional().isString().isLength({ min: 1, max: 2 }).withMessage('El departamento debe tener como máximo 2 caracteres'),
     ],
     manejarValidacionErrores,
     createDomicilio);
