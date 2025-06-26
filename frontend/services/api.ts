@@ -1,19 +1,7 @@
 
-import {
-    tiposNegocio, origenesDato, clientes, serviciosConvergentes,
-    tiposDomicilio, abonos, tiposConvergencia, gigas, companias,
-    tiposDocumento, mockBarrios
-} from '../data/mockData';
 import { SelectOption, Cliente, ClientSearchFilters, Barrio, TipoDocumento } from '../types';
 
 const SIMULATED_DELAY = 500; // ms
-
-// Generic filterActive for SelectOption based types
-const filterActiveGeneric = <T extends { activo: number },>(data: T[]): T[] => {
-    return data.filter(item => item.activo === 1);
-};
-
-
 
 
 export const getTiposNegocios = async (): Promise<any> => {
@@ -92,7 +80,7 @@ export const getTiposDocumento = async (): Promise<any> => {
 }
 
 
-export const getClientes = async (searchFilters: ClientSearchFilters): Promise<any> => {
+export const getClientes = async (searchFilters: ClientSearchFilters): Promise<Cliente[]> => {
     try {
         const apiUrl = import.meta.env.VITE_API_URL;
         if (!apiUrl) {
@@ -175,36 +163,130 @@ export const getTiposDomicilios = async (): Promise<any> => {
         throw error;
     }
 }
-export const getAbonos = (): Promise<SelectOption[]> => {
-    return new Promise((resolve) => {
-        setTimeout(() => resolve(filterActiveGeneric(abonos)), SIMULATED_DELAY);
-    });
-};
+export const getAbonos = async (): Promise<any> => {
+    try {
+        const apiUrl = import.meta.env.VITE_API_URL;
+        if (!apiUrl) {
+            throw new Error('API URL no definida en el archivo .env');
+        }
 
-export const getTiposConvergencias = (): Promise<SelectOption[]> => {
-    return new Promise((resolve) => {
-        setTimeout(() => resolve(filterActiveGeneric(tiposConvergencia)), SIMULATED_DELAY);
-    });
-};
+        const response = await fetch(`${apiUrl}/api/abonos`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("jwt")}`
+            }
+        });
+        const data = await response.json();
+        if (response.status !== 200) {
+            throw new Error("Error al cargar abonos");
+        }
 
-export const getGigas = (): Promise<SelectOption[]> => {
-    return new Promise((resolve) => {
-        setTimeout(() => resolve(filterActiveGeneric(gigas)), SIMULATED_DELAY);
-    });
-};
+        return data
+    } catch (error) {
+        throw error;
+    }
+}
 
-export const getCompanias = (): Promise<SelectOption[]> => {
-    return new Promise((resolve) => {
-        setTimeout(() => resolve(filterActiveGeneric(companias)), SIMULATED_DELAY);
-    });
-};
+export const getTiposConvergencias = async (): Promise<any> => {
+    try {
+        const apiUrl = import.meta.env.VITE_API_URL;
+        if (!apiUrl) {
+            throw new Error('API URL no definida en el archivo .env');
+        }
 
+        const response = await fetch(`${apiUrl}/api/tipos-convergencias`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("jwt")}`
+            }
+        });
+        const data = await response.json();
+        if (response.status !== 200) {
+            throw new Error("Error al cargar tipos de convergencias");
+        }
+
+        return data
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getGigas = async (): Promise<any> => {
+    try {
+        const apiUrl = import.meta.env.VITE_API_URL;
+        if (!apiUrl) {
+            throw new Error('API URL no definida en el archivo .env');
+        }
+
+        const response = await fetch(`${apiUrl}/api/gigas`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("jwt")}`
+            }
+        });
+        const data = await response.json();
+        if (response.status !== 200) {
+            throw new Error("Error al cargar gigas");
+        }
+
+        return data
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getCompanias = async (): Promise<any> => {
+    try {
+        const apiUrl = import.meta.env.VITE_API_URL;
+        if (!apiUrl) {
+            throw new Error('API URL no definida en el archivo .env');
+        }
+
+        const response = await fetch(`${apiUrl}/api/companias`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("jwt")}`
+            }
+        });
+        const data = await response.json();
+        if (response.status !== 200) {
+            throw new Error("Error al cargar companías");
+        }
+
+        return data
+    } catch (error) {
+        throw error;
+    }
+}
 // Returns Barrio[] which now has 'nombre'
-export const getBarrios = (): Promise<Barrio[]> => {
-    return new Promise((resolve) => {
-        setTimeout(() => resolve(filterActiveGeneric(mockBarrios)), SIMULATED_DELAY);
-    });
-};
+export const getBarrios = async (): Promise<any> => {
+    try {
+        const apiUrl = import.meta.env.VITE_API_URL;
+        if (!apiUrl) {
+            throw new Error('API URL no definida en el archivo .env');
+        }
+
+        const response = await fetch(`${apiUrl}/api/barrios`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("jwt")}`
+            }
+        });
+        const data = await response.json();
+        if (response.status !== 200) {
+            throw new Error("Error al cargar abonos");
+        }
+
+        return data
+    } catch (error) {
+        throw error;
+    }
+}
 
 export const saveSale = (formData: any): Promise<{ success: boolean; message: string }> => {
     return new Promise((resolve) => {

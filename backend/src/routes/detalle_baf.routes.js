@@ -7,6 +7,7 @@ import manejerValidacionErrores from "../middlewares/manejarValidacionErrores.js
 import AppError from "../utils/appError.js";
 import DetalleBaf from "../models/detalle_baf.models.js";
 
+
 const router = express.Router();
 
 router.get('/',

@@ -16,6 +16,8 @@ const Venta = sequelize.define('ventas', {
         { type: DataTypes.TINYINT(1), defaultValue: 1 },
     cliente_id:
         { type: DataTypes.INTEGER },
+    domicilio_id:
+        { type: DataTypes.INTEGER },
 }, { timestamps: false });
 
 export default Venta;

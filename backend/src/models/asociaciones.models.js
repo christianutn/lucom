@@ -41,6 +41,10 @@ Cliente.hasMany(Venta, { foreignKey: 'cliente_id', as: 'ventas' });
 Venta.belongsTo(TipoNegocio, { foreignKey: 'tipo_negocio_id', as: 'tipoNegocio' });
 TipoNegocio.hasMany(Venta, { foreignKey: 'tipo_negocio_id', as: 'ventas' });
 
+//Venta - Domicilio
+Venta.belongsTo(Domicilio, { foreignKey: 'domicilio_id', as: 'domicilio' });
+Domicilio.hasMany(Venta, { foreignKey: 'domicilio_id', as: 'ventas' });
+
 // DetalleBaf - Venta
 DetalleBaf.belongsTo(Venta, { foreignKey: 'venta_id', as: 'venta' });
 Venta.hasOne(DetalleBaf, { foreignKey: 'venta_id', as: 'detalleBaf' });

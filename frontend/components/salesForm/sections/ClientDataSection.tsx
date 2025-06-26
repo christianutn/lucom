@@ -10,6 +10,7 @@ import { getTiposDocumento, getClientes, getServiciosConvergentes, getBarrios } 
 import { TipoDocumento as TipoDocOption, Cliente, ClientDataState, ClientSearchFilters, Domicilio, TelefonoPrincipal, Barrio, SelectOption } from '../../../types';
 import { useNotification } from '../../../hooks/useNotification';
 
+
 interface ClientDataSectionProps {
   data: ClientDataState;
   onChange: <K extends keyof ClientDataState>(field: K, value: ClientDataState[K]) => void;
@@ -50,7 +51,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
       setTiposDocumento(tdRes);
       setServiciosConvergentes(scRes);
       setRawBarrios(bRes);
-      setBarriosOptions(bRes.map(b => ({ id: b.id.toString(), descripcion: b.nombre, activo: b.activo })));
+      setBarriosOptions(bRes.map((b: Barrio)  => ({ id: b.id.toString(), descripcion: b.nombre, activo: b.activo })));
     } catch (error) {
       console.error("Error fetching client section data:", error);
       showNotification("Error al cargar datos iniciales para cliente.", "error");

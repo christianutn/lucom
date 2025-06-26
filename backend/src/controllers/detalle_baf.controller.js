@@ -6,20 +6,22 @@ import Venta from "../models/venta.models.js";
 import TipoDomicilio from "../models/tipo_domicilio.models.js";
 import TipoConvergencia from "../models/tipo_convergencia.models.js";
 import TipoNegocio from "../models/tipo_negocio.models.js";
+import Domicilio from "../models/domicilio.models.js";
 import Cliente from "../models/cliente.models.js";
 import AppError from "../utils/appError.js";
-
+import { agregarFilaPorNombreColumnas } from '../googleSheets/cargarDatosBAF.js';
+import { DateTime } from 'luxon';
 
 export const getDetallesBaf = async (req, res, next) => {
 
     const where = {};
 
-    if(req.query.hasOwnProperty('venta_id')) where.venta_id = req.query.venta_id;
-    if(req.query.hasOwnProperty('abono_id')) where.abono_id = req.query.abono_id;
-    if(req.query.hasOwnProperty('tipos_domicilio_id')) where.tipos_domicilios_id = req.query.tipos_domicilio_id;
-    if(req.query.hasOwnProperty('tvhd')) where.TVHD = req.query.tvhd;
-    if(req.query.hasOwnProperty('cantidad_decos')) where.cantidad_decos = req.query.cantidad_decos;
-    if(req.query.hasOwnProperty('tipo_convergencia_id')) where.tipo_convergencia = req.query.tipo_convergencia;
+    if (req.query.hasOwnProperty('venta_id')) where.venta_id = req.query.venta_id;
+    if (req.query.hasOwnProperty('abono_id')) where.abono_id = req.query.abono_id;
+    if (req.query.hasOwnProperty('tipos_domicilio_id')) where.tipos_domicilios_id = req.query.tipos_domicilio_id;
+    if (req.query.hasOwnProperty('tvhd')) where.TVHD = req.query.tvhd;
+    if (req.query.hasOwnProperty('cantidad_decos')) where.cantidad_decos = req.query.cantidad_decos;
+    if (req.query.hasOwnProperty('tipo_convergencia_id')) where.tipo_convergencia = req.query.tipo_convergencia;
     try {
         const detallesBaf = await Detalle_Baf.findAll({
             include: [
@@ -75,8 +77,64 @@ export const getDetallesBaf = async (req, res, next) => {
 
 export const createDetalleBaf = async (req, res, next) => {
     try {
+
+        const nombre = req.user.user.nombre;
+        const apellido = req.user.user.apellido;
+
+        // Fecha hora actual de argentina
+        const fechaHoraActual = DateTime.now().setZone('America/Argentina/Buenos_Aires').toFormat('yyyy-MM-dd HH:mm:ss');
+
+        // String con nombre, apellido y fecha hora
+        const responsable = `${nombre} ${apellido} - ${fechaHoraActual}`;
+
         const detalleBaf = await Detalle_Baf.create(req.body);
-        res.status(201).json(detalleBaf);
+
+        // Consultar detalle baf creado
+        const detalleBafCreado = await Detalle_Baf.findByPk(detalleBaf.venta_id, {
+            include: [
+                {
+                    model: Abono,
+                    as: 'abono'
+                },
+                {
+                    model: Venta,
+                    as: 'venta',
+                    include: [
+                        {
+                            model: TipoNegocio,
+                            as: 'tipoNegocio'
+                        },
+                        {
+                            model: Cliente,
+                            as: 'cliente'
+                        },
+                        {
+                            model: Domicilio,
+                            as: 'domicilio'
+                        }
+                    ]
+                },
+                {
+                    model: TipoDomicilio,
+                    as: 'tipoDomicilio'
+                },
+                {
+                    model: TipoConvergencia,
+                    as: 'tipoConvergencia'
+                }
+
+
+            ],
+        });
+
+        const dataObject = {
+            "Marca temporal": responsable || '',
+            "DNI (solo numeros, sin puntos. Si es CUIT anteponer CUIT al número)": detalleBafCreado.venta.cliente.dni || '',
+            "Apellido y Nombre": `${detalleBafCreado.venta.cliente.apellido} ${detalleBafCreado.venta.cliente.nombre}` || '',
+
+        }
+
+        res.status(201).json(detalleBafCreado);
     } catch (error) {
         next(new AppError('Error al crear detalle de BAF', 500));
     }
@@ -127,7 +185,7 @@ export const eliminarDetalleBaf = async (req, res, next) => {
             return next(new AppError(`Detalle BAF con ID ${venta_id} no encontrado`, 404));
         }
         await detalleBaf.destroy();
-        res.status(204).send({message: 'Detalle BAF eliminado'});
+        res.status(204).send({ message: 'Detalle BAF eliminado' });
     } catch (error) {
         next(new AppError('Error al eliminar el detalle BAF', 500));
     }
