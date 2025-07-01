@@ -1,13 +1,13 @@
 
 import React, { useState, useCallback } from 'react';
-import InitialSelectionSection from './sections/InitialSelectionSection';
-import ClientDataSection from './sections/ClientDataSection';
-import AdditionalSaleDataSection from './sections/AdditionalSaleDataSection';
-import Button from '../common/Button';
-import Spinner from '../common/Spinner';
-import { useNotification } from '../../hooks/useNotification';
-import { saveSale } from '../../services/api';
-import { InitialSelectionState, ClientDataState, InternetBafState, PortabilidadState, Cliente } from '../../types';
+import InitialSelectionSection from './sections/InitialSelectionSection.js';
+import ClientDataSection from './sections/ClientDataSection.js';
+import AdditionalSaleDataSection from './sections/AdditionalSaleDataSection.js';
+import Button from '../common/Button.js';
+import Spinner from '../common/Spinner.js';
+import { useNotification } from '../../hooks/useNotification.js';
+import { saveSale } from '../../services/api.js';
+import { InitialSelectionState, ClientDataState, InternetBafState, PortabilidadState, Cliente } from '../../types.js';
 
 const initialSelectionDefault: InitialSelectionState = {
   tipoNegocioId: '',

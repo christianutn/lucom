@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import Select from '../../common/Select';
-import Input from '../../common/Input';
-import Spinner from '../../common/Spinner';
-import { getGigas, getCompanias } from '../../../services/api';
-import { SelectOption, PortabilidadState, Cliente, TelefonoPrincipal } from '../../../types';
-import { useNotification } from '../../../hooks/useNotification';
+import Select from '../../common/Select.js';
+import Input from '../../common/Input.js';
+import Spinner from '../../common/Spinner.js';
+import { getGigas, getCompanias } from '../../../services/api.js';
+import { SelectOption, PortabilidadState, Cliente, TelefonoPrincipal } from '../../../types.js';
+import { useNotification } from '../../../hooks/useNotification.js';
 
 interface PortabilidadFormProps {
   data: PortabilidadState;

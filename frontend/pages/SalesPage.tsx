@@ -1,8 +1,8 @@
 
 import React, { useContext } from 'react';
-import SalesForm from '../components/salesForm/SalesForm';
-import { AuthContext } from '../contexts/AuthContext';
-import Button from '../components/common/Button'; // Assuming Button component exists
+import SalesForm from '../components/salesForm/SalesForm.js';
+import { AuthContext } from '../contexts/AuthContext.js';
+import Button from '../components/common/Button.js'; // Assuming Button component exists
 
 const SalesPage: React.FC = () => {
   const auth = useContext(AuthContext);

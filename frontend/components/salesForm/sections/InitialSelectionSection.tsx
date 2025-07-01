@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import Select from '../../common/Select';
-import Card from '../../common/Card';
-import Spinner from '../../common/Spinner';
-import { getTiposNegocios, getOrigenesDatos } from '../../../services/api';
-import { SelectOption, InitialSelectionState } from '../../../types';
+import Select from '../../common/Select.js';
+import Card from '../../common/Card.js';
+import Spinner from '../../common/Spinner.js';
+import { getTiposNegocios, getOrigenesDatos } from '../../../services/api.js';
+import { SelectOption, InitialSelectionState } from '../../../types.js';
 
 interface InitialSelectionSectionProps {
   data: InitialSelectionState;

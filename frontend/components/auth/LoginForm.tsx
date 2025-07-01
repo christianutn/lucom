@@ -1,12 +1,12 @@
 
 import React, { useState, useContext, useEffect } from 'react';
-import { AuthContext } from '../../contexts/AuthContext';
-import Input from '../common/Input';
-import Button from '../common/Button';
-import Spinner from '../common/Spinner';
-import { useNotification } from '../../hooks/useNotification';
+import { AuthContext } from '../../contexts/AuthContext.js';
+import Input from '../common/Input.js';
+import Button from '../common/Button.js';
+import Spinner from '../common/Spinner.js';
+import { useNotification } from '../../hooks/useNotification.js';
 
-// Removed: import Logo from '../../assets/logo.svg'; 
+// Removed: import Logo from '../../assets/logo.svg.js'; 
 // Use a direct path relative to the public root (where index.html is served)
 const logoPath = './assets/logo.png'; 
 

@@ -1,9 +1,9 @@
 
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login as apiLogin } from '../services/auth';
-import { AuthContextType } from '../types';
-import { useNotification } from '../hooks/useNotification';
+import { login as apiLogin } from '../services/auth.js';
+import { AuthContextType } from '../types.js';
+import { useNotification } from '../hooks/useNotification.js';
 
 
 export const AuthContext = createContext<AuthContextType | null>(null);

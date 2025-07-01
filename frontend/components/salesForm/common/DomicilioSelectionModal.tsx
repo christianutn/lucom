@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Domicilio } from '../../../types';
-import Button from '../../common/Button';
-import Card from '../../common/Card';
+import { Domicilio } from '../../../types.js';
+import Button from '../../common/Button.js';
+import Card from '../../common/Card.js';
 
 interface DomicilioSelectionModalProps {
   isOpen: boolean;

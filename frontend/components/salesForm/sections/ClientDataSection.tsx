@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import Card from '../../common/Card';
-import Input from '../../common/Input';
-import Select from '../../common/Select';
-import Button from '../../common/Button';
-import Spinner from '../../common/Spinner';
-import DomicilioSelectionModal from '../common/DomicilioSelectionModal'; // Import the modal
-import { getTiposDocumento, getClientes, getServiciosConvergentes, getBarrios } from '../../../services/api';
-import { TipoDocumento as TipoDocOption, Cliente, ClientDataState, ClientSearchFilters, Domicilio, TelefonoPrincipal, Barrio, SelectOption } from '../../../types';
-import { useNotification } from '../../../hooks/useNotification';
+import Card from '../../common/Card.js';
+import Input from '../../common/Input.js';
+import Select from '../../common/Select.js';
+import Button from '../../common/Button.js';
+import Spinner from '../../common/Spinner.js';
+import DomicilioSelectionModal from '../common/DomicilioSelectionModal.js'; // Import the modal
+import { getTiposDocumento, getClientes, getServiciosConvergentes, getBarrios } from '../../../services/api.js';
+import { TipoDocumento as TipoDocOption, Cliente, ClientDataState, ClientSearchFilters, Domicilio, TelefonoPrincipal, Barrio, SelectOption } from '../../../types.js';
+import { useNotification } from '../../../hooks/useNotification.js';
 
 
 interface ClientDataSectionProps {

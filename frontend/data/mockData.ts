@@ -1,5 +1,5 @@
 
-import { TipoNegocio, OrigenDato, Cliente, ServicioConvergente, TipoDomicilio, Abono, TipoConvergencia, Giga, Compania, TipoDocumento, Barrio } from '../types';
+import { TipoNegocio, OrigenDato, Cliente, ServicioConvergente, TipoDomicilio, Abono, TipoConvergencia, Giga, Compania, TipoDocumento, Barrio } from '../types.js';
 
 export const tiposNegocio: TipoNegocio[] = [
     { id: 1, descripcion: "Internet (BAF)", activo: 1 },

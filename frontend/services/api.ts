@@ -1,5 +1,5 @@
 
-import { SelectOption, Cliente, ClientSearchFilters, Barrio, TipoDocumento } from '../types';
+import { SelectOption, Cliente, ClientSearchFilters, Barrio, TipoDocumento } from '../types.js';
 
 const SIMULATED_DELAY = 500; // ms
 

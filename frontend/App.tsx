@@ -1,11 +1,11 @@
 
 import React, { useContext } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom'; // Removed HashRouter import
-import LoginPage from './pages/LoginPage';
-import SalesPage from './pages/SalesPage';
-import { AuthContext } from './contexts/AuthContext';
-import Notification from './components/common/Notification';
-import { useNotification } from './hooks/useNotification';
+import LoginPage from './pages/LoginPage.js';
+import SalesPage from './pages/SalesPage.js';
+import { AuthContext } from './contexts/AuthContext.js';
+import Notification from './components/common/Notification.js';
+import { useNotification } from './hooks/useNotification.js';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const auth = useContext(AuthContext);

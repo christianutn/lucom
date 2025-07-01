@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { AppNotification as NotificationProps } from '../../types';
+import { AppNotification as NotificationProps } from '../../types.js';
 
 
 const Notification: React.FC<NotificationProps> = ({ message, type }) => {

@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, useCallback, ReactNode } from 'react';
-import { AppNotification } from '../types';
+import { AppNotification } from '../types.js';
 
 interface NotificationContextType {
   notification: AppNotification | null;

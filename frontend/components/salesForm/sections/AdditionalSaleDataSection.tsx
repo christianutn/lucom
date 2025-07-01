@@ -1,10 +1,10 @@
 
 import React from 'react';
-import Card from '../../common/Card';
-import InternetBafForm from '../businessTypes/InternetBafForm';
-import PortabilidadForm from '../businessTypes/PortabilidadForm';
-import ConsultaBbooForm from '../businessTypes/ConsultaBbooForm';
-import { InternetBafState, PortabilidadState, Cliente } from '../../../types';
+import Card from '../../common/Card.js';
+import InternetBafForm from '../businessTypes/InternetBafForm.js';
+import PortabilidadForm from '../businessTypes/PortabilidadForm.js';
+import ConsultaBbooForm from '../businessTypes/ConsultaBbooForm.js';
+import { InternetBafState, PortabilidadState, Cliente } from '../../../types.js';
 
 interface AdditionalSaleDataSectionProps {
   tipoNegocioId: string; // ID of the selected business type

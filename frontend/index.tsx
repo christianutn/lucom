@@ -2,9 +2,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HashRouter } from 'react-router-dom'; // Import HashRouter
-import App from './App';
-import { AuthProvider } from './contexts/AuthContext';
-import { NotificationProvider } from './hooks/useNotification';
+import App from './App.js';
+import { AuthProvider } from './contexts/AuthContext.js';
+import { NotificationProvider } from './hooks/useNotification.js';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
