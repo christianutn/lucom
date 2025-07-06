@@ -13,6 +13,18 @@ export interface IDomicilioAttributes {
   }
   
   // Para crear un Domicilio: name es obligatorio, isActive opcional (por defecto true, por ejemplo)
+
+  /**
+   * Para crear un Domicilio:
+   * @param cliente_id - El ID del cliente al que pertenece el domicilio.
+   * @param nombre_calle - El nombre de la calle.
+   * @param numero_calle - El número de la calle.
+   * @param entre_calle_1 - El nombre de la calle entre calle 1.
+   * @param entre_calle_2 - El nombre de la calle entre calle 2.
+   * @param barrio_id - El ID del barrio al que pertenece el domicilio.
+   * @param piso - El piso del domicilio (Opcional).
+   * @param departamento - El departamento del domicilio (Opcional).
+   */
   export interface IDomicilioCreate {
     cliente_id: number;
     nombre_calle: string;
@@ -25,6 +37,18 @@ export interface IDomicilioAttributes {
   }
   
   // Para actualizar: todo opcional (no siempre vas a actualizar todo)
+
+  /**
+   * Para actualizar un Domicilio:
+   * @param cliente_id - El ID del cliente al que pertenece el domicilio.
+   * @param nombre_calle - El nombre de la calle.
+   * @param numero_calle - El número de la calle.
+   * @param entre_calle_1 - El nombre de la calle entre calle 1.
+   * @param entre_calle_2 - El nombre de la calle entre calle 2.
+   * @param barrio_id - El ID del barrio al que pertenece el domicilio.
+   * @param piso - El piso del domicilio (Opcional).
+   * @param departamento - El departamento del domicilio (Opcional).  
+   */
   export interface IDomicilioUpdate {
     cliente_id?: number;
     nombre_calle?: string;

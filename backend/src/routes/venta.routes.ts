@@ -21,6 +21,8 @@ router.get('/',
         query('activo').optional().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1'),
         query('convergencia').optional().isIn([0, 1]).withMessage('El campo convergencia debe ser 0 o 1'),
         query('tipo_negocio_id').optional().isInt({ min: 1 }).withMessage('El id del tipo de negocio debe ser un entero positivo'),
+        query('empleado_id').optional().isInt({ min: 1 }).withMessage('El id del empleado debe ser un entero positivo'),
+        query('origen_dato_id').optional().isInt({ min: 1 }).withMessage('El id del origen de dato debe ser un entero positivo'),
     ],
     manejarValidacionErrores,
     getVentas);

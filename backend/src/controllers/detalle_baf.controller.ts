@@ -5,6 +5,16 @@ import AppError from "../utils/appError.js";
 import { Request, Response, NextFunction } from "express";
 import { Op, WhereOptions } from "sequelize";
 import { IDatalleBafAttributes, IDatalleBafCreate, IDatalleBafUpdate } from "../types/detalle_baf.d.js";
+import Venta from "../models/venta.models.js";
+import Cliente from "../models/cliente.models.js";
+import Domicilio from "../models/domicilio.models.js";
+import Barrio from "../models/barrio.models.js";
+import Empleado from "../models/empleado.models.js";
+import TipoDocumento from "../models/tipo_documento.models.js";
+import TelefonoPrincipal from "../models/telefono_principal.models.js";
+import Abono from "../models/abono.models.js";
+import TipoDomicilio from "../models/tipo_domicilio.models.js";
+import TipoConvergencia from "../models/tipo_convergencia.models.js";
 export const getDetallesBaf = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
@@ -18,7 +28,63 @@ export const getDetallesBaf = async (req: Request, res: Response, next: NextFunc
         if (horario_contacto) where.horario_contacto = horario_contacto as string;
         if (tipo_convergencia_id) where.tipo_convergencia_id = parseInt(tipo_convergencia_id as string, 10);
         const detalleBaf = await DetalleBaf.findAll({
-            where
+            where,
+            include: [
+                {
+                    model: Venta,
+                    as: 'venta',
+                    include: [
+                        {
+                            model: Cliente,
+                            as: 'cliente'
+                        },
+                        {
+                            model: Domicilio,
+                            as: 'domicilio',
+                            include: [
+                                {
+                                    model: Barrio,
+                                    as: 'barrio'
+                                }
+                            ]
+                        },
+                        {
+                            model: Empleado,
+                            as: 'empleado'
+                        },
+                        {
+                            model: Cliente,
+                            as: 'cliente',
+                            include: [
+                                {
+                                    model: TipoDocumento,
+                                    as: 'tipoDocumento'
+                                    
+                                },
+                                {
+                                    model: TelefonoPrincipal,
+                                    as: 'telefonosPrincipales'
+                                }
+                            ]
+                        }
+                        
+                    ]
+                },
+                {
+                    model: Abono,
+                    as: 'abono'
+                },
+                {
+                    model: TipoDomicilio,
+                    as: 'tipoDomicilio'
+                },
+                {
+                    model: TipoConvergencia,
+                    as: 'tipoConvergencia'
+                }
+                
+                
+            ]
         });
 
         res.status(200).json(detalleBaf);

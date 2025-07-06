@@ -26,6 +26,16 @@ export interface IUsuarioFilter {
     rol?: string
 }
 
+/**
+ * Interface para actualizar una Venta existente.
+ * Todos los campos son obligatorios
+ * @property empleado_id - ID del empleado
+ * @property rol - Rol del empleado
+ * @property activo - Estado del empleado (1: activo, 0: inactivo)
+ * @property nombre - Nombre del empleado
+ * @property apellido - Apellido del empleado
+ */
+
 export interface IUserInRequest {
     empleado_id: number;
     rol: string;

@@ -4,13 +4,23 @@ import { google, Auth, sheets_v4 } from 'googleapis';
 import 'dotenv/config';
 import AppError from '../utils/appError.js';
 import { NuevaFilaBaf } from "../types/googleSheets.js";
+import {NuevaFilaPorta} from "../types/googleSheets.js";
 
-// ... (El código de las variables de entorno no cambia)
+// ... Cargamos las variables de entorno para tipo de negocio BAF
 const clientEmail = process.env.GOOGLE_SHEETS_CLIENT_EMAIL_BAF;
 const privateKey = process.env.GOOGLE_SHEETS_PRIVATE_KEY_BAF;
-const spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEETS_ID_BAF;
 
-if (!clientEmail || !privateKey || !spreadsheetId) {
+const spreadsheetIdBaf = process.env.GOOGLE_SHEETS_SPREADSHEETS_ID_BAF;
+const sheetNameBaf = process.env.GOOGLE_SHEETS_NOMBRE_HOJA_BAF;
+
+const spreadsheetIdPorta= process.env.GOOGLE_SHEETS_SPREADSHEETS_ID_PORTA;
+const sheetNamePorta = process.env.GOOGLE_SHEETS_NOMBRE_HOJA_PORTA;
+
+
+
+// Cargamos las variables de entorno para portabilidad
+
+if (!clientEmail || !privateKey || !spreadsheetIdBaf || !spreadsheetIdPorta) {
   throw new AppError('Faltan variables de entorno críticas para Google Sheets (BAF)', 500);
 }
 
@@ -23,23 +33,45 @@ const auth: Auth.GoogleAuth = new google.auth.GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
-const sheetName = 'principal';
+
 
 /**
  * Agrega una nueva fila a Google Sheets mapeando un objeto de datos a las columnas.
  * @param dataObject Objeto con claves que coinciden con los encabezados de la hoja.
  */
-export const agregarFilaPorNombreColumnas = async (dataObject: NuevaFilaBaf): Promise<void> => {
+export const agregarFilaPorNombreColumnas = async (dataObject: NuevaFilaBaf | NuevaFilaPorta, tipo_negocio_id: number): Promise<void> => {
   try {
     // --- CAMBIO CLAVE ---
     // 1. Hemos ELIMINADO la línea: `const client = await auth.getClient();`
     // 2. Pasamos el objeto `auth` principal directamente a la configuración de sheets.
+    let spreadsheetId;
+    let sheetName;
+
+    // Tipo de negocio = 1 -> Portabilidad
+    // Tipo de negocio = 2 -> BAF
+
+    if (tipo_negocio_id == 1) {
+      spreadsheetId = spreadsheetIdPorta;
+      sheetName = sheetNamePorta;
+    } else if (tipo_negocio_id === 2) {
+      spreadsheetId = spreadsheetIdBaf;
+      sheetName = sheetNameBaf;
+    } else {
+      throw new AppError('Tipo de negocio no reconocido', 500);
+    }
+
+    // Cargamos datos según tipo de negocio
+
+    // si es tipo de negocio BAF
     const sheets: sheets_v4.Sheets = google.sheets({ version: 'v4', auth: auth });
+
+
 
     const encabezadosRes = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: `${sheetName}!1:1`,
     });
+
 
     const encabezados = encabezadosRes.data.values?.[0];
 
@@ -53,7 +85,7 @@ export const agregarFilaPorNombreColumnas = async (dataObject: NuevaFilaBaf): Pr
 
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: `${sheetName}!A1`,
+      range: `principal!A1`,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       requestBody: {

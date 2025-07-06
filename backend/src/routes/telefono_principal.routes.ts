@@ -14,7 +14,7 @@ router.get('/',
     passport.authenticate('jwt', { session: false }),
     autorizar(['VEND', 'ADM']),
     [
-        query('numero_telefono').optional().isString().isLength({ min: 1, max: 20 }).matches(/^[0-9]+$/).withMessage('El número de telefono es inválido'),
+        query('numero_telefono').optional().isString().isLength({ min: 10, max: 10 }).matches(/^[0-9]+$/).withMessage('El número de telefono es inválido'),
         query('cliente_id').optional().isInt({ min: 1 }).withMessage('El id del cliente debe ser un entero positivo'),
         query('activo').optional().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1')
     ],

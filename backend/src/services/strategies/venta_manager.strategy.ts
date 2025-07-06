@@ -1,5 +1,5 @@
 // backend/src/services/strategies/StrategyManager.ts
-import { IStrategyDetalleVenta } from './venta.strategy.js';
+import { IStrategyDetalleVenta,  } from './IStrategyDetalleVenta.js';
 import BafStrategy from './venta_baf.strategy.js';
 import PortaStrategy from './venta_porta.strategy.js';
 import AppError from '../../utils/appError.js';

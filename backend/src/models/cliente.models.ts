@@ -1,11 +1,10 @@
 import { DataTypes, Optional, Model } from "sequelize";
 import sequelize from "../config/base_datos.js";
-import { IClienteAttributes, IClienteCreate, IClienteFilter, IClienteUpdate } from "../types/cliente.d.js";
-
-interface ClienteCreationAttributes extends Optional<IClienteAttributes, 'id' | 'activo' | 'telefono_secundario' | 'fecha_nacimiento' | 'correo_electronico'> {}
+import { IClienteAttributes, IClienteCreate } from "../types/cliente.d.js";
 
 
-class Cliente extends Model<IClienteAttributes, ClienteCreationAttributes> implements IClienteAttributes {
+
+class Cliente extends Model<IClienteAttributes, IClienteCreate> implements IClienteAttributes {
     public id!: number;
     public tipo_documento!: number;
     public numero_documento!: string;
@@ -17,6 +16,19 @@ class Cliente extends Model<IClienteAttributes, ClienteCreationAttributes> imple
     public correo_electronico!: string;
 }
 
+/**
+ * @description Esquema de la tabla "clientes"
+ * @param id - ID del cliente
+ * @param tipo_documento - Tipo de documento
+ * @param numero_documento - Número de documento
+ * @param nombre - Nombre del cliente
+ * @param apellido - Apellido del cliente
+ * @param fecha_nacimiento - Fecha de nacimiento del cliente
+ * @param telefono_secundario - Teléfono secundario del cliente
+ * @param activo - Estado del cliente (1: activo, 0: inactivo)
+ * @param correo_electronico - Correo electrónico del cliente
+ * 
+ */
 
 Cliente.init({
     id: { 

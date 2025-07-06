@@ -45,6 +45,15 @@ TipoNegocio.hasMany(Venta, { foreignKey: 'tipo_negocio_id', as: 'ventas' });
 Venta.belongsTo(Domicilio, { foreignKey: 'domicilio_id', as: 'domicilio' });
 Domicilio.hasMany(Venta, { foreignKey: 'domicilio_id', as: 'ventas' });
 
+
+//Vetna - Empleado
+Venta.belongsTo(Empleado, { foreignKey: 'empleado_id', as: 'empleado' });
+Empleado.hasMany(Venta, { foreignKey: 'empleado_id', as: 'ventas' });
+
+//Venta - Origen Dato
+Venta.belongsTo(OrigenDato, { foreignKey: 'origen_dato_id', as: 'origenDato' });
+OrigenDato.hasMany(Venta, { foreignKey: 'origen_dato_id', as: 'ventas' });
+
 // DetalleBaf - Venta
 DetalleBaf.belongsTo(Venta, { foreignKey: 'venta_id', as: 'venta' });
 Venta.hasOne(DetalleBaf, { foreignKey: 'venta_id', as: 'detalleBaf' });

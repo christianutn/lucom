@@ -12,6 +12,8 @@ class Venta extends Model<IVentaAttributes, IVentaCreate> implements IVentaAttri
     public activo!: 1 | 0;
     public cliente_id!: number;
     public domicilio_id!: number;
+    public empleado_id!: number;
+    public origen_dato_id!: number;
 }
 
 Venta.init(
@@ -47,6 +49,14 @@ Venta.init(
             allowNull: false,
         },
         domicilio_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        empleado_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        origen_dato_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
