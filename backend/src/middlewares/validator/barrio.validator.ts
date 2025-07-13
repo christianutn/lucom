@@ -11,7 +11,7 @@ export const validarAtributosBarrio : ValidationChain[] = [
     body('barrio').notEmpty().withMessage("El objeto 'barrio' es requerido."),
 
     body('barrio.id')
-    .optional({ checkFalsy: true })
+    .if(body('barrio.id').notEmpty())
     .isInt({ min: 1 }).withMessage('El campo "id" debe ser un entero positivo.')
     .custom(async (value, { req }) => {
         const barrio = await Barrio.findByPk(value);

@@ -119,7 +119,7 @@ class PortaStrategy implements IStrategyDetalleVenta {
                 .trim()
                 .isString()
                 .isLength({ max: 15, min:1})
-                .withMessage('El NIM_a_portar debe contener 15 caracteres como.maxcdn'),
+                .withMessage('El NIM_a_portar debe contener entre 1 a 15 caracteres'),
             body('detalles.gigas')
                 .exists()
                 .trim()

@@ -64,3 +64,6 @@ export interface IVentaUpdate {
   domicilio_id?: number;
   origen_dato_id?: number;
 }
+
+
+

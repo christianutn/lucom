@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Card from '../../common/Card.js';
 import InternetBafForm from '../businessTypes/InternetBafForm.js';
@@ -7,8 +6,8 @@ import ConsultaBbooForm from '../businessTypes/ConsultaBbooForm.js';
 import { InternetBafState, PortabilidadState, Cliente } from '../../../types.js';
 
 interface AdditionalSaleDataSectionProps {
-  tipoNegocioId: string; // ID of the selected business type
-  tipoNegocioDescripcion: string; // Description for title
+  tipoNegocioId: string;
+  tipoNegocioDescripcion: string;
   internetBafData: InternetBafState;
   onInternetBafChange: <K extends keyof InternetBafState>(field: K, value: InternetBafState[K]) => void;
   portabilidadData: PortabilidadState;
@@ -27,9 +26,8 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
 }) => {
   
   const renderFormBasedOnType = () => {
-    // Note: IDs are numbers in mockData, but select value is string.
     switch (tipoNegocioId) {
-      case "4": // Internet (BAF)
+      case "2": // BAF (Cambiado a ID 2 como en tu ejemplo)
         return <InternetBafForm data={internetBafData} onChange={onInternetBafChange} />;
       case "1": // Portabilidad
         return <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} selectedClient={selectedClient} />;

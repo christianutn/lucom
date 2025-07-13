@@ -1,5 +1,5 @@
 
-import { SelectOption, Cliente, ClientSearchFilters, Barrio, TipoDocumento } from '../types.js';
+import { SelectOption, Cliente, ClientSearchFilters, Barrio, TipoDocumento, IVentaConDetalle } from '../types.js';
 
 const SIMULATED_DELAY = 500; // ms
 
@@ -288,11 +288,40 @@ export const getBarrios = async (): Promise<any> => {
     }
 }
 
-export const saveSale = (formData: any): Promise<{ success: boolean; message: string }> => {
-    return new Promise((resolve) => {
-        console.log("Simulating sale save with data:", formData);
-        setTimeout(() => {
-            resolve({ success: true, message: "Venta guardada exitosamente" });
-        }, SIMULATED_DELAY * 2);
-    });
+export const saveSale = (formData: any) => {
+    console.log(formData);
 };
+
+
+export const postVenta = async (ventaConDetalle: any): Promise<any> => {
+
+    try {
+        console.log(ventaConDetalle);
+
+        const apiUrl = import.meta.env.VITE_API_URL;
+        if (!apiUrl) {
+            throw new Error('API URL no definida en el archivo .env');
+        }
+
+        const response = await fetch(`${apiUrl}/api/ventas`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("jwt")}`
+            },
+            body: JSON.stringify(ventaConDetalle)
+        });
+        const data = await response.json();
+        if (response.status !== 201) {
+            throw new Error("Error al cargar abonos");
+        }
+
+        return data
+
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+
+}

@@ -163,7 +163,7 @@ export const crearVentaConDetalles = async (req: Request, res: Response, next: N
     }
 
     //Cargamos los datos a ventas que no vienen por el body y se calculan automáticamente
-    datosVenta.empleado_id = empleado_id; 
+    datosVenta.empleado_id = empleado_id;
     datosVenta.fecha_realizacion = DateTime.now().setZone('America/Argentina/Buenos_Aires').toJSDate();
 
 
@@ -174,18 +174,22 @@ export const crearVentaConDetalles = async (req: Request, res: Response, next: N
 
         // 1. Creamos o actualizamos cliente
         await tratarCliente(cliente, t);
+        integrar_id_cliente(cliente, datosVenta, domicilio, telefonos_principales); // por si se carga nuevo cliente
 
         // 2. Creamos o actualizamos telefonos_principales
         await tratarTelefonosPrincipales(telefonos_principales, t);
 
-        // 3. Creamos o actualizamos domicilio
-        await tratarDomicilio(domicilio, t);
+        // 3. Creamos o actualizamos barrio. Primero el barrio ya que el domicilio necesita del id del barrio
+        await tratarBarrio(barrio, t);
+        integrar_id_barrio(barrio, domicilio);
 
-        // 4. Creamos o actualizamos barrio
-        await tratarBarrio(barrio, t); 
+        // 4. Creamos o actualizamos domicilio
+        await tratarDomicilio(domicilio, t);
+        integrar_id_domicilio(domicilio, datosVenta);
+
 
         // 5. Crear la Venta principal dentro de la transacción
-        const nuevaVenta : IVentaAttributes= await Venta.create(datosVenta, { transaction: t });
+        const nuevaVenta: IVentaAttributes = await Venta.create(datosVenta, { transaction: t });
         if (!nuevaVenta) {
             throw new AppError('No se pudo crear el registro de venta principal.', 500);
         }
@@ -198,17 +202,17 @@ export const crearVentaConDetalles = async (req: Request, res: Response, next: N
         await strategy.createDetails(detalles, t); // Se pasa la instancia completa de venta
 
         //Cargar nueva fila en googlesheets
-        
-        
+
+
         await strategy.cargar_nueva_fila(nuevaVenta, detalles, cliente, telefonos_principales, domicilio, barrio);
-        
+
         const detallesCreados = await strategy.getDetails(nuevaVenta.id, t);
-        
+
         // 7. Confirmar la transacción
         await t.commit();
 
-        
-        
+
+
 
         res.status(201).json(detallesCreados);
 
@@ -226,12 +230,28 @@ export const crearVentaConDetalles = async (req: Request, res: Response, next: N
 const tratarCliente = async (cliente: IClienteAttributes, t: Transaction): Promise<void> => {
     try {
 
+        const clienteEncontrado = await Cliente.findOne({
+            where: {
+                numero_documento: cliente.numero_documento,
+                tipo_documento: cliente.tipo_documento
+            },
+            transaction: t
+        });
+
+        if (clienteEncontrado) {
+            cliente.id = clienteEncontrado.id;
+        }
 
         // Si datosCliente.id es undifined o vacío, crear un nuevo cliente, caso contrario actualizarlo
         if (!cliente.id) {
 
             const nuevoCliente = await Cliente.create({
-                ...cliente
+                tipo_documento: cliente.tipo_documento,
+                numero_documento: cliente.numero_documento,
+                nombre: cliente.nombre,
+                apellido: cliente.apellido,
+                telefono_secundario: cliente.telefono_secundario,
+                correo_electronico: cliente.correo_electronico,
             }, { transaction: t });
 
             cliente.id = nuevoCliente.id;
@@ -244,6 +264,7 @@ const tratarCliente = async (cliente: IClienteAttributes, t: Transaction): Promi
                 nombre: cliente.nombre,
                 apellido: cliente.apellido,
                 telefono_secundario: cliente.telefono_secundario,
+                correo_electronico: cliente.correo_electronico,
             };
 
             await Cliente.update(datosClienteParaActualizar, {
@@ -252,7 +273,6 @@ const tratarCliente = async (cliente: IClienteAttributes, t: Transaction): Promi
                 },
                 transaction: t
             });
-
 
         }
 
@@ -289,45 +309,47 @@ const tratarTelefonosPrincipales = async (telefonos_principales: ITelefonoPrinci
                     transaction: t
                 });
             }
+
+            // Eliminamos en caso de exister todos aquellos telefonos del cliente que no vienen por la lista
+            await TelefonoPrincipal.destroy({
+                where: {
+                    id: {
+                        [Op.notIn]: telefonos_principales.map(telefono => telefono.id)
+                    },
+                    cliente_id: telefono.cliente_id
+                },
+                transaction: t
+            });
         }
     } catch (error) {
         throw new AppError('Error al tratar los telefonos principales', 500);
     }
 };
 
-const tratarDomicilio = async (domicilio: IDomicilioAttributes, t: Transaction) : Promise<void> => {
+const tratarDomicilio = async (domicilio: IDomicilioAttributes, t: Transaction): Promise<void> => {
     try {
+
+        const domObject : IDomicilioCreate = {
+            cliente_id: domicilio.cliente_id,
+            nombre_calle: domicilio.nombre_calle,
+            numero_calle: domicilio.numero_calle,
+            entre_calle_1: domicilio.entre_calle_1,
+            entre_calle_2: domicilio.entre_calle_2,
+            barrio_id: domicilio.barrio_id,
+        }
+
+        if (domicilio.piso) domObject.piso = domicilio.piso;
+        if (domicilio.departamento) domObject.departamento = domicilio.departamento;
+
 
         if (!domicilio.id) {
 
-
-            const nuevoDomicilio: IDomicilioCreate = {
-                cliente_id: domicilio.cliente_id,
-                nombre_calle: domicilio.nombre_calle,
-                numero_calle: domicilio.numero_calle,
-                entre_calle_1: domicilio.entre_calle_1,
-                entre_calle_2: domicilio.entre_calle_2,
-                barrio_id: domicilio.barrio_id,
-                piso: domicilio.piso,
-                departamento: domicilio.departamento
-
-            }
-            const domicilioCreado = await Domicilio.create(nuevoDomicilio, { transaction: t });
+            const domicilioCreado = await Domicilio.create(domObject, { transaction: t });
             domicilio.id = domicilioCreado.id;
 
         } else {
 
-            const domicilioActualizado: IDomicilioUpdate = {
-                cliente_id: domicilio.cliente_id,
-                nombre_calle: domicilio.nombre_calle,
-                numero_calle: domicilio.numero_calle,
-                entre_calle_1: domicilio.entre_calle_1,
-                entre_calle_2: domicilio.entre_calle_2,
-                barrio_id: domicilio.barrio_id,
-                piso: domicilio.piso,
-                departamento: domicilio.departamento
-            }
-            await Domicilio.update(domicilioActualizado, {
+            await Domicilio.update(domObject, {
                 where: {
                     id: domicilio.id
                 },
@@ -339,7 +361,7 @@ const tratarDomicilio = async (domicilio: IDomicilioAttributes, t: Transaction) 
     }
 }
 
-const tratarBarrio = async (barrio: IBarrioAttributes, t: Transaction) : Promise<void> => {
+const tratarBarrio = async (barrio: IBarrioAttributes, t: Transaction): Promise<void> => {
     try {
 
         if (!barrio.id) {
@@ -359,6 +381,34 @@ const tratarBarrio = async (barrio: IBarrioAttributes, t: Transaction) : Promise
                 transaction: t
             });
         }
+    } catch (error) {
+        throw new AppError('Error al tratar el barrio', 500);
+    }
+}
+
+const integrar_id_cliente = (cliente: IClienteAttributes, datosVenta: IVentaCreate, domicilio: IDomicilioAttributes, telefonos_principales: ITelefonoPrincipalAttributes[]) => {
+    try {
+        datosVenta.cliente_id = cliente.id;
+        domicilio.cliente_id = cliente.id;
+        for (const telefono of telefonos_principales) {
+            telefono.cliente_id = cliente.id;
+        }
+    } catch (error) {
+        throw new AppError('Error al tratar el barrio', 500);
+    }
+}
+
+const integrar_id_domicilio = (domicilio: IDomicilioAttributes, datosVenta: IVentaCreate) => {
+    try {
+        datosVenta.domicilio_id = domicilio.id;
+    } catch (error) {
+        throw new AppError('Error al tratar el domicilio', 500);
+    }
+}
+
+const integrar_id_barrio = (barrio: IBarrioAttributes, domicilio: IDomicilioAttributes) => {
+    try {
+        domicilio.barrio_id = barrio.id;
     } catch (error) {
         throw new AppError('Error al tratar el barrio', 500);
     }

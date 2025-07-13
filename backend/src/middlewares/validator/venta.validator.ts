@@ -50,9 +50,11 @@ export const validarCreacionVenta = (): (ValidationChain | ((req: any, res: any,
         }),
 
     body('datosVenta.cliente_id')
-        .exists().withMessage('El ID del cliente es requerido.')
-        .isInt({ min: 1 }).trim().withMessage('El ID del cliente debe ser un entero positivo.')
+        .optional({checkFalsy: true})
+        .isInt({ min: 1 }).withMessage('El ID del cliente en "datosVenta" debe ser un entero positivo.')
         .custom(async (value) => {
+            if (!value) return true;
+
             const existe_cliente = await Cliente.findByPk(value);
             if (!existe_cliente) {
                 throw new AppError('El cliente no existe.', 400);
@@ -61,8 +63,8 @@ export const validarCreacionVenta = (): (ValidationChain | ((req: any, res: any,
         }),
 
     body('datosVenta.domicilio_id')
-        .exists().withMessage('El ID del domicilio es requerido.')
-        .isInt({ min: 1 }).trim().withMessage('El ID del domicilio debe ser un entero positivo.')
+        .if(body('datosVenta.domicilio_id').notEmpty()) 
+        .isInt({ min: 1 }).withMessage('El ID del domicilio debe ser un entero positivo.')
         .custom(async (value) => {
             const existe_domicilio = await Domicilio.findByPk(value);
             if (!existe_domicilio) {

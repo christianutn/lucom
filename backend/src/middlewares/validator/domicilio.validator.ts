@@ -13,7 +13,7 @@ export const validarAtributosDomicilio: ValidationChain[] = [
     body('domicilio').notEmpty().withMessage("El objeto 'domicilio' debe ser existir."),
 
     body('domicilio.id')
-    .optional({checkFalsy: true})
+    .if(body('domicilio.id').notEmpty()) 
     .isInt({ min: 1 }).withMessage('El campo "id" debe ser un entero positivo.')
     .custom(async (value, { req }) => {
         const domicilio = await Domicilio.findByPk(value);
@@ -23,8 +23,9 @@ export const validarAtributosDomicilio: ValidationChain[] = [
         return true;
     }),
 
+    
     body('domicilio.cliente_id')
-    .exists().withMessage('El campo "cliente_id" es requerido.')
+    .if(body('domicilio.cliente_id').notEmpty()) 
     .isInt({ min: 1 }).withMessage('El campo "cliente_id" debe ser un entero positivo.')
     .custom(async (value, { req }) => {
         const cliente = await Cliente.findByPk(value);
@@ -45,26 +46,26 @@ export const validarAtributosDomicilio: ValidationChain[] = [
     .isLength({ min: 1, max: 15 }).withMessage('El campo "numero_calle" debe tener un máximo de 15 caracteres.'),
 
     body('domicilio.entre_calle_1')
-    .optional()
+    .optional({checkFalsy: true})
     .isString().trim().withMessage('El campo "entre_calle_1" debe ser una cadena de texto.')
     .isLength({ min: 1, max: 150 }).withMessage('El campo "entre_calle_1" debe tener un.maxcdn 150 caracteres.'),
 
     body('domicilio.entre_calle_2')
-    .optional()
+    .optional({checkFalsy: true})
     .isString().trim().withMessage('El campo "entre_calle_2" debe ser una cadena de texto.')
     .isLength({ min: 1, max: 150 }).withMessage('El campo "entre_calle_2" debe tener un.maxcdn 150 caracteres.'),
 
     body('domicilio.piso')
-    .optional()
+    .optional({checkFalsy: true})
     .isInt({ min: 1 }).trim().withMessage('El campo "piso" debe ser un entero positivo.'),
 
     body('domicilio.departamento')
-    .optional()
+    .optional({checkFalsy: true})
     .isString().trim().withMessage('El campo "departamento" debe ser una cadena de texto.')
     .isLength({ min: 1, max: 2}).withMessage('El campo "departamento" debe tener máximo de 2 caracteres.'),
 
     body('domicilio.barrio_id')
-    .exists().withMessage('El campo "barrio_id" es requerido.')
+    .optional({checkFalsy: true})
     .isInt({ min: 1 }).withMessage('El campo "barrio_id" debe ser un entero positivo.')
     .custom(async (value, { req }) => {
         const barrio = await Barrio.findByPk(value);

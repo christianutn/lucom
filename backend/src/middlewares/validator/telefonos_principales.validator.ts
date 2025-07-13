@@ -12,7 +12,9 @@ export const validarAtributosTelefonosPrincipales: ValidationChain[] = [
     body('telefonos_principales').isArray().withMessage("El objeto 'telefonos_principales' debe ser un array.")
     .isLength({ min: 1 }).withMessage("El array 'telefonos_principales' debe tener al menos un elemento."),
 
-    body('telefonos_principales.*.id').optional({checkFalsy: true}).isInt({min: 1}).withMessage('El id debe ser un número entero')
+    body('telefonos_principales.*.id')
+    .if(body('telefonos_principales.*.id').notEmpty())
+    .isInt({min: 1}).withMessage('El id debe ser un número entero')
     .custom(async (value, { req }) => {
         const telefono_principal = await TelefonoPrincipal.findByPk(value);
         if (!telefono_principal) {
@@ -22,8 +24,8 @@ export const validarAtributosTelefonosPrincipales: ValidationChain[] = [
     }),
 
     body('telefonos_principales.*.cliente_id')
-    .exists().withMessage('El campo "cliente_id" es requerido.')
-    .isInt({ min: 1 }).trim().withMessage('El campo "cliente_id" debe ser un entero positivo.')
+    .if(body('telefonos_principales.*.cliente_id').notEmpty())
+    .isInt({ min: 1 }).withMessage('El campo "cliente_id" debe ser un entero positivo.')
     .custom(async (value, { req }) => {
         const cliente = await Cliente.findByPk(value);
         if (!cliente) {

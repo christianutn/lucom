@@ -19,7 +19,7 @@ export interface Compania extends SelectOption {}
 
 // Updated Barrio to match client.domicilios.barrio structure
 export interface Barrio {
-  id: number;
+  id: number | string;
   nombre: string;
   codigo_postal?: string; // Optional as per new mock
   activo: number;
@@ -83,10 +83,11 @@ export interface ClientDataState {
   numeroDocumento: string;
   nombre: string;
   apellido: string;
-  telefonosPrincipales: Array<{ numero: string }>; // Kept simple for form inputs
+  telefonosPrincipales: Array<{ numero: string, id: string }>; // Kept simple for form inputs
   telefonoSecundario: string;
   email: string;
   domicilioSeleccionadoId: string; // ID of existing address or "NUEVO" or "" (nothing selected yet)
+  clienteId: string;
   nuevoDomicilio: {
     calle: string;
     altura: string;
@@ -129,4 +130,171 @@ export interface AuthContextType {
   token: string | null;
   login: (employeeId: number | string, password_raw: string) => Promise<void>;
   logout: () => void;
+}
+
+// DInterfaces para venta
+/**
+ * Interface para crear un nuevo DetallePorta.
+ * Todos los campos son obligatorios.
+ * @property venta_id ID de la venta asociada
+ * @property NIM_a_portar Número de Identificación del Móvil (NIM) que se va a portar
+ * @property gigas Cantidad de gigas contratados
+ * @property compania ID de la compañía actual o destino
+ */
+export interface IDetallePortaCreate {
+  venta_id: number;
+  NIM_a_portar: string;
+  gigas: number;
+  compania: number;
+}
+
+/**
+ * Interface para crear un nuevo DetalleBaf.
+ * Todos los campos son obligatorios.
+ * @property venta_id ID de la venta asociada
+ * @property tipos_domicilios_id Tipo de domicilio (ID)
+ * @property abono_id ID del abono contratado
+ * @property TVHD Indica si tiene TV HD (1) o no (0)
+ * @property cantidad_decos Cantidad de decodificadores solicitados
+ * @property horario_contacto Horario preferido de contacto
+ * @property tipo_convergencia_id Tipo de convergencia (ID)
+ */
+export interface IDatalleBafCreate {
+  venta_id: number;
+  tipos_domicilios_id: number;
+  abono_id: number;
+  TVHD: 1 | 0;
+  cantidad_decos: number;
+  horario_contacto: string;
+  tipo_convergencia_id: number;
+}
+
+
+/**
+ * Interface para crear una nueva Venta.
+ * Todos los campos son obligatorios.
+ * @property comentario_horario_contacto Comentario adicional sobre el horario de contacto
+ * @property convergencia Indica si aplica convergencia (1) o no (0)
+ * @property tipo_negocio_id ID del tipo de negocio asociado
+ * @property fecha_realizacion Fecha en que se realiza la venta
+ * @property cliente_id ID del cliente asociado
+ * @property domicilio_id ID del domicilio asociado a la venta
+ * @property empleado_id ID del empleado que realiza la venta
+ */
+export interface IVentaCreate {
+  comentario_horario_contacto: string;
+  convergencia: 1 | 0;
+  tipo_negocio_id: number;
+  fecha_realizacion: Date;
+  cliente_id: number;
+  domicilio_id: number;
+  empleado_id: number;
+  origen_dato_id: number;
+}
+
+/**
+ * Interface para actualizar un DetalleBaf existente.
+ * Todos los campos son opcionales; podés actualizar uno o varios.
+ * @property id - ID del cliente
+ * @property tipo_documento - Tipo de documento
+ * @property numero_documento - Número de documento
+ * @property nombre - Nombre del cliente
+ * @property apellido - Apellido del cliente  
+ * @property fecha_nacimiento - Fecha de nacimiento del cliente
+ * @property telefono_secundario - Teléfono secundario del cliente
+ * @property activo - Estado del cliente (1: activo, 0: inactivo)
+ * @property correo_electronico - Correo electrónico del cliente
+
+ */
+export interface IClienteAttributes {
+    id: number;
+    tipo_documento: number;
+    numero_documento: string;
+    nombre: string;
+    apellido: string;
+    fecha_nacimiento: string;
+    telefono_secundario: string;
+    activo: 1 | 0;
+    correo_electronico: string;
+  }
+
+  /**
+   * @property id
+   * @property cliente_id
+   * @property nombre_calle
+   * @property numero_calle
+   * @property entre_calle_1
+   * @property entre_calle_2
+   * @property barrio_id
+   * @property activo
+   * @property piso
+   * @property departamento
+   */
+  export interface IDomicilioAttributes {
+    id: number;
+    cliente_id: number;
+    nombre_calle: string;
+    numero_calle: string;
+    entre_calle_1: string;
+    entre_calle_2: string;
+    barrio_id: number;
+    activo: number;
+    piso: number;
+    departamento: string;
+  }
+
+/**
+ * 
+ * @property id
+ * @property nombre
+ * @property codigo_postal
+ * @property activo
+ */
+  
+export interface IBarrioAttributes {
+    id: number;
+    nombre: string;
+    codigo_postal: string;
+    activo: 0 | 1;
+  }
+  
+
+  /**
+ * Interface que representa los atributos completos del modelo TelefonoPrincipal.
+ * Incluye todos los campos tal cual están en la base de datos.
+ * 
+ * @property id - ID autoincremental del registro
+ * @property cliente_id - ID del cliente asociado
+ * @property numero_telefono - Número de teléfono principal
+ * @property fecha_modificacion - Fecha de última modificación
+ * @property activo - Estado del registro (1: activo, 0: inactivo)
+ */
+export interface ITelefonoPrincipalAttributes {
+  id: number;
+  cliente_id: number;
+  numero_telefono: string;
+  fecha_modificacion: Date; // o DateTime si decidís usar luxon
+  activo: 1 | 0;
+}
+
+
+// Interface para venta con detalle
+
+/**
+ * 
+ * @property datosVenta
+ * @property detalles
+ * @property cliente
+ * @property telefonos_principales
+ * @property domicilio
+ * @property barrio
+ */
+
+export interface IVentaConDetalle {
+  datosVenta: IVentaCreate;
+  detalles: IDetallePortaCreate | IDatalleBafCreate;
+  cliente: IClienteAttributes;
+  telefonos_principales: ITelefonoPrincipalAttributes[];
+  domicilio: IDomicilioAttributes;
+  barrio: IBarrioAttributes;
 }

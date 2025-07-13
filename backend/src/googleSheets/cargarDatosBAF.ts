@@ -53,7 +53,7 @@ export const agregarFilaPorNombreColumnas = async (dataObject: NuevaFilaBaf | Nu
     if (tipo_negocio_id == 1) {
       spreadsheetId = spreadsheetIdPorta;
       sheetName = sheetNamePorta;
-    } else if (tipo_negocio_id === 2) {
+    } else if (tipo_negocio_id == 2) {
       spreadsheetId = spreadsheetIdBaf;
       sheetName = sheetNameBaf;
     } else {
