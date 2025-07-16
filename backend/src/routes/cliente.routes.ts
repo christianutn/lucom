@@ -44,6 +44,8 @@ router.post('/',
         body('telefono_secundario').optional().isString().trim().withMessage('El campo telefono_secundario debe ser una cadena de texto'),
         body('fecha_nacimiento').optional().isString().trim().withMessage('El campo fecha_nacimiento debe ser una cadena de texto'),
         body('correo_electronico').optional().isEmail().trim().withMessage('El campo correo_electronico debe ser una cadena de texto'),
+        body('fecha_nacimiento').optional().isString().trim().withMessage('El campo fecha_nacimiento debe ser una cadena de texto')
+            .matches(/^\d{4}-\d{2}-\d{2}$/).withMessage('El campo fecha_nacimiento debe ser una cadena de texto con el formato YYYY-MM-DD'),
     ],
     manejarValidacionErrores,
     createCliente);

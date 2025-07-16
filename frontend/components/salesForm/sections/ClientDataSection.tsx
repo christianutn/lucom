@@ -8,7 +8,7 @@ import DomicilioSelectionModal from '../common/DomicilioSelectionModal';
 import { getTiposDocumento, getClientes, getServiciosConvergentes, getBarrios } from '../../../services/api';
 import { TipoDocumento as TipoDocOption, Cliente, ClientDataState, ClientSearchFilters, Domicilio, TelefonoPrincipal, Barrio, SelectOption } from '../../../types';
 import { useNotification } from '../../../hooks/useNotification';
-
+import formatName from '../../../utils/formatName';
 interface ClientDataSectionProps {
   data: ClientDataState;
   onChange: <K extends keyof ClientDataState>(field: K, value: ClientDataState[K]) => void;
@@ -19,17 +19,19 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
   const [tiposDocumento, setTiposDocumento] = useState<TipoDocOption[]>([]);
   const [serviciosConvergentes, setServiciosConvergentes] = useState<SelectOption[]>([]);
   const [barriosOptions, setBarriosOptions] = useState<SelectOption[]>([]);
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [isDomicilioModalOpen, setIsDomicilioModalOpen] = useState(false);
-  
+
   const [searchFilters, setSearchFilters] = useState<ClientSearchFilters>({ tipo_documento: '', numero_documento: '', apellido: '', nombre: '' });
   const [searchResults, setSearchResults] = useState<Cliente[]>([]);
   const [selectedClient, setSelectedClient] = useState<Cliente | null>(null);
   const { showNotification } = useNotification();
 
   const [showAddressForm, setShowAddressForm] = useState(false);
+
+
 
   // Lista de opciones para el select de barrios, incluyendo la opción de crear uno nuevo.
   const allBarriosOptions: SelectOption[] = [
@@ -40,10 +42,10 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
   const fetchInitialData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [tdRes, scRes, bRes] = await Promise.all([ getTiposDocumento(), getServiciosConvergentes(), getBarrios() ]);
+      const [tdRes, scRes, bRes] = await Promise.all([getTiposDocumento(), getServiciosConvergentes(), getBarrios()]);
       setTiposDocumento(tdRes);
       setServiciosConvergentes(scRes);
-      setBarriosOptions(bRes.map((b: Barrio)  => ({ id: b.id.toString(), descripcion: b.nombre, activo: b.activo })));
+      setBarriosOptions(bRes.map((b: Barrio) => ({ id: b.id.toString(), descripcion: b.nombre, activo: b.activo })));
     } catch (error) {
       console.error("Error fetching client section data:", error);
       showNotification("Error al cargar datos iniciales para cliente.", "error");
@@ -65,9 +67,9 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
   const handleSearchClient = async () => {
     setIsSearching(true);
     setSearchResults([]);
-    setSelectedClient(null); 
-    onClientSelected(null); 
-    onChange('domicilioSeleccionadoId', ''); 
+    setSelectedClient(null);
+    onClientSelected(null);
+    onChange('domicilioSeleccionadoId', '');
     resetAddressFields();
     setShowAddressForm(false);
 
@@ -87,7 +89,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
 
   const handleSelectClient = (client: Cliente) => {
     setSelectedClient(client);
-    setSearchResults([]); 
+    setSearchResults([]);
     onClientSelected(client);
     onChange('tipoDocumentoId', client.tipo_documento.toString());
     onChange('numeroDocumento', client.numero_documento);
@@ -95,14 +97,15 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     onChange('apellido', client.apellido);
     onChange('email', client.correo_electronico || '');
     onChange('clienteId', client.id.toString());
-    const principalPhones = client.telefonosPrincipales?.filter(t => t.activo === 1).sort((a,b) => new Date(b.fecha_modificacion).getTime() - new Date(a.fecha_modificacion).getTime()).map(t => ({ numero: t.numero_telefono, id: t.id?.toString() || '' })) || [];
+    const principalPhones = client.telefonosPrincipales?.filter(t => t.activo === 1).sort((a, b) => new Date(b.fecha_modificacion).getTime() - new Date(a.fecha_modificacion).getTime()).map(t => ({ numero: t.numero_telefono, id: t.id?.toString() || '' })) || [];
     onChange('telefonosPrincipales', principalPhones.length > 0 ? principalPhones : [{ numero: '', id: '' }]);
     onChange('telefonoSecundario', client.telefono_secundario || '');
-    onChange('domicilioSeleccionadoId', ''); 
+    onChange('domicilioSeleccionadoId', '');
+    onChange('fechaNacimiento', client.fecha_nacimiento || '');
     resetAddressFields();
     setShowAddressForm(false);
   };
-  
+
   const handleDomicilioButtonClick = () => {
     if (selectedClient && selectedClient.domicilios?.length > 0) {
       setIsDomicilioModalOpen(true);
@@ -112,7 +115,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
       setShowAddressForm(true);
     }
   };
-  
+
   const handleModalSelectExisting = (domicilio: Domicilio) => {
     onChange('domicilioSeleccionadoId', domicilio.id.toString());
     onChange('nuevoDomicilio', {
@@ -135,8 +138,9 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     setIsDomicilioModalOpen(false);
     setShowAddressForm(true);
   };
-  
+
   const handleAddTelefonoPrincipal = () => {
+
     onChange('telefonosPrincipales', [...data.telefonosPrincipales, { numero: '', id: '' }]);
   };
 
@@ -152,65 +156,69 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
 
   const handleBarrioChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = e.target.value;
-    onChange('nuevoDomicilio', { 
-        ...data.nuevoDomicilio, 
-        barrioId: selectedId !== 'NUEVO_BARRIO' ? selectedId : 'NUEVO_BARRIO', 
-        nuevoBarrioNombre:  barriosOptions.find(b => b.id === selectedId)?.descripcion || ''
+    onChange('nuevoDomicilio', {
+      ...data.nuevoDomicilio,
+      barrioId: selectedId !== 'NUEVO_BARRIO' ? selectedId : 'NUEVO_BARRIO',
+      nuevoBarrioNombre: barriosOptions.find(b => b.id === selectedId)?.descripcion || ''
     });
   };
 
   const handleNuevoBarrioKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-        e.preventDefault(); // Previene que el formulario se envíe por error
-        const nuevoNombre = data.nuevoDomicilio.nuevoBarrioNombre.trim();
-        if (nuevoNombre === '') {
-            showNotification("Ingrese un nombre para el nuevo barrio.", "info");
-            return;
-        }
-        
-        // Creamos una opción temporal para el nuevo barrio
-        // Usamos el propio nombre como ID temporal, ya que es único en este contexto.
-        // El backend lo identificará como nuevo porque no es un número.
-        const tempId = nuevoNombre;
-        const nuevaOpcion: SelectOption = { id: tempId, descripcion: nuevoNombre, activo: 1 };
-        
-        // Añadimos la opción a la lista para que aparezca en el select
-        setBarriosOptions(prev => [...prev, nuevaOpcion]);
-        
-        // Actualizamos el estado del formulario para seleccionar el nuevo barrio
-        // y mantener los datos del domicilio que ya estaban cargados.
-        onChange('nuevoDomicilio', {
-            ...data.nuevoDomicilio,
-            barrioId: tempId,
-            // 'nuevoBarrioNombre' ya tiene el valor correcto
-        });
+      e.preventDefault(); // Previene que el formulario se envíe por error
+      const nuevoNombre = data.nuevoDomicilio.nuevoBarrioNombre.trim();
+      if (nuevoNombre === '') {
+        showNotification("Ingrese un nombre para el nuevo barrio.", "info");
+        return;
+      }
+
+      // Creamos una opción temporal para el nuevo barrio
+      // Usamos el propio nombre como ID temporal, ya que es único en este contexto.
+      // El backend lo identificará como nuevo porque no es un número.
+      const tempId = nuevoNombre;
+      const nuevaOpcion: SelectOption = { id: tempId, descripcion: nuevoNombre, activo: 1 };
+
+      // Añadimos la opción a la lista para que aparezca en el select
+      setBarriosOptions(prev => [...prev, nuevaOpcion]);
+
+      // Actualizamos el estado del formulario para seleccionar el nuevo barrio
+      // y mantener los datos del domicilio que ya estaban cargados.
+      onChange('nuevoDomicilio', {
+        ...data.nuevoDomicilio,
+        barrioId: tempId,
+        // 'nuevoBarrioNombre' ya tiene el valor correcto
+      });
     }
   };
-  
+
   const activeClientDomicilios = selectedClient?.domicilios.filter(d => d.activo === 1) || [];
 
   if (isLoading) {
     return (
-        <Card title="Datos del Cliente">
-            <div className="relative h-40">
-                <Spinner fullScreen={false}/>
-            </div>
-        </Card>
+      <Card title="Datos del Cliente">
+        <div className="relative h-40">
+          <Spinner fullScreen={false} />
+        </div>
+      </Card>
     );
   }
 
   return (
     <Card title="Datos del Cliente" className="mb-6">
-      {isSearching && <Spinner fullScreen={false}/>}
-      
+      {isSearching && <Spinner fullScreen={false} />}
+
       {/* SECCIÓN DE BÚSQUEDA DE CLIENTE */}
       <div className="mb-6 p-4 border border-gray-700 rounded-lg bg-gray-800">
         <h3 className="text-lg font-semibold mb-3 text-gray-200">Buscar Cliente Existente</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <Select label="Tipo Doc." id="searchTipoDoc" options={tiposDocumento.map(td => ({ id: td.id.toString(), descripcion: td.descripcion, activo: td.activo }))} value={searchFilters.tipo_documento} onChange={(e) => handleSearchChange('tipo_documento', e.target.value)} emptyOptionLabel="Todos" />
-          <Input label="Nro. Doc." id="searchNroDoc" value={searchFilters.numero_documento} onChange={(e) => handleSearchChange('numero_documento', e.target.value)} />
+          <Input label="Nro. Doc." id="searchNroDoc" value={searchFilters.numero_documento} onChange={(e) =>
+            handleSearchChange('numero_documento', e.target.value)
+
+          } />
           <Input label="Apellido" id="searchApellido" value={searchFilters.apellido} onChange={(e) => handleSearchChange('apellido', e.target.value)} />
           <Input label="Nombre" id="searchNombre" value={searchFilters.nombre} onChange={(e) => handleSearchChange('nombre', e.target.value)} />
+
         </div>
         <Button onClick={handleSearchClient} variant="secondary" disabled={isSearching}>
           {isSearching ? 'Buscando...' : 'Buscar Cliente'}
@@ -229,24 +237,32 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
           </ul>
         </div>
       )}
-      
+
       {/* SECCIÓN DE DATOS DEL CLIENTE */}
       <h3 className="text-lg font-semibold mb-4 mt-6 text-gray-200">{selectedClient ? `Editando Cliente: ${selectedClient.nombre} ${selectedClient.apellido}` : 'Ingresar Nuevo Cliente'}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Select label="Tipo de Documento" id="tipoDocumento" options={tiposDocumento.map(td => ({ id: td.id.toString(), descripcion: td.descripcion, activo: td.activo }))} value={data.tipoDocumentoId} onChange={e => onChange('tipoDocumentoId', e.target.value)} required emptyOptionLabel="Seleccione tipo"/>
+        <Select label="Tipo de Documento" id="tipoDocumento" options={tiposDocumento.map(td => ({ id: td.id.toString(), descripcion: td.descripcion, activo: td.activo }))} value={data.tipoDocumentoId} onChange={e => onChange('tipoDocumentoId', e.target.value)} required emptyOptionLabel="Seleccione tipo" />
         <Input label="Número de Documento" id="numeroDocumento" value={data.numeroDocumento} onChange={e => onChange('numeroDocumento', e.target.value)} required />
-        <Input label="Nombre" id="nombre" value={data.nombre} onChange={e => onChange('nombre', e.target.value)} required />
-        <Input label="Apellido" id="apellido" value={data.apellido} onChange={e => onChange('apellido', e.target.value)} required />
-        
+        <Input label="Nombre" id="nombre" value={data.nombre} onChange={e => onChange('nombre', formatName(e.target.value))} required />
+        <Input label="Apellido" id="apellido" value={data.apellido} onChange={e => onChange('apellido', formatName(e.target.value))} required />
+
+        <Input
+          label="Fecha de nacimiento"
+          type="date"
+          id="fechaNacimiento"
+          value={data.fechaNacimiento || ''}
+          onChange={e => onChange('fechaNacimiento', e.target.value)}
+        />
+
         <div className="md:col-span-2 space-y-3">
-            <label className="block text-sm font-medium text-gray-300 mb-1">Teléfono/s de contacto principal</label>
-            {data.telefonosPrincipales.map((tel, index) => (
-                <div key={index} className="flex items-center gap-2">
-                    <Input label="" id={`telPrincipal-${index}`} type="tel" value={tel.numero} onChange={e => handleTelefonoPrincipalChange(index, e.target.value)} placeholder="Número principal" className="flex-grow"/>
-                    {data.telefonosPrincipales.length > 1 && <Button type="button" variant="danger" onClick={() => handleRemoveTelefonoPrincipal(index)} className="py-2 px-3 text-sm shrink-0">Eliminar</Button>}
-                </div>
-            ))}
-            <Button type="button" variant="secondary" onClick={handleAddTelefonoPrincipal} className="text-sm py-2">+ Añadir teléfono</Button>
+          <label className="block text-sm font-medium text-gray-300 mb-1">Teléfono/s de contacto principal</label>
+          {data.telefonosPrincipales.map((tel, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <Input label="" id={`telPrincipal-${index}`} type="tel" value={tel.numero} onChange={e => handleTelefonoPrincipalChange(index, e.target.value)} placeholder="Número principal" className="flex-grow" />
+              {data.telefonosPrincipales.length > 1 && <Button type="button" variant="danger" onClick={() => handleRemoveTelefonoPrincipal(index)} className="py-2 px-3 text-sm shrink-0">Eliminar</Button>}
+            </div>
+          ))}
+          <Button type="button" variant="secondary" onClick={handleAddTelefonoPrincipal} className="text-sm py-2">+ Añadir teléfono</Button>
         </div>
 
         <Input label="Teléfono de contacto secundario (opcional)" id="telefonoSecundario" type="tel" value={data.telefonoSecundario} onChange={e => onChange('telefonoSecundario', e.target.value)} />
@@ -255,74 +271,74 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
 
       {/* SECCIÓN DE DOMICILIO CORREGIDA */}
       <div className="mt-6 pt-6 border-t border-gray-700">
-          <h4 className="text-md font-semibold mb-3 text-gray-200">Domicilio del Cliente</h4>
-          <Button type="button" variant="secondary" className="mb-4 text-sm py-2" onClick={handleDomicilioButtonClick}>
-              {selectedClient?.domicilios && selectedClient.domicilios.length > 0 ? 'Seleccionar o Cargar Domicilio' : 'Cargar Domicilio'}
-          </Button>
+        <h4 className="text-md font-semibold mb-3 text-gray-200">Domicilio del Cliente</h4>
+        <Button type="button" variant="secondary" className="mb-4 text-sm py-2" onClick={handleDomicilioButtonClick}>
+          {selectedClient?.domicilios && selectedClient.domicilios.length > 0 ? 'Seleccionar o Cargar Domicilio' : 'Cargar Domicilio'}
+        </Button>
 
-          {showAddressForm && (
-              <div className="space-y-4 p-4 border border-gray-700 rounded-lg bg-gray-800 mt-2">
-                  <h5 className="text-sm font-semibold text-gray-300">
-                      {data.domicilioSeleccionadoId === 'NUEVO' ? 'Datos del Nuevo Domicilio' : 'Editando Domicilio Seleccionado'}
-                  </h5>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Input label="Calle" id="calle" value={data.nuevoDomicilio.calle} onChange={e => onChange('nuevoDomicilio', {...data.nuevoDomicilio, calle: e.target.value})} required />
-                      <Input label="Altura / Numeración" id="altura" value={data.nuevoDomicilio.altura} onChange={e => onChange('nuevoDomicilio', {...data.nuevoDomicilio, altura: e.target.value})} required />
-                      <Input label="Piso (opcional)" id="piso" value={data.nuevoDomicilio.piso} onChange={e => onChange('nuevoDomicilio', {...data.nuevoDomicilio, piso: e.target.value})} />
-                      <Input label="Departamento (opcional)" id="departamento" value={data.nuevoDomicilio.departamento} onChange={e => onChange('nuevoDomicilio', {...data.nuevoDomicilio, departamento: e.target.value})} />
-                      <Input label="Entre calle 1 (opcional)" id="entreCalle1" value={data.nuevoDomicilio.entreCalle1} onChange={e => onChange('nuevoDomicilio', {...data.nuevoDomicilio, entreCalle1: e.target.value})} />
-                      <Input label="Entre calle 2 (opcional)" id="entreCalle2" value={data.nuevoDomicilio.entreCalle2} onChange={e => onChange('nuevoDomicilio', {...data.nuevoDomicilio, entreCalle2: e.target.value})} />
-                  
-                      <div className="md:col-span-2">
-                          <Select label="Barrio" id="barrio" options={allBarriosOptions} value={data.nuevoDomicilio.barrioId} onChange={handleBarrioChange} emptyOptionLabel="Seleccione un barrio" required />
-                          {data.nuevoDomicilio.barrioId === 'NUEVO_BARRIO' && (
-                              <div className="mt-2 p-3 bg-gray-700 rounded">
-                                  <Input label="Nombre del nuevo barrio" id="nuevoBarrioNombre" value={data.nuevoDomicilio.nuevoBarrioNombre} onChange={e => onChange('nuevoDomicilio', {...data.nuevoDomicilio, nuevoBarrioNombre: e.target.value})} onKeyDown={handleNuevoBarrioKeyDown} placeholder="Escriba el nombre y presione Enter" />
-                              </div>
-                          )}
-                      </div>
+        {showAddressForm && (
+          <div className="space-y-4 p-4 border border-gray-700 rounded-lg bg-gray-800 mt-2">
+            <h5 className="text-sm font-semibold text-gray-300">
+              {data.domicilioSeleccionadoId === 'NUEVO' ? 'Datos del Nuevo Domicilio' : 'Editando Domicilio Seleccionado'}
+            </h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input label="Calle" id="calle" value={data.nuevoDomicilio.calle} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, calle: e.target.value })} required />
+              <Input label="Altura / Numeración" id="altura" value={data.nuevoDomicilio.altura} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, altura: e.target.value })} required />
+              <Input label="Piso (opcional)" id="piso" value={data.nuevoDomicilio.piso} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, piso: e.target.value })} />
+              <Input label="Departamento (opcional)" id="departamento" value={data.nuevoDomicilio.departamento} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, departamento: e.target.value })} />
+              <Input label="Entre calle 1 (opcional)" id="entreCalle1" value={data.nuevoDomicilio.entreCalle1} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, entreCalle1: e.target.value })} />
+              <Input label="Entre calle 2 (opcional)" id="entreCalle2" value={data.nuevoDomicilio.entreCalle2} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, entreCalle2: e.target.value })} />
+
+              <div className="md:col-span-2">
+                <Select label="Barrio" id="barrio" options={allBarriosOptions} value={data.nuevoDomicilio.barrioId} onChange={handleBarrioChange} emptyOptionLabel="Seleccione un barrio" required />
+                {data.nuevoDomicilio.barrioId === 'NUEVO_BARRIO' && (
+                  <div className="mt-2 p-3 bg-gray-700 rounded">
+                    <Input label="Nombre del nuevo barrio" id="nuevoBarrioNombre" value={data.nuevoDomicilio.nuevoBarrioNombre} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, nuevoBarrioNombre: e.target.value })} onKeyDown={handleNuevoBarrioKeyDown} placeholder="Escriba el nombre y presione Enter" />
                   </div>
+                )}
               </div>
-          )}
+            </div>
+          </div>
+        )}
       </div>
-      
+
       {/* SECCIÓN DE CONVERGENCIA */}
       <div className="mt-6 pt-6 border-t border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Input label="Horario de contacto" id="horarioContacto" value={data.horarioContacto} onChange={e => onChange('horarioContacto', e.target.value)} placeholder="Ej: 9-12hs y 14-18hs"/>
+        <Input label="Horario de contacto" id="horarioContacto" value={data.horarioContacto} onChange={e => onChange('horarioContacto', e.target.value)} placeholder="Ej: 9-12hs y 14-18hs" />
         <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">¿Convergencia?</label>
-            <div className="flex items-center space-x-4">
-                {(['Sí', 'No'] as const).map(option => (
-                    <label key={option} className="flex items-center space-x-2 cursor-pointer">
-                        <input type="radio" name="convergencia" value={option} checked={data.convergencia === option} onChange={e => onChange('convergencia', e.target.value as 'Sí' | 'No')} className="form-radio h-4 w-4 text-indigo-600 bg-gray-700 border-gray-600 focus:ring-indigo-500" />
-                        <span className="text-gray-300">{option}</span>
-                    </label>
-                ))}
-            </div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">¿Convergencia?</label>
+          <div className="flex items-center space-x-4">
+            {(['Sí', 'No'] as const).map(option => (
+              <label key={option} className="flex items-center space-x-2 cursor-pointer">
+                <input type="radio" name="convergencia" value={option} checked={data.convergencia === option} onChange={e => onChange('convergencia', e.target.value as 'Sí' | 'No')} className="form-radio h-4 w-4 text-indigo-600 bg-gray-700 border-gray-600 focus:ring-indigo-500" />
+                <span className="text-gray-300">{option}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         {data.convergencia === 'Sí' && (
           <div className="md:col-span-2">
             <label htmlFor="serviciosConvergentes" className="block text-sm font-medium text-gray-300 mb-1">Servicios Convergentes</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 border border-gray-700 rounded-md bg-gray-800">
-                {serviciosConvergentes.map(servicio => (
-                    <label key={servicio.id} className="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" value={servicio.id.toString()} checked={data.serviciosConvergentesIds.includes(servicio.id.toString())} onChange={e => {
-                                const id = e.target.value;
-                                const newIds = data.serviciosConvergentesIds.includes(id)
-                                    ? data.serviciosConvergentesIds.filter(sid => sid !== id)
-                                    : [...data.serviciosConvergentesIds, id];
-                                onChange('serviciosConvergentesIds', newIds);
-                            }} className="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500" />
-                        <span className="text-sm text-gray-300">{servicio.descripcion}</span>
-                    </label>
-                ))}
+              {serviciosConvergentes.map(servicio => (
+                <label key={servicio.id} className="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" value={servicio.id.toString()} checked={data.serviciosConvergentesIds.includes(servicio.id.toString())} onChange={e => {
+                    const id = e.target.value;
+                    const newIds = data.serviciosConvergentesIds.includes(id)
+                      ? data.serviciosConvergentesIds.filter(sid => sid !== id)
+                      : [...data.serviciosConvergentesIds, id];
+                    onChange('serviciosConvergentesIds', newIds);
+                  }} className="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500" />
+                  <span className="text-sm text-gray-300">{servicio.descripcion}</span>
+                </label>
+              ))}
             </div>
           </div>
         )}
       </div>
 
-       <DomicilioSelectionModal
+      <DomicilioSelectionModal
         isOpen={isDomicilioModalOpen}
         onClose={() => setIsDomicilioModalOpen(false)}
         domicilios={activeClientDomicilios}

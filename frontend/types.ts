@@ -101,6 +101,7 @@ export interface ClientDataState {
   horarioContacto: string;
   convergencia: 'Sí' | 'No' | '';
   serviciosConvergentesIds: string[];
+  fechaNacimiento ?: string;
 }
 
 export interface InternetBafState {

@@ -29,6 +29,7 @@ const clientDataDefault: ClientDataState = {
   horarioContacto: '',
   convergencia: '',
   serviciosConvergentesIds: [],
+  fechaNacimiento: '',
 };
 
 const internetBafDefault: InternetBafState = {
@@ -140,6 +141,7 @@ const SalesForm: React.FC = () => {
         apellido: clientData.apellido,
         telefono_secundario: clientData.telefonoSecundario,
         correo_electronico: clientData.email,
+        fecha_nacimiento: clientData.fechaNacimiento,
       },
       telefonos_principales: clientData.telefonosPrincipales
         .filter(tel => tel.numero.trim() !== '') // Solo enviar teléfonos con número
@@ -166,7 +168,7 @@ const SalesForm: React.FC = () => {
       }
     };
 
-    
+
 
     // Ahora 'ventaConDetalle' tiene la estructura exacta que el backend espera
 
@@ -193,11 +195,15 @@ const SalesForm: React.FC = () => {
         setTipoNegocioDescripcion={setTipoNegocioDescripcion}
       />
 
-      <ClientDataSection
-        data={clientData}
-        onChange={handleClientDataChange}
-        onClientSelected={handleClientSelected}
-      />
+      {
+        initialSelection.tipoNegocioId && (
+          <ClientDataSection
+            data={clientData}
+            onChange={handleClientDataChange}
+            onClientSelected={handleClientSelected}
+          />
+        )
+      }
 
       {initialSelection.tipoNegocioId && (
         <AdditionalSaleDataSection

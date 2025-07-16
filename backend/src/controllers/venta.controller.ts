@@ -252,6 +252,7 @@ const tratarCliente = async (cliente: IClienteAttributes, t: Transaction): Promi
                 apellido: cliente.apellido,
                 telefono_secundario: cliente.telefono_secundario,
                 correo_electronico: cliente.correo_electronico,
+                fecha_nacimiento: cliente.fecha_nacimiento
             }, { transaction: t });
 
             cliente.id = nuevoCliente.id;
@@ -265,6 +266,7 @@ const tratarCliente = async (cliente: IClienteAttributes, t: Transaction): Promi
                 apellido: cliente.apellido,
                 telefono_secundario: cliente.telefono_secundario,
                 correo_electronico: cliente.correo_electronico,
+                fecha_nacimiento: cliente.fecha_nacimiento
             };
 
             await Cliente.update(datosClienteParaActualizar, {
