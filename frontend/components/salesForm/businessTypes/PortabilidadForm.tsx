@@ -6,6 +6,7 @@ import Spinner from '../../common/Spinner.js';
 import { getGigas, getCompanias } from '../../../services/api.js';
 import { SelectOption, PortabilidadState, Cliente, TelefonoPrincipal } from '../../../types.js';
 import { useNotification } from '../../../hooks/useNotification.js';
+import { validarTelefono } from '@/utils/validarDatosEntrada.js';
 
 interface PortabilidadFormProps {
   data: PortabilidadState;
@@ -18,6 +19,7 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, sel
   const [companiasOptions, setCompaniasOptions] = useState<SelectOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { showNotification } = useNotification();
+  const [errorNim, setErrorNim] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,6 +31,9 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, sel
         ]);
         setGigasOptions(gigasRes);
         setCompaniasOptions(companiasRes);
+        setErrorNim('El NIM es obligatorio y debe ser un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX');
+
+        
       } catch (error) {
         console.error("Error fetching Portabilidad form data:", error);
         showNotification("Error al cargar datos para Portabilidad.", "error");
@@ -71,7 +76,16 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, sel
         label="NIM a Portar"
         id="nimAPortar"
         value={data.nimAPortar}
-        onChange={e => onChange('nimAPortar', e.target.value)}
+        onChange={e => {
+          onChange('nimAPortar', e.target.value)
+
+          if (validarTelefono(e.target.value)) {
+            setErrorNim('');
+          } else {
+            setErrorNim('Debe ingresar un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX');
+          }
+        }}
+        error={errorNim}
         required
       />
       <Select

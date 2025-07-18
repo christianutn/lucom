@@ -2,6 +2,7 @@
 import { IStrategyDetalleVenta,  } from './IStrategyDetalleVenta.js';
 import BafStrategy from './venta_baf.strategy.js';
 import PortaStrategy from './venta_porta.strategy.js';
+import BbooStrategy from './venta_bboo.strategy.js';
 import AppError from '../../utils/appError.js';
 
 // Mapeamos el ID del tipo de negocio a su clase de estrategia correspondiente.
@@ -9,6 +10,7 @@ import AppError from '../../utils/appError.js';
 const strategies: { [key: number]: new () => IStrategyDetalleVenta } = {
     1: PortaStrategy,
     2: BafStrategy,
+    3: BbooStrategy
     
 };
 

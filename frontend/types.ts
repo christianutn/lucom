@@ -50,6 +50,20 @@ export interface Domicilio {
 }
 
 // Updated Cliente to match new structure
+
+/**
+ * Parámetros del cliente
+ * @typedef {Object} Cliente
+ * @property {number} id - ID del cliente
+ * @property {number} tipo_documento - ID del tipo de documento
+ * @property {string} numero_documento - Número de documento
+ * @property {string} nombre - Nombre del cliente
+ * @property {string} apellido - Apellido del cliente
+ * @property {string} fecha_nacimiento - Fecha de nacimiento del cliente
+ * @property {string} telefono_secundario - Telefono secundario del cliente
+ * @property {string} correo_electronico - Correo electrónica del cliente
+ * @property {number} activo - Estado del cliente
+ */
 export interface Cliente {
   id: number;
   tipo_documento: number; // ID of the document type
@@ -104,6 +118,33 @@ export interface ClientDataState {
   fechaNacimiento ?: string;
 }
 
+
+export interface ClientDataStateErrors {
+  tipoDocumentoId: string; // Store ID as string for select compatibility
+  numeroDocumento: string;
+  nombre: string;
+  apellido: string;
+  telefonosPrincipales: string
+  telefonoSecundario: string;
+  email: string;
+  domicilioSeleccionadoId: string;
+  clienteId: string;
+  nuevoDomicilio: {
+    calle: string;
+    altura: string;
+    entreCalle1: string;
+    entreCalle2:string;
+    barrioId: string; // ID of selected barrio or new barrio name if creating
+    nuevoBarrioNombre: string; // If adding a new barrio
+    piso: string; // Stays string for form input
+    departamento: string; // Stays string for form input
+  };
+  horarioContacto: string;
+  convergencia: string;
+  serviciosConvergentesIds: string
+  fechaNacimiento : string;
+}
+
 export interface InternetBafState {
   tipoDomicilioId: string;
   abonoId: string;
@@ -111,6 +152,12 @@ export interface InternetBafState {
   cantidadDecos: string;
   tipoConvergenciaId: string;
   lineaConvergente: string;
+}
+
+export interface ConsultaBbooState {
+  tipoDomicilioId: string;
+  lineaClaroAConsultar: string;
+  pedidoRellamado: string;
 }
 
 export interface PortabilidadState {

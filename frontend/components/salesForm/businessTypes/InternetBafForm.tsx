@@ -6,6 +6,7 @@ import Spinner from '../../common/Spinner.js';
 import { getTiposDomicilios, getAbonos, getTiposConvergencias } from '../../../services/api.js';
 import { SelectOption, InternetBafState } from '../../../types.js';
 import { useNotification } from '../../../hooks/useNotification.js';
+import { validarTelefono } from '@/utils/validarDatosEntrada.js';
 
 interface InternetBafFormProps {
   data: InternetBafState;
@@ -18,6 +19,7 @@ const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => 
   const [tiposConvergencia, setTiposConvergencia] = useState<SelectOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { showNotification } = useNotification();
+  const [errorLineaConvergente, setErrorLineaConvergente] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,12 +99,23 @@ const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => 
         value={data.tipoConvergenciaId}
         onChange={e => onChange('tipoConvergenciaId', e.target.value)}
         emptyOptionLabel="Seleccione tipo de convergencia"
+        required
       />
       <Input
         label="Línea Convergente"
         id="lineaConvergenteBaf"
         value={data.lineaConvergente}
-        onChange={e => onChange('lineaConvergente', e.target.value)}
+        onChange={e => {
+          onChange('lineaConvergente', e.target.value)
+          if (validarTelefono(e.target.value)) {
+            setErrorLineaConvergente("");
+          } else {
+            setErrorLineaConvergente("Debe ingresar un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX");
+          }
+
+        }}
+        error={errorLineaConvergente}
+        required
       />
     </div>
   );

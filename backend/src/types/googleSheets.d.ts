@@ -81,4 +81,31 @@ export interface NuevaFilaPorta {
     "CONTACTO ALTERNATIVO"?: string;
     "Domicilio del Cliente (ingrese calle, nro, piso, dpto, entrecalles y otros datos extras)"?: string;
     "ORIGEN DATO"?: string;
-}   
+}
+
+/**
+ * 
+ * @property {string} [Marca temporal] Fecha y hora de carga del registro (generalmente generada por Google Sheets).
+ * @property {string} [Vendedor] Nombre del vendedor que cargó la fila.
+ * @property {string} [TIPO DE DOMICILIO] Tipo de domicilio (ejemplo: casa, departamento, etc).
+ * @property {string} [Entre Calles] Detalle de la ubicación entre calles.
+ * @property {string} [Cliente Nombre y Apellido] Nombre y apellido del cliente.
+ * @property {string} [Teléfono Cliente] Teléfono principal del cliente.
+ * @property {string} [LINEA CLARO A CONSULTAR (Todas las líneas PosPago masivo, ahora aplican a Convergencia, EXCLUYE LINEA FIJA)] Linea claro a consultar.
+ * @property {string} [PEDIDO RELLAMADO Ingresar DNI. Si es urgente agregar la palabra ALERTA] DNI del cliente.
+ */
+
+export interface NuevaFilaBboo {
+    [key: string]: string | number | undefined;
+    "Marca temporal": string,
+    "Vendedor": string,
+    "TIPO DE DOMICILIO": string,
+    "Calle y Nro": string,
+    "Entre Calles": string,
+    "Cliente Nombre y Apellido": string,
+    "Cliente DNI (Incluir la sigla LC o LE si no es DNI)": string,
+    "Teléfono Cliente": string,
+    "LINEA CLARO A CONSULTAR (Todas las líneas PosPago masivo, ahora aplican a Convergencia, EXCLUYE LINEA FIJA) ": string,
+    "PEDIDO RELLAMADO Ingresar DNI. Si es urgente agregar la palabra ALERTA": string,
+
+};

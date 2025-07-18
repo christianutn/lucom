@@ -16,11 +16,15 @@ import OrigenDato from "../../models/origen_dato.models.js";
 const STRATEGY_IDS = {
     PORTA:'1',
     BAF: '2',
+    BBOO: '3'
 };
 
 // Obtenemos las reglas de la estrategia BAF una sola vez.
 const bafRules = getStrategy(parseInt(STRATEGY_IDS.BAF)).getValidationRules();
 const portaRules = getStrategy(parseInt(STRATEGY_IDS.PORTA)).getValidationRules();
+const bbooRules = getStrategy(parseInt(STRATEGY_IDS.BBOO)).getValidationRules();
+
+console.log('Reglas de validación de estrategia BAF:', bbooRules);
 
 // Definimos el middleware como un array de validadores y manejadores.
 // NO es una función async. Es simplemente un array.
@@ -90,6 +94,9 @@ export const validarCreacionVenta = (): (ValidationChain | ((req: any, res: any,
         [body('datosVenta.tipo_negocio_id').equals(STRATEGY_IDS.BAF), ...bafRules],
         // Aquí irían las otras estrategias cuando las descomentes.
         [body('datosVenta.tipo_negocio_id').equals(STRATEGY_IDS.PORTA), ...portaRules],
+
+        // --- Grupo 3: El manejador que procesa los resultados de todas las validaciones anteriores ---
+        [body('datosVenta.tipo_negocio_id').equals(STRATEGY_IDS.BBOO), ...bbooRules],
 
     ], {
         message: 'Los detalles proporcionados no son válidos o no corresponden con el tipo de negocio seleccionado.',

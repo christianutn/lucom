@@ -131,6 +131,16 @@ class BafStrategy implements IStrategyDetalleVenta {
                 throw new AppError('Tipo de domicilio no encontrado', 404);
             }
 
+            //Aramamos string del domicilio
+
+            const domicilioString = `${domicilio.nombre_calle?.trim() || 'Domicilio desconocido'} ${domicilio.numero_calle || 'Nro. de calle desconocido'}
+            Piso: ${domicilio.piso || 'No aplica'} Dpto: ${domicilio.departamento || 'No aplica'}
+            Entre calles: ${domicilio.entre_calle_1 || 'Entre calles desconocidas'} / ${domicilio.entre_calle_2 || 'Entre calles desconocidas'}
+            Barrio: ${barrio.nombre || 'Barrio no cargado'}
+            `
+
+            //Formateamos desde AAAA-MM-DD a DD/MM/AAAA
+            const fechaNacimientoString = cliente.fecha_nacimiento?.split('-').reverse().join('/') || 'Fecha de nacimiento desconocida';
 
             
             const nuevaFila: NuevaFilaBaf = {
@@ -138,8 +148,8 @@ class BafStrategy implements IStrategyDetalleVenta {
                 "Vendedor": `${empleado?.nombre|| 'Nombre desconocido'}, ${empleado?.apellido || 'Apellido desconocido'}`,
                 "DNI (solo numeros, sin puntos. Si es CUIT anteponer CUIT al número)": `${tipoDocumento?.descripcion}:  ${cliente.numero_documento.trim() || 'Documento desconocido'}`,
                 "Apellido y Nombre": `${cliente?.apellido.trim() || 'Apellido desconocido'}, ${cliente?.nombre.trim() || 'Nombre desconocido'}`,
-                "Fecha Nacim.": `${cliente?.fecha_nacimiento || 'Fecha de nacimiento desconocida'}`,
-                "Domicilio": `${domicilio?.nombre_calle.trim() || 'Domicilio desconocido'} ${domicilio?.numero_calle || 'Nro. de calle desconocido'}`,
+                "Fecha Nacim.": `${fechaNacimientoString}`,
+                "Domicilio": `${domicilioString}`,
                 "Entre Calles": `${domicilio?.entre_calle_1 || 'Entre calles desconocidas'} / ${domicilio?.entre_calle_2 || 'Entre calles desconocidas'}`,
                 "Telefono1": `${telefonosPrincipalesString}`,
                 "Telefono2 IMPORTANTE mejora contacto!": `${cliente?.telefono_secundario ? cliente.telefono_secundario : 'Telefono desconocido'}`,
@@ -151,7 +161,7 @@ class BafStrategy implements IStrategyDetalleVenta {
                 "Horario Contacto / OBSERVACIONES": `${venta?.comentario_horario_contacto || 'Horario de contacto desconocido'}`,
                 "Origen Dato": `${origenDato?.descripcion || 'Origen de datos desconocido'}`,
                 "PORTABILIDAD - CONVERGENCIA": `${tipoConvergencia?.descripcion || 'Tipo de convergencia desconocido'}`,
-                "TIPO DOMICILIO": `${tipoDomicilio?.descripcion || 'Tipo de domicilio desconocido'}`,
+                "TIPO DOMICILIO": `${tipoDomicilio?.descripcion}`,
             };
             console.log(nuevaFila)
 

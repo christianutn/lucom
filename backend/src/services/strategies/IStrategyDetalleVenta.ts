@@ -8,13 +8,15 @@ import { IClienteAttributes } from "../../types/cliente.js";
 import { ITelefonoPrincipalAttributes } from "../../types/telefono_principal.js";
 import { IDomicilioAttributes } from "../../types/domicilio.js";
 import { IBarrioAttributes } from "../../types/barrio.js";
+import { IDetalleBbooCreate } from '../../types/detalle_bboo.js';
+
 export interface IStrategyDetalleVenta {
 
-  createDetails(detalles: IDatalleBafCreate | IDetallePortaCreate, transaction: Transaction): Promise<any>;
+  createDetails(detalles: IDatalleBafCreate | IDetallePortaCreate | IDetalleBbooCreate, transaction: Transaction): Promise<any>;
   getDetails(venta_id: number, transaction: Transaction): Promise<any>;
   getValidationRules(): ValidationChain[];
   cargar_nueva_fila(venta: IVentaAttributes, 
-    detalles: IDatalleBafCreate | IDetallePortaCreate, 
+    detalles: IDatalleBafCreate | IDetallePortaCreate | IDetalleBbooCreate, 
     cliente: IClienteAttributes, 
     telefonos_principales: ITelefonoPrincipalAttributes[], 
     domicilio: IDomicilioAttributes, 

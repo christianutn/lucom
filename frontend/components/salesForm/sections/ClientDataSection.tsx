@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, use } from 'react';
 import Card from '../../common/Card';
 import Input from '../../common/Input';
 import Select from '../../common/Select';
@@ -6,16 +6,21 @@ import Button from '../../common/Button';
 import Spinner from '../../common/Spinner';
 import DomicilioSelectionModal from '../common/DomicilioSelectionModal';
 import { getTiposDocumento, getClientes, getServiciosConvergentes, getBarrios } from '../../../services/api';
-import { TipoDocumento as TipoDocOption, Cliente, ClientDataState, ClientSearchFilters, Domicilio, TelefonoPrincipal, Barrio, SelectOption } from '../../../types';
+import { TipoDocumento as TipoDocOption, Cliente, ClientDataState, ClientSearchFilters, Domicilio, TelefonoPrincipal, Barrio, SelectOption, ClientDataStateErrors } from '../../../types';
 import { useNotification } from '../../../hooks/useNotification';
-import formatName from '../../../utils/formatName';
+import { formatName, formatearNombreCalle } from "../../../utils/formatear";
+import { validarNombreApellido, validarCuit, validarTelefono, validarEmail } from '../../../utils/validarDatosEntrada';
+
+
 interface ClientDataSectionProps {
   data: ClientDataState;
+  errors: ClientDataStateErrors;
   onChange: <K extends keyof ClientDataState>(field: K, value: ClientDataState[K]) => void;
   onClientSelected: (client: Cliente | null) => void;
+  onClientDataErrors: (errors: ClientDataStateErrors) => void;
 }
 
-const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, onClientSelected }) => {
+const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, onClientSelected, errors, onClientDataErrors }) => {
   const [tiposDocumento, setTiposDocumento] = useState<TipoDocOption[]>([]);
   const [serviciosConvergentes, setServiciosConvergentes] = useState<SelectOption[]>([]);
   const [barriosOptions, setBarriosOptions] = useState<SelectOption[]>([]);
@@ -30,6 +35,8 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
   const { showNotification } = useNotification();
 
   const [showAddressForm, setShowAddressForm] = useState(false);
+
+
 
 
 
@@ -93,12 +100,16 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     onClientSelected(client);
     onChange('tipoDocumentoId', client.tipo_documento.toString());
     onChange('numeroDocumento', client.numero_documento);
+    errors.numeroDocumento = '';
     onChange('nombre', client.nombre);
+    errors.nombre = '';
     onChange('apellido', client.apellido);
+    errors.apellido = '';
     onChange('email', client.correo_electronico || '');
     onChange('clienteId', client.id.toString());
     const principalPhones = client.telefonosPrincipales?.filter(t => t.activo === 1).sort((a, b) => new Date(b.fecha_modificacion).getTime() - new Date(a.fecha_modificacion).getTime()).map(t => ({ numero: t.numero_telefono, id: t.id?.toString() || '' })) || [];
     onChange('telefonosPrincipales', principalPhones.length > 0 ? principalPhones : [{ numero: '', id: '' }]);
+    errors.telefonosPrincipales = client.telefonosPrincipales?.length > 0 ? '' : 'El cliente debe tener al menos un teléfono principal.';
     onChange('telefonoSecundario', client.telefono_secundario || '');
     onChange('domicilioSeleccionadoId', '');
     onChange('fechaNacimiento', client.fecha_nacimiento || '');
@@ -128,6 +139,9 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
       piso: domicilio.piso?.toString() || '',
       departamento: domicilio.departamento || '',
     });
+    errors.nuevoDomicilio.calle = '';
+    errors.nuevoDomicilio.altura = '';
+    errors.nuevoDomicilio.nuevoBarrioNombre = '';
     setIsDomicilioModalOpen(false);
     setShowAddressForm(true);
   };
@@ -161,12 +175,20 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
       barrioId: selectedId !== 'NUEVO_BARRIO' ? selectedId : 'NUEVO_BARRIO',
       nuevoBarrioNombre: barriosOptions.find(b => b.id === selectedId)?.descripcion || ''
     });
+
+    if (barriosOptions.find(b => b.id === selectedId)?.descripcion != '') {
+      errors.nuevoDomicilio.nuevoBarrioNombre = '';
+    } else {
+      errors.nuevoDomicilio.nuevoBarrioNombre = 'Debes ingresar un nombre para el nuevo barrio.';
+    }
   };
 
   const handleNuevoBarrioKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault(); // Previene que el formulario se envíe por error
       const nuevoNombre = data.nuevoDomicilio.nuevoBarrioNombre.trim();
+
+
       if (nuevoNombre === '') {
         showNotification("Ingrese un nombre para el nuevo barrio.", "info");
         return;
@@ -190,6 +212,8 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
       });
     }
   };
+
+
 
   const activeClientDomicilios = selectedClient?.domicilios.filter(d => d.activo === 1) || [];
 
@@ -241,32 +265,137 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
       {/* SECCIÓN DE DATOS DEL CLIENTE */}
       <h3 className="text-lg font-semibold mb-4 mt-6 text-gray-200">{selectedClient ? `Editando Cliente: ${selectedClient.nombre} ${selectedClient.apellido}` : 'Ingresar Nuevo Cliente'}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Select label="Tipo de Documento" id="tipoDocumento" options={tiposDocumento.map(td => ({ id: td.id.toString(), descripcion: td.descripcion, activo: td.activo }))} value={data.tipoDocumentoId} onChange={e => onChange('tipoDocumentoId', e.target.value)} required emptyOptionLabel="Seleccione tipo" />
-        <Input label="Número de Documento" id="numeroDocumento" value={data.numeroDocumento} onChange={e => onChange('numeroDocumento', e.target.value)} required />
-        <Input label="Nombre" id="nombre" value={data.nombre} onChange={e => onChange('nombre', formatName(e.target.value))} required />
-        <Input label="Apellido" id="apellido" value={data.apellido} onChange={e => onChange('apellido', formatName(e.target.value))} required />
+        <Select label="Tipo de Documento" id="tipoDocumento" options={tiposDocumento.map(td => ({ id: td.id.toString(), descripcion: td.descripcion, activo: td.activo }))} value={data.tipoDocumentoId}
+          onChange={e => {
+            onChange('tipoDocumentoId', e.target.value);
+
+            if (e.target.value == "9" && !validarCuit(data.numeroDocumento)) {
+              onClientDataErrors({ ...errors, numeroDocumento: 'El CUIT es invalido. Estos deben ser ingresado sin guiones.' });
+            } else if ( (e.target.value != "9" && data.numeroDocumento.length !== 8 && data.numeroDocumento.length !== 7 ) || !/^\d+$/.test(data.numeroDocumento)) {
+              console.log(data.numeroDocumento);
+              onClientDataErrors({ ...errors, numeroDocumento: 'El número de documento debe tener entre 7 y 8 dígitos numéricos.' });
+            } else {
+              onClientDataErrors({ ...errors, numeroDocumento: '' });
+            }
+
+
+          }} required emptyOptionLabel="Seleccione tipo" />
+        <Input label="Número de Documento" id="numeroDocumento" value={data.numeroDocumento}
+          onChange={e => {
+
+            // Asegurarse de que solo se ingresen dígitos numéricos
+            const sanitizedValue = e.target.value.replace(/[^0-9]/g, '');
+            onChange('numeroDocumento', sanitizedValue);
+
+            if (data.tipoDocumentoId == "9") {
+              if (validarCuit(e.target.value)) {
+                onClientDataErrors({ ...errors, numeroDocumento: '' });
+              } else {
+                onClientDataErrors({ ...errors, numeroDocumento: 'Debes ingresar un CUIT válido. Estos deben ser ingresados sin guiones.' });
+              }
+            } else if (data.tipoDocumentoId != "9") {
+              if (e.target.value.length !== 8 && e.target.value.length !== 7 || !/^\d+$/.test(e.target.value)) {
+                onClientDataErrors({ ...errors, numeroDocumento: 'El número de documento debe tener entre 7 y 8 dígitos numéricos.' });
+              } else {
+                onClientDataErrors({ ...errors, numeroDocumento: '' });
+              }
+            }
+
+          }}
+          error={errors.numeroDocumento}
+          required />
+        <Input label="Nombre" id="nombre" value={data.nombre}
+          onChange={e => {
+            const formattedName = formatName(e.target.value);
+            onChange('nombre', formattedName);
+
+            if (validarNombreApellido(formattedName)) {
+              onClientDataErrors({ ...errors, nombre: '' });
+            } else {
+              onClientDataErrors({ ...errors, nombre: 'Debes ingresar un nombre válido.' });
+            }
+
+          }}
+          error={errors.nombre}
+          required />
+        <Input label="Apellido" id="apellido" value={data.apellido}
+          onChange={e => {
+            const formattedApellido = formatName(e.target.value);
+            onChange('apellido', formattedApellido);
+            if (validarNombreApellido(formattedApellido)) {
+              onClientDataErrors({ ...errors, apellido: '' });
+            } else {
+              onClientDataErrors({ ...errors, apellido: 'Debes ingresar un apellido válido.' });
+            }
+          }}
+          error={errors.apellido}
+          required />
 
         <Input
           label="Fecha de nacimiento"
           type="date"
           id="fechaNacimiento"
           value={data.fechaNacimiento || ''}
-          onChange={e => onChange('fechaNacimiento', e.target.value)}
+          onChange={e => {
+            onChange('fechaNacimiento', e.target.value);
+            // Si el año es anterior a hoy marcar error
+            const selectedDate = new Date(e.target.value);
+            const currentYear = new Date().getFullYear();
+            if (selectedDate.getFullYear() > currentYear) {
+              onClientDataErrors({ ...errors, fechaNacimiento: 'La fecha de nacimiento no puede ser en el futuro.' });
+            } else {
+              onClientDataErrors({ ...errors, fechaNacimiento: '' });
+            }
+          }}
+          error={errors.fechaNacimiento}
+          required
         />
 
         <div className="md:col-span-2 space-y-3">
           <label className="block text-sm font-medium text-gray-300 mb-1">Teléfono/s de contacto principal</label>
           {data.telefonosPrincipales.map((tel, index) => (
             <div key={index} className="flex items-center gap-2">
-              <Input label="" id={`telPrincipal-${index}`} type="tel" value={tel.numero} onChange={e => handleTelefonoPrincipalChange(index, e.target.value)} placeholder="Número principal" className="flex-grow" />
+              <Input label="" id={`telPrincipal-${index}`} type="tel" value={tel.numero}
+                onChange={e => {
+                  handleTelefonoPrincipalChange(index, e.target.value)
+                  if (validarTelefono(e.target.value)) {
+                    onClientDataErrors({ ...errors, telefonosPrincipales: '' });
+                  } else {
+                    onClientDataErrors({ ...errors, telefonosPrincipales: 'Debes ingresar un teléfono válido. Debe tener 10 dígitos.' });
+                  }
+                }}
+                placeholder="Número principal" className="flex-grow" error={errors.telefonosPrincipales} required />
               {data.telefonosPrincipales.length > 1 && <Button type="button" variant="danger" onClick={() => handleRemoveTelefonoPrincipal(index)} className="py-2 px-3 text-sm shrink-0">Eliminar</Button>}
             </div>
           ))}
           <Button type="button" variant="secondary" onClick={handleAddTelefonoPrincipal} className="text-sm py-2">+ Añadir teléfono</Button>
         </div>
 
-        <Input label="Teléfono de contacto secundario (opcional)" id="telefonoSecundario" type="tel" value={data.telefonoSecundario} onChange={e => onChange('telefonoSecundario', e.target.value)} />
-        <Input label="Correo electrónico (opcional)" id="email" type="email" value={data.email} onChange={e => onChange('email', e.target.value)} />
+        <Input label="Teléfono de contacto secundario (opcional)" id="telefonoSecundario" type="tel" value={data.telefonoSecundario}
+          onChange={e => {
+            onChange('telefonoSecundario', e.target.value);
+
+            if (validarTelefono(e.target.value) || e.target.value === '') {
+              onClientDataErrors({ ...errors, telefonoSecundario: '' });
+            } else {
+              onClientDataErrors({ ...errors, telefonoSecundario: 'Debes ingresar un teléfono válido. Debe tener 10 dígitos.' });
+            }
+
+          }}
+          error={errors.telefonoSecundario}
+        />
+        <Input label="Correo electrónico (opcional)" id="email" type="email" value={data.email}
+          onChange={e => {
+            onChange('email', e.target.value);
+
+            if (validarEmail(e.target.value) || e.target.value === '') {
+              onClientDataErrors({ ...errors, email: '' });
+            } else {
+              onClientDataErrors({ ...errors, email: 'Debes ingresar un correo electrónica válido.' });
+            }
+          }}
+
+          error={errors.email} />
       </div>
 
       {/* SECCIÓN DE DOMICILIO CORREGIDA */}
@@ -282,18 +411,46 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
               {data.domicilioSeleccionadoId === 'NUEVO' ? 'Datos del Nuevo Domicilio' : 'Editando Domicilio Seleccionado'}
             </h5>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input label="Calle" id="calle" value={data.nuevoDomicilio.calle} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, calle: e.target.value })} required />
-              <Input label="Altura / Numeración" id="altura" value={data.nuevoDomicilio.altura} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, altura: e.target.value })} required />
+              <Input label="Calle" id="calle" value={data.nuevoDomicilio.calle}
+                onChange={e => {
+                  const formattedCalle = formatearNombreCalle(e.target.value);
+                  onChange('nuevoDomicilio', { ...data.nuevoDomicilio, calle: formattedCalle })
+                  if (e.target.value === '') {
+                    onClientDataErrors({ ...errors, nuevoDomicilio: { ...errors.nuevoDomicilio, calle: 'Debes ingresar una calle.' } });
+                  } else {
+                    onClientDataErrors({ ...errors, nuevoDomicilio: { ...errors.nuevoDomicilio, calle: '' } });
+                  }
+                }}
+                error={errors.nuevoDomicilio.calle}
+                required />
+              <Input label="Altura / Numeración" id="altura" value={data.nuevoDomicilio.altura}
+                onChange={e => {
+                  onChange('nuevoDomicilio', { ...data.nuevoDomicilio, altura: e.target.value })
+                  if (e.target.value === '') {
+                    onClientDataErrors({ ...errors, nuevoDomicilio: { ...errors.nuevoDomicilio, altura: 'Debes ingresar una altura.' } });
+                  } else {
+                    onClientDataErrors({ ...errors, nuevoDomicilio: { ...errors.nuevoDomicilio, altura: '' } });
+                  }
+                }}
+                error={errors.nuevoDomicilio.altura}
+                required />
               <Input label="Piso (opcional)" id="piso" value={data.nuevoDomicilio.piso} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, piso: e.target.value })} />
               <Input label="Departamento (opcional)" id="departamento" value={data.nuevoDomicilio.departamento} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, departamento: e.target.value })} />
-              <Input label="Entre calle 1 (opcional)" id="entreCalle1" value={data.nuevoDomicilio.entreCalle1} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, entreCalle1: e.target.value })} />
-              <Input label="Entre calle 2 (opcional)" id="entreCalle2" value={data.nuevoDomicilio.entreCalle2} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, entreCalle2: e.target.value })} />
+              <Input label="Entre calle 1 (opcional)" id="entreCalle1" value={data.nuevoDomicilio.entreCalle1}
+                onChange={e => {
+                  const formattedCalle = formatearNombreCalle(e.target.value);
+                  onChange('nuevoDomicilio', { ...data.nuevoDomicilio, entreCalle1: formattedCalle })
+                }} />
+              <Input label="Entre calle 2 (opcional)" id="entreCalle2" value={data.nuevoDomicilio.entreCalle2} onChange={e => {
+                const formattedCalle = formatearNombreCalle(e.target.value);
+                onChange('nuevoDomicilio', { ...data.nuevoDomicilio, entreCalle2: formattedCalle })
+              }} />
 
               <div className="md:col-span-2">
-                <Select label="Barrio" id="barrio" options={allBarriosOptions} value={data.nuevoDomicilio.barrioId} onChange={handleBarrioChange} emptyOptionLabel="Seleccione un barrio" required />
+                <Select label="Barrio" id="barrio" options={allBarriosOptions} value={data.nuevoDomicilio.barrioId} onChange={handleBarrioChange} emptyOptionLabel="Seleccione un barrio" error={errors.nuevoDomicilio.nuevoBarrioNombre} required />
                 {data.nuevoDomicilio.barrioId === 'NUEVO_BARRIO' && (
                   <div className="mt-2 p-3 bg-gray-700 rounded">
-                    <Input label="Nombre del nuevo barrio" id="nuevoBarrioNombre" value={data.nuevoDomicilio.nuevoBarrioNombre} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, nuevoBarrioNombre: e.target.value })} onKeyDown={handleNuevoBarrioKeyDown} placeholder="Escriba el nombre y presione Enter" />
+                    <Input label="Nombre del nuevo barrio" id="nuevoBarrioNombre" value={data.nuevoDomicilio.nuevoBarrioNombre} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, nuevoBarrioNombre: e.target.value })} onKeyDown={handleNuevoBarrioKeyDown} placeholder="Escriba el nombre y presione Enter" required />
                   </div>
                 )}
               </div>

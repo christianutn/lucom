@@ -3,7 +3,7 @@ import Card from '../../common/Card.js';
 import InternetBafForm from '../businessTypes/InternetBafForm.js';
 import PortabilidadForm from '../businessTypes/PortabilidadForm.js';
 import ConsultaBbooForm from '../businessTypes/ConsultaBbooForm.js';
-import { InternetBafState, PortabilidadState, Cliente } from '../../../types.js';
+import { InternetBafState, PortabilidadState, Cliente, ConsultaBbooState } from '../../../types.js';
 
 interface AdditionalSaleDataSectionProps {
   tipoNegocioId: string;
@@ -13,6 +13,8 @@ interface AdditionalSaleDataSectionProps {
   portabilidadData: PortabilidadState;
   onPortabilidadChange: <K extends keyof PortabilidadState>(field: K, value: PortabilidadState[K]) => void;
   selectedClient: Cliente | null;
+  consultaBbooData: ConsultaBbooState;
+  onConsultaBbooChange: <K extends keyof ConsultaBbooState>(field: K, value: ConsultaBbooState[K]) => void;
 }
 
 const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
@@ -23,6 +25,8 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
   portabilidadData,
   onPortabilidadChange,
   selectedClient,
+  consultaBbooData,
+  onConsultaBbooChange
 }) => {
   
   const renderFormBasedOnType = () => {
@@ -32,7 +36,7 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
       case "1": // Portabilidad
         return <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} selectedClient={selectedClient} />;
       case "3": // Consulta BBOO
-        return <ConsultaBbooForm />;
+        return <ConsultaBbooForm data={consultaBbooData} onChange={onConsultaBbooChange} />;
       default:
         return <p className="text-gray-400">Seleccione un tipo de negocio para ver campos adicionales.</p>;
     }

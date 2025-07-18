@@ -1,12 +1,13 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import InitialSelectionSection from './sections/InitialSelectionSection';
 import ClientDataSection from './sections/ClientDataSection';
 import AdditionalSaleDataSection from './sections/AdditionalSaleDataSection';
 import Button from '../common/Button';
 import Spinner from '../common/Spinner';
 import { useNotification } from '../../hooks/useNotification';
-import { InitialSelectionState, ClientDataState, InternetBafState, PortabilidadState, Cliente } from '../../types';
+import { InitialSelectionState, ClientDataState, InternetBafState, PortabilidadState, Cliente, ClientDataStateErrors, ConsultaBbooState } from '../../types';
 import { postVenta } from '../../services/api';
+import { error } from 'console';
 
 const initialSelectionDefault: InitialSelectionState = {
   tipoNegocioId: '',
@@ -32,6 +33,26 @@ const clientDataDefault: ClientDataState = {
   fechaNacimiento: '',
 };
 
+const clientDataErrorsDefault: ClientDataStateErrors = {
+  tipoDocumentoId: '',
+  numeroDocumento: 'El número de documento es requerido',
+  nombre: 'El nombre es requerido',
+  apellido: 'El apellido es requerido',
+  telefonosPrincipales: 'Al menos debe ingresarse un número de teléfono principal',
+  telefonoSecundario: '',
+  email: '',
+  domicilioSeleccionadoId: '',
+  clienteId: '',
+  nuevoDomicilio: {
+    calle: 'La calle es requerida', altura: 'La altura es requerida', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: 'Debes ingresar el nombre del barrio', piso: '', departamento: '',
+  },
+  horarioContacto: '',
+  convergencia: '',
+  serviciosConvergentesIds: '',
+  fechaNacimiento: '',
+};
+
+
 const internetBafDefault: InternetBafState = {
   tipoDomicilioId: '', abonoId: '', tvhd: '', cantidadDecos: '', tipoConvergenciaId: '', lineaConvergente: '',
 };
@@ -40,15 +61,28 @@ const portabilidadDefault: PortabilidadState = {
   nimAPortar: '', gigasId: '', companiaActualId: '',
 };
 
+
+const consultaBbooStateDefault: ConsultaBbooState = {
+  tipoDomicilioId: '',
+  lineaClaroAConsultar: '',
+  pedidoRellamado: '',
+}
+
+
+
 const SalesForm: React.FC = () => {
   const [initialSelection, setInitialSelection] = useState<InitialSelectionState>(initialSelectionDefault);
   const [clientData, setClientData] = useState<ClientDataState>(clientDataDefault);
   const [internetBafData, setInternetBafData] = useState<InternetBafState>(internetBafDefault);
   const [portabilidadData, setPortabilidadData] = useState<PortabilidadState>(portabilidadDefault);
+  const [consultaBbooData, setConsultaBbooData] = useState<ConsultaBbooState>(consultaBbooStateDefault);
   const [selectedClient, setSelectedClient] = useState<Cliente | null>(null);
   const [tipoNegocioDescripcion, setTipoNegocioDescripcion] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const { showNotification } = useNotification();
+
+  // Errores
+  const [clientDataErrors, setClientDataErrors] = useState<ClientDataStateErrors>(clientDataErrorsDefault);
 
   const handleInitialSelectionChange = useCallback(<K extends keyof InitialSelectionState>(field: K, value: InitialSelectionState[K]) => {
     setInitialSelection(prev => ({ ...prev, [field]: value }));
@@ -56,6 +90,7 @@ const SalesForm: React.FC = () => {
 
   const handleClientDataChange = useCallback(<K extends keyof ClientDataState>(field: K, value: ClientDataState[K]) => {
     setClientData(prev => ({ ...prev, [field]: value }));
+
   }, []);
 
   const handleInternetBafChange = useCallback(<K extends keyof InternetBafState>(field: K, value: InternetBafState[K]) => {
@@ -74,12 +109,20 @@ const SalesForm: React.FC = () => {
     setPortabilidadData(prev => ({ ...prev, [field]: value }));
   }, []);
 
+  const handleConsultaBbooChange = useCallback(<K extends keyof ConsultaBbooState>(field: K, value: ConsultaBbooState[K]) => {
+    setConsultaBbooData(prev => ({ ...prev, [field]: value }));
+  }, []);
   const handleClientSelected = useCallback((client: Cliente | null) => {
     setSelectedClient(client);
     if (!client) {
       setPortabilidadData(prev => ({ ...prev, nimAPortar: '' }));
     }
   }, []);
+
+  const handleClientDataErrors = useCallback((errors: ClientDataStateErrors) => {
+    setClientDataErrors(errors);
+  }, []);
+
 
   const resetForm = useCallback(() => {
     setInitialSelection(initialSelectionDefault);
@@ -89,6 +132,7 @@ const SalesForm: React.FC = () => {
     setSelectedClient(null);
     setTipoNegocioDescripcion('');
   }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,7 +164,13 @@ const SalesForm: React.FC = () => {
         horario_contacto: clientData.horarioContacto, // Este campo es común pero el backend lo espera en detalles BAF
         tipo_convergencia_id: internetBafData.tipoConvergenciaId,
       };
-    }
+    } else if (initialSelection.tipoNegocioId === '3') { // Consulta BBOO
+      detallesPayload = {
+        tipos_domicilios_id: consultaBbooData.tipoDomicilioId,
+        linea_claro_a_consultar: consultaBbooData.lineaClaroAConsultar,
+        pedido_rellamado: consultaBbooData.pedidoRellamado,
+      }
+    };
 
     // 2. Construir el objeto principal 'ventaConDetalle'
     const ventaConDetalle: any = {
@@ -173,17 +223,22 @@ const SalesForm: React.FC = () => {
     // Ahora 'ventaConDetalle' tiene la estructura exacta que el backend espera
 
     try {
+
+      // Si los campos obligatorios son vacios, mostrar un aviso
+      // Recorrer un objeto por clave
+
       await postVenta(ventaConDetalle);
       showNotification('Venta guardada exitosamente.', 'success');
       resetForm();
     } catch (error) {
-      console.error("Error saving sale:", error);
-      const errorMessage = (error as any).response?.data?.message || 'Error al guardar la venta. Intente nuevamente.';
+      const errorMessage = 'Error al guardar la venta. Revise los datos del formulario.';
       showNotification(errorMessage, 'error');
     } finally {
       setIsSaving(false);
     }
   };
+
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 pb-24">
@@ -201,6 +256,8 @@ const SalesForm: React.FC = () => {
             data={clientData}
             onChange={handleClientDataChange}
             onClientSelected={handleClientSelected}
+            onClientDataErrors={handleClientDataErrors}
+            errors={clientDataErrors}
           />
         )
       }
@@ -214,6 +271,8 @@ const SalesForm: React.FC = () => {
           portabilidadData={portabilidadData}
           onPortabilidadChange={handlePortabilidadChange}
           selectedClient={selectedClient}
+          consultaBbooData={consultaBbooData}
+          onConsultaBbooChange={handleConsultaBbooChange}
         />
       )}
 
