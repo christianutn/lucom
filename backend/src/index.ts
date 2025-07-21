@@ -13,7 +13,7 @@ import AppError from "./utils/appError.js";
 import { Request, Response, NextFunction } from "express";
 
 const app = express();
-const PORT = process.env.PORT || 4001;
+const PORT = process.env.PORT || 8080;
 
 export const initDb = async () => {
     try {
