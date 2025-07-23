@@ -19,12 +19,12 @@
             "internalConsoleOptions": "openOnSessionStart",
             // Mantenemos tus variables de entorno
             "env": {
-                "DB_NAME": "bd_lucom",
-                "DB_USER": "root",
-                "DB_PASSWORD": "cairo2024",
-                "DB_CONNECTION_NAME": "localhost",
+                "DB_NAME": "lucom_sales",
+                "DB_USER": "lucom-user",
+                "DB_PASSWORD": "Lucom2025*",
+                "DB_CONNECTION_NAME": "lucom-test:southamerica-east1:lucom-db",
                 "DB_PORT": "3306",
-                "PORT": "4001",
+                "PORT": "8080",
                 "SALT": "11",
                 "JWT_SECRET": "klskdjweorfoqnaoqkwje$%kjs47*-asdw",
                 "NODE_ENV": "desarrollo" // Cambiado a 'development' para depuración
@@ -44,12 +44,12 @@
                 "<node_internals>/**"
             ],
             "env": {
-                "DB_NAME": "bd_lucom",
-                "DB_USER": "root",
-                "DB_PASSWORD": "cairo2024",
-                "DB_CONNECTION_NAME": "localhost",
+                "DB_NAME": "lucom_sales",
+                "DB_USER": "lucom-user",
+                "DB_PASSWORD": "Lucom2025*",
+                "DB_CONNECTION_NAME": "lucom-test:southamerica-east1:lucom-db",
                 "DB_PORT": "3306",
-                "PORT": "4001",
+                "PORT": "8080",
                 "SALT": "11",
                 "JWT_SECRET": "klskdjweorfoqnaoqkwje$%kjs47*-asdw",
                 "NODE_ENV": "production" // Mantenido como 'production' o 'produccion'

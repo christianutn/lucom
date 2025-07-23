@@ -8,7 +8,7 @@ import { useNotification } from '../../hooks/useNotification.js';
 
 // Removed: import Logo from '../../assets/logo.svg.js'; 
 // Use a direct path relative to the public root (where index.html is served)
-const logoPath = './assets/logo.png'; 
+const logoPath = 'logo.png'; 
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 60 * 1000; // 1 minute

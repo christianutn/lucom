@@ -49,7 +49,7 @@ const globalErrorHandler = (err: AppError, req: Request, res: Response, next: Ne
     // Determina si estamos en desarrollo o producción
     if (process.env.NODE_ENV === 'desarrollo' || process.env.NODE_ENV === 'test') {
         sendErrorDev(err, res);
-    } else if (process.env.NODE_ENV === 'produccion') {
+    } else if (process.env.NODE_ENV === 'production') {
         // Aquí puedes copiar propiedades del error original si quieres,
         // pero generalmente err.isOperational ya maneja esto.
         // Si tienes errores específicos de MongoDB o Mongoose que quieres convertir a AppError,
