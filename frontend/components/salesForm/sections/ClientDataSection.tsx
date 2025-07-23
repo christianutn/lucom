@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, use } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Card from '../../common/Card';
 import Input from '../../common/Input';
 import Select from '../../common/Select';
@@ -6,7 +6,7 @@ import Button from '../../common/Button';
 import Spinner from '../../common/Spinner';
 import DomicilioSelectionModal from '../common/DomicilioSelectionModal';
 import { getTiposDocumento, getClientes, getServiciosConvergentes, getBarrios } from '../../../services/api';
-import { TipoDocumento as TipoDocOption, Cliente, ClientDataState, ClientSearchFilters, Domicilio, TelefonoPrincipal, Barrio, SelectOption, ClientDataStateErrors } from '../../../types';
+import { TipoDocumento as TipoDocOption, Cliente, ClientDataState, ClientSearchFilters, Domicilio, Barrio, SelectOption, ClientDataStateErrors } from '../../../types';
 import { useNotification } from '../../../hooks/useNotification';
 import { formatName, formatearNombreCalle } from "../../../utils/formatear";
 import { validarNombreApellido, validarCuit, validarTelefono, validarEmail } from '../../../utils/validarDatosEntrada';
@@ -19,6 +19,7 @@ interface ClientDataSectionProps {
   onClientSelected: (client: Cliente | null) => void;
   onClientDataErrors: (errors: ClientDataStateErrors) => void;
 }
+
 
 const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, onClientSelected, errors, onClientDataErrors }) => {
   const [tiposDocumento, setTiposDocumento] = useState<TipoDocOption[]>([]);
@@ -35,10 +36,6 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
   const { showNotification } = useNotification();
 
   const [showAddressForm, setShowAddressForm] = useState(false);
-
-
-
-
 
   // Lista de opciones para el select de barrios, incluyendo la opción de crear uno nuevo.
   const allBarriosOptions: SelectOption[] = [

@@ -7,7 +7,6 @@ import Spinner from '../common/Spinner';
 import { useNotification } from '../../hooks/useNotification';
 import { InitialSelectionState, ClientDataState, InternetBafState, PortabilidadState, Cliente, ClientDataStateErrors, ConsultaBbooState } from '../../types';
 import { postVenta } from '../../services/api';
-import { error } from 'console';
 
 const initialSelectionDefault: InitialSelectionState = {
   tipoNegocioId: '',
@@ -51,7 +50,54 @@ const clientDataErrorsDefault: ClientDataStateErrors = {
   serviciosConvergentesIds: '',
   fechaNacimiento: '',
 };
+const obtenerErrores = (errores: ClientDataStateErrors): string[] => {
+  const mensajesDeError: string[] = [];
 
+  const clavesNoObligatorias = [
+    'tipoDocumentoId',
+    'telefonoSecundario',
+    'email',
+    'domicilioSeleccionadoId',
+    'telefonoSecundario',
+    'email',
+    'clienteId',
+    'entreCalle1',
+    'entreCalle2',
+    'barrioId',
+    'piso',
+    'departamento',
+    'convergencia',
+    'serviciosConvergentesIds',
+  ];
+  // Iterar sobre las propiedades de nivel superior del objeto de errores
+  for (const key in errores) {
+    // Asegurarse de que la propiedad sea realmente del objeto y no heredada
+    if (Object.prototype.hasOwnProperty.call(errores, key)) {
+      const value = errores[key as keyof ClientDataStateErrors]; // Casteo para TypeScript
+
+      // Verificar si el valor es una cadena y si NO está vacía
+      if (typeof value === 'string' && value !== '' && !clavesNoObligatorias.includes(key)) {
+        mensajesDeError.push(value);
+      }
+    }
+  }
+
+  // Manejar las propiedades anidadas explícitamente (en este caso, 'nuevoDomicilio')
+  // Si tuvieras más objetos anidados, necesitarías una función recursiva o iteraciones adicionales.
+  if (errores.nuevoDomicilio) {
+    for (const nestedKey in errores.nuevoDomicilio) {
+      if (Object.prototype.hasOwnProperty.call(errores.nuevoDomicilio, nestedKey)) {
+        const nestedValue = errores.nuevoDomicilio[nestedKey as keyof typeof errores.nuevoDomicilio];
+
+        if (typeof nestedValue === 'string' && nestedValue !== '' && !clavesNoObligatorias.includes(nestedKey)) {
+          mensajesDeError.push(nestedValue);
+        }
+      }
+    }
+  }
+
+  return mensajesDeError;
+}
 
 const internetBafDefault: InternetBafState = {
   tipoDomicilioId: '', abonoId: '', tvhd: '', cantidadDecos: '', tipoConvergenciaId: '', lineaConvergente: '',
@@ -132,6 +178,28 @@ const SalesForm: React.FC = () => {
     setSelectedClient(null);
     setTipoNegocioDescripcion('');
   }, []);
+
+  const restErrors = useCallback(() => {
+    setClientDataErrors({
+      tipoDocumentoId: '',
+      numeroDocumento: 'El número de documento es requerido',
+      nombre: 'El nombre es requerido',
+      apellido: 'El apellido es requerido',
+      telefonosPrincipales: 'Al menos debe ingresarse un número de teléfono principal',
+      telefonoSecundario: '',
+      email: '',
+      domicilioSeleccionadoId: '',
+      clienteId: '',
+      nuevoDomicilio: {
+        calle: 'La calle es requerida', altura: 'La altura es requerida', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: 'Debes ingresar el nombre del barrio', piso: '', departamento: '',
+      },
+      horarioContacto: '',
+      convergencia: '',
+      serviciosConvergentesIds: '',
+      fechaNacimiento: '',
+    });
+  }, []);
+
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -226,10 +294,15 @@ const SalesForm: React.FC = () => {
 
       // Si los campos obligatorios son vacios, mostrar un aviso
       // Recorrer un objeto por clave
-
+      if (obtenerErrores(clientDataErrors).length > 0) {
+        const errorMessages = obtenerErrores(clientDataErrors).join(' - ');
+        showNotification(`Faltan completar los siguientes campos: ${errorMessages}`, 'error');
+        return;
+      }
       await postVenta(ventaConDetalle);
       showNotification('Venta guardada exitosamente.', 'success');
       resetForm();
+      restErrors();
     } catch (error) {
       const errorMessage = 'Error al guardar la venta. Revise los datos del formulario.';
       showNotification(errorMessage, 'error');

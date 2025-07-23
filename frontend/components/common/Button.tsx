@@ -8,7 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', fullWidth = false, className, ...props }) => {
   let baseStyle = "font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-bg";
-  
+
   if (fullWidth) {
     baseStyle += " w-full";
   }
@@ -20,7 +20,7 @@ const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', fullWidt
   } else if (variant === 'danger') {
     baseStyle += " bg-red-600 hover:bg-red-700 text-white focus:ring-red-500";
   } else if (variant === 'success') {
-     baseStyle += " bg-green-600 hover:bg-green-700 text-white focus:ring-green-500";
+    baseStyle += " bg-green-600 hover:bg-green-700 text-white focus:ring-green-500";
   }
 
 
@@ -28,13 +28,17 @@ const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', fullWidt
     baseStyle += " opacity-50 cursor-not-allowed";
   }
 
+
   return (
+
     <button
       className={`${baseStyle} ${className}`}
       {...props}
     >
       {children}
     </button>
+
+
   );
 };
 

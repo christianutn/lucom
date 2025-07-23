@@ -31,7 +31,6 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, sel
         ]);
         setGigasOptions(gigasRes);
         setCompaniasOptions(companiasRes);
-        setErrorNim('El NIM es obligatorio y debe ser un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX');
 
         
       } catch (error) {
@@ -57,6 +56,7 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, sel
       
       if (nimToPort) {
         onChange('nimAPortar', nimToPort);
+        setErrorNim(''); // Clear error if a valid phone is set
       } else {
          onChange('nimAPortar', ''); // Clear if no suitable phone found
       }

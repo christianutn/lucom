@@ -22,7 +22,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   }, [timeoutId]);
 
-  const showNotification = useCallback((message: string, type: AppNotification['type'], duration: number = 3000) => {
+  const showNotification = useCallback((message: string, type: AppNotification['type'], duration: number = 6000) => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
