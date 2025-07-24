@@ -6,6 +6,8 @@ import SalesPage from './pages/SalesPage.js';
 import { AuthContext } from './contexts/AuthContext.js';
 import Notification from './components/common/Notification.js';
 import { useNotification } from './hooks/useNotification.js';
+import UsuariosForm from './components/usuarios/usuariosForm.js';
+import OrigenDatoForm from './components/origenesDatos/origenDatosForm.js';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const auth = useContext(AuthContext);
@@ -32,6 +34,9 @@ const App: React.FC = () => {
             </ProtectedRoute>
           } 
         />
+        <Route path="/usuarios" element={<ProtectedRoute><UsuariosForm /></ProtectedRoute>} />
+        <Route path="/origenes-datos" element={<ProtectedRoute><OrigenDatoForm /></ProtectedRoute>} />
+        {/* Add more protected routes as needed */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>

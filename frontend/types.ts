@@ -346,3 +346,130 @@ export interface IVentaConDetalle {
   domicilio: IDomicilioAttributes;
   barrio: IBarrioAttributes;
 }
+
+export interface IUsuario {
+  empleado_id: number;
+  rol: string;
+  contrasena: string;
+  activo: 0 | 1;
+  empleado: IEmpleado; // Assuming empleado has a nested usuario object
+  nuevaContrasena?: string; // Optional for updates, required for creation
+  isNuevaContrasena: 0 | 1; // Flag to indicate if a new password is being set
+
+}
+
+export interface IEmpleado {
+  id: number;
+  nombre: string;
+  apellido: string;
+  correo_electronico: string;
+  activo: 0 | 1;
+}
+
+export interface IUsuarioUpdate {
+  empleado_id: number;
+  rol: string;
+  activo: 0 | 1;
+  nombre: string;
+  apellido: string;
+  correo_electronico: string;
+  isNuevaContrasena: 0 | 1; // Flag to indicate if a new password is being set
+  nuevaContrasena: string; // Optional for updates, required for creation
+}
+
+/**
+ * Interface para crear un nuevo Usuario.
+ * Todos los campos son obligatorios.
+ * @property empleado_id ID del empleado asociado al usuario
+ * @property rol Rol del usuario (VEND o ADM)
+ * @property activo Estado del usuario (1: activo, 0: inactivo)
+ * @property nombre Nombre del usuario
+ * @property apellido Apellido del usuario
+ * @property correo_electronico Correo electrónico del usuario
+ * @property contrasena Contraseña del usuario (opcional, si no se actualiza, se deja igual)
+ */
+
+export interface IUsuarioCreate {
+  rol: string;
+  activo: 0 | 1;
+  nombre: string;
+  apellido: string;
+  correo_electronico: string;
+  contrasena?: string; 
+}
+
+export interface IRol {
+  codigo: string;
+  descripcion: string;
+  activo: 0 | 1;
+}
+
+/**
+ * Interface para OrigenDato.
+ * @property id ID del origen de dato
+ * @property descripcion Descripción del origen de dato
+ * @property activo Estado del origen de dato (1: activo, 0: inactivo)
+ * 
+ */
+export interface IOrigenDato {
+  id: number;
+  descripcion: string;
+  activo: 0 | 1;
+}
+
+/**
+ * Interface para crear un nuevo OrigenDato.
+ * @property descripcion Descripción del origen de dato
+ */
+export interface IOrigenDatoCreate {
+  descripcion: string;
+}
+
+/**
+ * Interface para actualizar un OrigenDato.
+ * @property descripcion Descripción del origen de dato
+ * @property activo Estado del origen de dato (1: activo, 0: inactivo)
+ * 
+ */
+export interface IOrigenDatoUpdate {
+  descripcion: string;
+  activo: 0 | 1;
+  id: number;
+}
+
+
+
+
+
+/**
+ * Interface para OrigenDato.
+ * @property id ID del origen de dato
+ * @property descripcion Descripción del origen de dato
+ * @property activo Estado del origen de dato (1: activo, 0: inactivo)
+ * 
+ */
+export interface IAbono {
+  id: number;
+  descripcion: string;
+  activo: 0 | 1;
+}
+
+/**
+ * Interface para crear un nuevo OrigenDato.
+ * @property descripcion Descripción del origen de dato
+ */
+export interface IAbonoCreate {
+  descripcion: string;
+}
+
+/**
+ * Interface para actualizar un OrigenDato.
+ * @property descripcion Descripción del origen de dato
+ * @property activo Estado del origen de dato (1: activo, 0: inactivo)
+ * 
+ */
+export interface IAbonoUpdate {
+  descripcion: string;
+  activo: 0 | 1;
+  id: number;
+}

@@ -59,7 +59,7 @@ export const actualizarOrigenDato= async (req: Request, res: Response, next: Nex
 
 
     try {
-        if (req.body.hasOwnProperty('descripcion')) objetoActualizado.descripcion = req.body.descricion
+        if (req.body.hasOwnProperty('descripcion')) objetoActualizado.descripcion = req.body.descripcion
         if (req.body.hasOwnProperty('activo')) objetoActualizado.activo = req.body.activo
 
         const [actualizado] = await OrigenDato.update(

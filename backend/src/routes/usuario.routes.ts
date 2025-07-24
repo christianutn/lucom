@@ -37,18 +37,6 @@ router.post('/',
     passport.authenticate('jwt', { session: false }),
     autorizar(['ADM']),
     [
-        body('empleado_id').exists().isInt({ min: 1 }).withMessage('El id del empleado debe ser un entero positivo')
-        .custom(async (empleado_id) => {
-            const empleado = await Empleado.findByPk(empleado_id);
-            if (!empleado) {
-                throw new AppError('El empleado no existe', 400);
-            }
-
-            const usuario = await Usuario.findByPk(empleado_id);
-            if (usuario) {
-                throw new AppError('El empleado ya tiene un usuario', 400);
-            }
-        }),
         body('rol').exists().isString().isLength({ min: 2, max: 45 }).withMessage('El campo rol debe ser VEND o ADM')
         .custom(async (rol) => {
             const rolExistente = await Rol.findOne({ where: { codigo: rol } });
@@ -56,7 +44,11 @@ router.post('/',
                 throw new AppError('El rol no existe', 400);
             }
         }),
-        body('contrasena').exists().isString().isLength({ min: 4, max: 200 }).withMessage('La contrasena debe ser un string de 4 a 45 caracteres')
+        body('contrasena').exists().isString().isLength({ min: 4, max: 200 }).withMessage('La contrasena debe ser un string de 4 a 45 caracteres'),
+        body('activo').exists().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1'),
+        body('nombre').exists().isString().isLength({ min: 2, max: 45 }).withMessage('El nombre debe ser un string de 2 a 45 caracteres'),
+        body('apellido').exists().isString().isLength({ min: 2, max: 45 }).withMessage('El apellido debe ser un string de 2 a 45 caracteres'),
+        body('correo_electronico').exists().isEmail().withMessage('El correo electrónico debe ser un email válido')
     ],
     manejarValidacionErrores,
     createUsuario);
@@ -65,9 +57,33 @@ router.put('/:empleado_id',
     passport.authenticate('jwt', { session: false }),
     autorizar(['ADM']),
     [
-        param('empleado_id').exists().isInt({ min: 1 }).withMessage('El ID de emleado debe ser un número entero positivo'),
-        body('activo').optional().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1'),
-        body('rol').optional().isString().isLength({ min: 2, max: 45 }).withMessage('El campo rol debe ser VEND o ADM'),
+        param('empleado_id').exists().isInt({ min: 1 }).withMessage('El ID de empleadeado debe ser un número entero positivo')
+            .custom(async (empleado_id) => {
+                const empleado = await Empleado.findByPk(empleado_id);
+                if (!empleado) {
+                    throw new AppError('El empleado no existe', 400);
+                }
+
+                const usuario = await Usuario.findByPk(empleado_id);
+                if (!usuario) {
+                    throw new AppError('El usuario no existe', 400);
+                }
+            }),
+        body('activo').exists().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1'),
+        body('rol').exists().isString().isLength({ min: 2, max: 45 }).withMessage('El campo rol debe ser VEND o ADM')
+        .custom(async (rol) => {
+            const rolExistente = await Rol.findByPk(rol);
+            if (!rolExistente) {
+                throw new AppError('El rol no existe', 400);
+            }
+        }),
+        body('nombre').exists().isString().isLength({ min: 2, max: 45 }).withMessage('El nombre debe ser un string de 2 a 45 caracteres'),
+        body('apellido').exists().isString().isLength({ min: 2, max: 45 }).withMessage('El apellido debe ser un string de 2 a 45 caracteres'),
+        body('correo_electronico').exists().isEmail().withMessage('El correo electrónico debe ser un email válido'),
+        body('isNuevaContrasena').exists().isIn([1, 0]).withMessage('isNuevaContrasena debe ser un 0 o 1'),
+        body('nuevaContrasena')
+            .optional({ checkFalsy: true })
+            .isString().isLength({ min: 4, max: 200 }).withMessage('La nueva contrasena debe ser un string de 4 a 200 caracteres')
     ],
     manejarValidacionErrores,
     actualizarUsuario);

@@ -93,7 +93,7 @@ const inicializarPassport = () => {
             }
 
             // No se permite loguear usuario que no están activos
-            if (!usuario) {
+            if (!usuario || !usuario.activo) {
                 done(null, false);
                 return;
             }

@@ -93,3 +93,12 @@ export const validarEmail = (email: string): boolean => {
 
   return emailRegex.test(email);
 };
+
+export const validarFormatoContrasena = (contrasena: string): boolean => {
+  // debe tener al menos 4 caracteres.
+  if (contrasena.length < 4) {
+    return false;
+  }
+
+  return true;
+}

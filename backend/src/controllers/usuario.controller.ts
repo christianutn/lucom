@@ -3,18 +3,26 @@ import { Op, WhereOptions } from "sequelize";
 import Usuario from "../models/usuario.models.js";
 import { Request, Response, NextFunction } from "express";
 import { IUsuarioAttributes, IUsuarioCreate, IUsuarioUpdate } from "../types/usuario.js"
-import {createHash} from "../utils/bcrypt.js";
-export const  getUsuarios = async (req: Request, res: Response, next: NextFunction) => {
+import { IEmpleadoAttributes, IEmpleadoCreate, IEmpleadoUpdate } from "../types/empleado.js";
+import { createHash } from "../utils/bcrypt.js";
+import Empleado from "../models/empleado.models.js";
+import sequelize from "../config/base_datos.js";
+export const getUsuarios = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        const where : WhereOptions<IUsuarioAttributes> = {};
+        const where: WhereOptions<IUsuarioAttributes> = {};
 
 
         if (req.query.hasOwnProperty('activo')) where.activo = req.query.activo === '1' ? 1 : 0;
-        if(req.query.hasOwnProperty('rol')) where.rol = req.query.rol as string;
+        if (req.query.hasOwnProperty('rol')) where.rol = req.query.rol as string;
 
         const usuario = await Usuario.findAll({
-            where: where
+            where: where,
+            include: [{
+                model: Empleado,
+                as: 'empleado'
+            }],
+
         });
         res.status(200).json(usuario);
     } catch (error) {
@@ -23,7 +31,7 @@ export const  getUsuarios = async (req: Request, res: Response, next: NextFuncti
 }
 
 
-export const  getUsuarioPorId = async (req: Request, res: Response, next: NextFunction) => {
+export const getUsuarioPorId = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
         const usuario = await Usuario.findByPk(req.params.empleado_id);
@@ -32,23 +40,44 @@ export const  getUsuarioPorId = async (req: Request, res: Response, next: NextFu
             return next(new AppError(`Usuario con ID ${req.params.empleado_id} no encontrado`, 404));
         }
         res.status(200).json(usuario);
-    } catch (error) { 
-         next(new AppError(`Error al buscar usuario con id: ${req.params.empleado_id}`, 500));
+    } catch (error) {
+        next(new AppError(`Error al buscar usuario con id: ${req.params.empleado_id}`, 500));
     }
 }
 
 
 
-export const createUsuario= async (req: Request, res: Response, next: NextFunction) => {
+export const createUsuario = async (req: Request, res: Response, next: NextFunction) => {
+
+    const t = await sequelize.transaction();
     try {
+        
+
+        const empleadoData: IEmpleadoCreate = {
+            nombre: req.body.nombre,
+            apellido: req.body.apellido,
+            correo_electronico: req.body.correo_electronico,
+            activo: 1
+        };
+
+        const empleadoCreado = await Empleado.create(empleadoData, { transaction: t });
+
         const usuarioData: IUsuarioCreate = {
-            empleado_id: req.body.empleado_id,
+            empleado_id: empleadoCreado.id,
             rol: req.body.rol,
             contrasena: createHash(req.body.contrasena), // Asegúrate de hashear la contraseña
+            activo: req.body.activo ? 1 : 0
         }
-        const usuario = await Usuario.create(usuarioData);
+
+        const usuario = await Usuario.create(usuarioData, { transaction: t });
+
+
+        await t.commit();
+
         res.status(201).json(usuario);
+
     } catch (error) {
+        await t.rollback();
         next(new AppError('Error al crear usuario', 500));
     }
 }
@@ -56,40 +85,59 @@ export const createUsuario= async (req: Request, res: Response, next: NextFuncti
 
 
 
-export const actualizarUsuario= async (req: Request, res: Response, next: NextFunction) => {
+export const actualizarUsuario = async (req: Request, res: Response, next: NextFunction) => {
     const { empleado_id } = req.params;
 
-    const objetoActualizado : IUsuarioUpdate = {};
+    const updateUsuario: IUsuarioUpdate = {
+        rol: req.body.rol,
+        activo: req.body.activo
+    };
 
+    if (req.body.isNuevaContrasena == 1) {
+        updateUsuario.contrasena = createHash(req.body.nuevaContrasena);
+    }
+
+    const updateEmpleado: IEmpleadoUpdate = {
+        nombre: req.body.nombre,
+        apellido: req.body.apellido,
+        correo_electronico: req.body.correo_electronico
+    };
+
+    const t = await sequelize.transaction();
 
     try {
-        if (req.body.hasOwnProperty('rol')) objetoActualizado.rol = req.body.rol;
-        if (req.body.hasOwnProperty('activo')) objetoActualizado.activo = req.body.activo
 
-        const [actualizado] = await Usuario.update(
-            objetoActualizado,
+        await Empleado.update(updateEmpleado, {
+            where: {
+                id: empleado_id
+            },
+            transaction: t
+        });
+        await Usuario.update(
+            updateUsuario,
             {
                 where: {
                     empleado_id: empleado_id
-                }
+                },
+                transaction: t
             });
 
-        if (actualizado == 0) {
-            res.status(200).json({ message: 'No hubo atributos para actualizar' });
-            return;
-        }
+        await t.commit();
 
-        const dataModificada = await Usuario.findByPk(empleado_id);
+        const dataModificada = await Usuario.findByPk(empleado_id, {
+            include: [{ model: Empleado, as: 'empleado' }]
+        });
 
         res.status(200).json(dataModificada);
     } catch (error) {
+        await t.rollback();
         return next(new AppError('Error al actualizar usuario', 500));
     }
 };
 
 
 
-export const eliminarUsuario = async(req: Request, res: Response, next: NextFunction) =>{
+export const eliminarUsuario = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { empleado_id } = req.params;
 
@@ -97,11 +145,13 @@ export const eliminarUsuario = async(req: Request, res: Response, next: NextFunc
         if (!usuario) {
             return next(new AppError(`Tipo de negocio con ID ${empleado_id} no encontrado`, 404));
         }
-        const usuarioEliminado : IUsuarioAttributes = await usuario.update({ activo: 0 });
-        res.status(204).send(usuarioEliminado);
+        await usuario.update({ activo: 0 });
+        res.status(204).send();
     } catch (error) {
         next(new AppError('Error al eliminar el tipo de negocio', 500));
     }
 }
+
+
 
 

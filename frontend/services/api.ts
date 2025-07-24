@@ -1,8 +1,5 @@
 
-import { SelectOption, Cliente, ClientSearchFilters, Barrio, TipoDocumento, IVentaConDetalle } from '../types.js';
-
-const SIMULATED_DELAY = 500; // ms
-
+import {  Cliente, ClientSearchFilters} from '../types.js';
 
 export const getTiposNegocios = async (): Promise<any> => {
     try {
