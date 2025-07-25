@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Select from '../../common/Select.js';
 import Input from '../../common/Input.js';
 import Spinner from '../../common/Spinner.js';
-import { getTiposDomicilios, getAbonos, getTiposConvergencias } from '../../../services/api.js';
+import { getTiposDomicilios,  getTiposConvergencias } from '../../../services/api.js';
+import { getAbonos } from '../../../services/abonos.js';
 import { SelectOption, InternetBafState } from '../../../types.js';
 import { useNotification } from '../../../hooks/useNotification.js';
 import { validarTelefono } from '@/utils/validarDatosEntrada.js';
@@ -30,8 +31,17 @@ const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => 
           getAbonos(),
           getTiposConvergencias()
         ]);
-        setTiposDomicilio(tdRes);
-        setAbonos(abonosRes);
+
+        setTiposDomicilio(
+          tdRes
+            .filter(tipo => tipo.activo === 1)
+            .map(tipo => ({ id: tipo.id, descripcion: tipo.descripcion, activo: tipo.activo }))
+        );
+        setAbonos(
+          abonosRes
+            .filter(abono => abono.activo === 1)
+            .map(abono => ({ id: abono.id, descripcion: abono.descripcion, activo: abono.activo }))
+        );
         setTiposConvergencia(tcRes);
       } catch (error) {
         console.error("Error fetching Internet/BAF form data:", error);

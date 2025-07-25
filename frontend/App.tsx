@@ -8,6 +8,8 @@ import Notification from './components/common/Notification.js';
 import { useNotification } from './hooks/useNotification.js';
 import UsuariosForm from './components/usuarios/usuariosForm.js';
 import OrigenDatoForm from './components/origenesDatos/origenDatosForm.js';
+import AbonoForm from './components/abonos/abonosForm.js'
+import TiposDomicilioForm from './components/tiposDomicilios/tipoDomicilio.js'
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const auth = useContext(AuthContext);
@@ -36,6 +38,8 @@ const App: React.FC = () => {
         />
         <Route path="/usuarios" element={<ProtectedRoute><UsuariosForm /></ProtectedRoute>} />
         <Route path="/origenes-datos" element={<ProtectedRoute><OrigenDatoForm /></ProtectedRoute>} />
+        <Route path="/abonos" element={<ProtectedRoute><AbonoForm /></ProtectedRoute>} />
+        <Route path="/tipos-domicilios" element={<ProtectedRoute><TiposDomicilioForm /></ProtectedRoute>} />
         {/* Add more protected routes as needed */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Select from '../../common/Select.js';
 import Input from '../../common/Input.js';
 import Spinner from '../../common/Spinner.js';
-import { getTiposDomicilios} from '../../../services/api.js';
+import { getTiposDomicilios } from '../../../services/tipos_domicilios.js';
 import { SelectOption, ConsultaBbooState } from '../../../types.js';
 import { useNotification } from '../../../hooks/useNotification.js';
 import { validarTelefono } from '../../../utils/validarDatosEntrada';
@@ -24,8 +24,12 @@ const ConsultaBbooForm: React.FC<ConsultaBbooFormProps> = ({ data, onChange }) =
       setIsLoading(true);
       try {
         const tdRes = await getTiposDomicilios();
-        setTiposDomicilio(tdRes);
-        setErrorTelefono("Debe ingresar un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX");
+
+        const activeTipos = tdRes
+          .filter(tipo => tipo.activo === 1)
+          .map(tipo => ({ id: tipo.id, descripcion: tipo.descripcion, activo: tipo.activo }));
+
+        setTiposDomicilio(activeTipos);
       } catch (error) {
         showNotification("Error al cargar datos para Internet/BAF.", "error");
       } finally {
@@ -58,14 +62,13 @@ const ConsultaBbooForm: React.FC<ConsultaBbooFormProps> = ({ data, onChange }) =
         onChange={e => {
           onChange('lineaClaroAConsultar', e.target.value)
           data.lineaClaroAConsultar = e.target.value;
-          if (!validarTelefono(e.target.value)) {
+          if (!validarTelefono(e.target.value) && e.target.value !== "") {
             setErrorTelefono("El teléfono no es válido, debe ingresarse 10 dígitos.");
           } else {
             setErrorTelefono("");
           }
         }}
         error = {errorTelefono}
-        required
       />
       <Input
         label="PEDIDO RELLAMADO Ingresar DNI. Si es urgente agregar la palabra ALERTA"

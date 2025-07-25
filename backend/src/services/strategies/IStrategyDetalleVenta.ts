@@ -9,10 +9,13 @@ import { ITelefonoPrincipalAttributes } from "../../types/telefono_principal.js"
 import { IDomicilioAttributes } from "../../types/domicilio.js";
 import { IBarrioAttributes } from "../../types/barrio.js";
 import { IDetalleBbooCreate } from '../../types/detalle_bboo.js';
+import { IDetalleBafPortaCreate } from '../../types/detalle_baf_con_porta.js'
+
+
 
 export interface IStrategyDetalleVenta {
 
-  createDetails(detalles: IDatalleBafCreate | IDetallePortaCreate | IDetalleBbooCreate, transaction: Transaction): Promise<any>;
+  createDetails(detalles: IDatalleBafCreate | IDetallePortaCreate | IDetalleBbooCreate | IDetalleBafPortaCreate , transaction: Transaction): Promise<any>;
   getDetails(venta_id: number, transaction: Transaction): Promise<any>;
   getValidationRules(): ValidationChain[];
   cargar_nueva_fila(venta: IVentaAttributes, 

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import InitialSelectionSection from './sections/InitialSelectionSection';
 import ClientDataSection from './sections/ClientDataSection';
 import AdditionalSaleDataSection from './sections/AdditionalSaleDataSection';
@@ -238,7 +238,19 @@ const SalesForm: React.FC = () => {
         linea_claro_a_consultar: consultaBbooData.lineaClaroAConsultar,
         pedido_rellamado: consultaBbooData.pedidoRellamado,
       }
-    };
+    } else if (initialSelection.tipoNegocioId === '4') { // Venta BAF + Porta
+      detallesPayload = {
+        NIM_a_portar: portabilidadData.nimAPortar,
+        gigas: portabilidadData.gigasId,
+        compania: portabilidadData.companiaActualId,
+        tipos_domicilios_id: internetBafData.tipoDomicilioId,
+        abono_id: internetBafData.abonoId,
+        TVHD: internetBafData.tvhd === 'Sí' ? 1 : 0,
+        cantidad_decos: internetBafData.cantidadDecos,
+        horario_contacto: clientData.horarioContacto, // Este campo es común pero el backend lo espera en detalles BAF
+        tipo_convergencia_id: internetBafData.tipoConvergenciaId,
+      }
+    }
 
     // 2. Construir el objeto principal 'ventaConDetalle'
     const ventaConDetalle: any = {
@@ -324,7 +336,7 @@ const SalesForm: React.FC = () => {
       />
 
       {
-        initialSelection.tipoNegocioId && (
+        initialSelection.tipoNegocioId && initialSelection.origenDatoId && (
           <ClientDataSection
             data={clientData}
             onChange={handleClientDataChange}
@@ -335,7 +347,7 @@ const SalesForm: React.FC = () => {
         )
       }
 
-      {initialSelection.tipoNegocioId && (
+      {initialSelection.tipoNegocioId && initialSelection.origenDatoId && (
         <AdditionalSaleDataSection
           tipoNegocioId={initialSelection.tipoNegocioId}
           tipoNegocioDescripcion={tipoNegocioDescripcion}

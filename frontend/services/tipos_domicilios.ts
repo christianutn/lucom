@@ -1,12 +1,12 @@
-import { IAbono, IAbonoUpdate, IAbonoCreate } from "../types";
-export const getAbonos = async (): Promise<IAbono[]> => {
+import { ITipoDomicilio, ITipoDomicilioCreate, ITipoDomicilioUpdate } from "../types";
+export const getTiposDomicilios = async (): Promise<ITipoDomicilio[]> => {
     try {
         const apiUrl = import.meta.env.VITE_API_URL;
         if (!apiUrl) {
             throw new Error('API URL no definida en el archivo .env');
         }
 
-        const response = await fetch(`${apiUrl}/api/abonos`, {
+        const response = await fetch(`${apiUrl}/api/tipos-domicilios`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -14,10 +14,10 @@ export const getAbonos = async (): Promise<IAbono[]> => {
             }
         });
 
-        const data: IAbono[]  = await response.json();
+        const data: ITipoDomicilio[]  = await response.json();
 
         if (!response.ok) {
-            throw new Error(`Error ${response.status}: ${'No se pudieron obtener los datos de los abonos' } `);
+            throw new Error(`Error ${response.status}: ${'No se pudieron obtener los datos de los tipos de domicilios' } `);
         }
 
         if (!Array.isArray(data)) {
@@ -30,24 +30,24 @@ export const getAbonos = async (): Promise<IAbono[]> => {
         throw error;
     }
 };
-export const putAbono = async (abono: IAbonoUpdate): Promise<IAbono> => {
+export const putTipoDomicilio = async (tipoDomicilio: ITipoDomicilioUpdate): Promise<any> => {
     try {
         const apiUrl = import.meta.env.VITE_API_URL;
         if (!apiUrl) {
             throw new Error('API URL no definida en el archivo .env');
         }
 
-        const response = await fetch(`${apiUrl}/api/abonos/${abono.id}`, {
+        const response = await fetch(`${apiUrl}/api/tipos-domicilios/${tipoDomicilio.id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${localStorage.getItem("jwt")}`
             },
-            body: JSON.stringify(abono)
+            body: JSON.stringify(tipoDomicilio)
         });
         const data = await response.json();
         if (response.status !== 200) {
-            throw new Error("No fue posible actualizar el abono");
+            throw new Error("No fue posible actualizar el tipo de domicilio");
         }
 
         return data
@@ -56,14 +56,14 @@ export const putAbono = async (abono: IAbonoUpdate): Promise<IAbono> => {
     }
 }
 
-export const postAbono = async (abono: IAbonoCreate): Promise<IAbonoCreate> => {
+export const postTipoDomicilio = async (abono: ITipoDomicilioCreate): Promise<ITipoDomicilioCreate> => {
     try {
         const apiUrl = import.meta.env.VITE_API_URL;
         if (!apiUrl) {
             throw new Error('API URL no definida en el archivo .env');
         }
 
-        const response = await fetch(`${apiUrl}/api/abonos`, {
+        const response = await fetch(`${apiUrl}/api/tipos-domicilios`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

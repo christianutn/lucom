@@ -1,5 +1,5 @@
 
-import {  Cliente, ClientSearchFilters} from '../types.js';
+import {  Cliente, ClientSearchFilters, ITipoDomicilio, IOrigenDato} from '../types.js';
 
 export const getTiposNegocios = async (): Promise<any> => {
     try {
@@ -26,7 +26,7 @@ export const getTiposNegocios = async (): Promise<any> => {
     }
 }
 
-export const getOrigenesDatos = async (): Promise<any> => {
+export const getOrigenesDatos = async (): Promise<IOrigenDato[]> => {
     try {
         const apiUrl = import.meta.env.VITE_API_URL;
         if (!apiUrl) {
@@ -136,7 +136,7 @@ export const getServiciosConvergentes = async (): Promise<any> => {
     }
 }
 
-export const getTiposDomicilios = async (): Promise<any> => {
+export const getTiposDomicilios = async (): Promise<ITipoDomicilio[]> => {
     try {
         const apiUrl = import.meta.env.VITE_API_URL;
         if (!apiUrl) {

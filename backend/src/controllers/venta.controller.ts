@@ -211,9 +211,6 @@ export const crearVentaConDetalles = async (req: Request, res: Response, next: N
         // 7. Confirmar la transacción
         await t.commit();
 
-
-
-
         res.status(201).json(detallesCreados);
 
     } catch (error) {

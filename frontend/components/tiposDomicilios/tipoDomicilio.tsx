@@ -1,24 +1,24 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { getOrigenesDatos, putOrigeneDato, postOrigenDato } from '../../services/origenes_datos';
-import { IOrigenDato, IOrigenDatoUpdate, IOrigenDatoCreate } from '../../types';
+import { getTiposDomicilios, putTipoDomicilio, postTipoDomicilio } from '../../services/tipos_domicilios';
+import { ITipoDomicilio, ITipoDomicilioUpdate, ITipoDomicilioCreate } from '../../types';
 import Button from '../common/Button';
 import Spinner from '../common/Spinner';
 import { useNotification } from '../../hooks/useNotification';
 import Input from '../common/Input';
 
-const emptyOrigenDato: IOrigenDato = {
+const emptyTipoDomicilio: ITipoDomicilio = {
     id: 0,
     descripcion: '',
     activo: 1,
 };
 
-const OrigenDatoForm = () => {
-    const [origenesDatos, setOrigenesDatos] = useState<IOrigenDato[]>([]);
-    const [selectedOrigenDato, setSelectOrigenDato] = useState<IOrigenDato | null>(null);
+const TipoDomicilioForm = () => {
+    const [tiposDomicilios, setTiposDomicilios] = useState<ITipoDomicilio[]>([]);
+    const [selectedTipoDomicilio, setSelectedTipoDomicilio] = useState<ITipoDomicilio | null>(null);
     const [isFormVisible, setIsFormVisible] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [formData, setFormData] = useState<IOrigenDato>(emptyOrigenDato);
+    const [formData, setFormData] = useState<ITipoDomicilio>(emptyTipoDomicilio);
     const { showNotification } = useNotification();
 
     const [errorDescripcion, setErrorDescripcion] = useState('');
@@ -27,14 +27,11 @@ const OrigenDatoForm = () => {
         const fetchInitialData = async () => {
             setIsLoading(true);
             try {
-                const [origenesDatosRes] = await Promise.all([
-                    getOrigenesDatos()
-                ]);
-                setOrigenesDatos(origenesDatosRes);
-
+                const tiposDomiciliosRes = await getTiposDomicilios();
+                setTiposDomicilios(tiposDomiciliosRes);
             } catch (error) {
                 console.error("Error fetching data:", error);
-                showNotification('Error al cargar datos iniciales', 'error');
+                showNotification('Error al cargar los tipos de domicilio', 'error');
             } finally {
                 setIsLoading(false);
             }
@@ -44,22 +41,22 @@ const OrigenDatoForm = () => {
     }, []);
 
     useEffect(() => {
-        if (selectedOrigenDato) {
-            setFormData(selectedOrigenDato);
+        if (selectedTipoDomicilio) {
+            setFormData(selectedTipoDomicilio);
         } else {
-            setFormData(emptyOrigenDato);
+            setFormData(emptyTipoDomicilio);
         }
-    }, [selectedOrigenDato]);
+    }, [selectedTipoDomicilio]);
 
     const handleCreateClick = () => {
-        setSelectOrigenDato(null);
+        setSelectedTipoDomicilio(null);
         setIsCreating(true);
         setIsFormVisible(true);
         window.scrollTo(0, 0);
     };
 
-    const handleEditClick = (origenDato: IOrigenDato) => {
-        setSelectOrigenDato(origenDato);
+    const handleEditClick = (tipoDomicilio: ITipoDomicilio) => {
+        setSelectedTipoDomicilio(tipoDomicilio);
         setIsCreating(false);
         setIsFormVisible(true);
         window.scrollTo(0, 0);
@@ -67,7 +64,7 @@ const OrigenDatoForm = () => {
 
     const handleCancel = () => {
         setIsFormVisible(false);
-        setSelectOrigenDato(null);
+        setSelectedTipoDomicilio(null);
         setErrorDescripcion('');
     };
 
@@ -86,30 +83,29 @@ const OrigenDatoForm = () => {
             return;
         }
 
-
         setIsLoading(true);
         try {
             if (isCreating) {
-                const origenDatoCreacion: IOrigenDatoCreate = {
+                const tipoDomicilioCreacion: ITipoDomicilioCreate = {
                     descripcion: formData.descripcion,
                 };
-                await postOrigenDato(origenDatoCreacion);
-                showNotification('Usuario creado correctamente', 'success');
+                await postTipoDomicilio(tipoDomicilioCreacion);
+                showNotification('Tipo de Domicilio creado correctamente', 'success');
             } else {
-                const origenDatoUpdate: IOrigenDatoUpdate = {
+                const tipoDomicilioUpdate: ITipoDomicilioUpdate = {
                     id: formData.id,
                     descripcion: formData.descripcion,
                     activo: formData.activo
                 };
-                await putOrigeneDato(origenDatoUpdate);
-                showNotification('Usuario actualizado correctamente', 'success');
+                await putTipoDomicilio(tipoDomicilioUpdate);
+                showNotification('Tipo de Domicilio actualizado correctamente', 'success');
             }
 
-            const origesDatos = await getOrigenesDatos();
-            setOrigenesDatos(origesDatos);
+            const tiposDomiciliosRes = await getTiposDomicilios();
+            setTiposDomicilios(tiposDomiciliosRes);
             setIsFormVisible(false);
-            setSelectOrigenDato(null);
-            setFormData(emptyOrigenDato);
+            setSelectedTipoDomicilio(null);
+            setFormData(emptyTipoDomicilio);
         } catch (error) {
             showNotification('Error: Revisar datos de entrada del formulario', 'error');
         } finally {
@@ -120,18 +116,18 @@ const OrigenDatoForm = () => {
     return (
         <div className="p-4 sm:p-6 lg:p-8 bg-slate-900 text-gray-300 min-h-screen">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-2xl font-bold text-white mb-6">Gestión de Usuarios</h1>
+                <h1 className="text-2xl font-bold text-white mb-6">Gestión de Tipos de Domicilio</h1>
 
                 {isLoading && <Spinner />}
 
                 {isFormVisible ? (
                     <div className="bg-slate-800 p-6 rounded-lg shadow-lg">
-                        <h2 className="text-xl font-semibold text-white mb-4">{isCreating ? 'Crear Nuevo Usuario' : 'Editar Usuario'}</h2>
+                        <h2 className="text-xl font-semibold text-white mb-4">{isCreating ? 'Crear Nuevo Tipo de Domicilio' : 'Editar Tipo de Domicilio'}</h2>
                         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Columna 1 */}
                             <div className="space-y-4">
                                 {!isCreating && (
-                                    <Input label="ID Origen de Dato:" type="number" name="id" value={formData.id} disabled />
+                                    <Input label="ID Tipo Domicilio:" type="number" name="id" value={formData.id} disabled />
                                 )}
                                 <Input label="Descripción:" type="text" name="descripcion" value={formData.descripcion} onChange={handleInputChange} error={errorDescripcion}  required/>
                             </div>
@@ -156,7 +152,7 @@ const OrigenDatoForm = () => {
                 ) : (
                     <>
                         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                            <Button onClick={handleCreateClick} variant="primary">Crear Nuevo Origen de Dato</Button>
+                            <Button onClick={handleCreateClick} variant="primary">Crear Nuevo Tipo de Domicilio</Button>
                             <Button variant="secondary" onClick={() => window.history.back()}>Volver</Button>
                         </div>
                         <div className="bg-slate-800 shadow-lg rounded-lg overflow-hidden">
@@ -164,24 +160,24 @@ const OrigenDatoForm = () => {
                                 <table className="min-w-full divide-y divide-slate-700">
                                     <thead className="bg-slate-700/50">
                                         <tr>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID Origen de Dato</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID</th>
                                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Descripción</th>
                                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
                                             <th scope="col" className="relative px-6 py-3"><span className="sr-only">Editar</span></th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-slate-800 divide-y divide-slate-700">
-                                        {origenesDatos.map((origen) => (
-                                            <tr key={origen.id} className="hover:bg-slate-700/50">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{origen.id}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{`${origen.descripcion}`}</td>
+                                        {tiposDomicilios.map((tipo) => (
+                                            <tr key={tipo.id} className="hover:bg-slate-700/50">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{tipo.id}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{`${tipo.descripcion}`}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${origen.activo ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
-                                                        {origen.activo ? 'Activo' : 'Inactivo'}
+                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${tipo.activo ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                                                        {tipo.activo ? 'Activo' : 'Inactivo'}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <Button onClick={() => handleEditClick(origen)} variant="primary">Editar</Button>
+                                                    <Button onClick={() => handleEditClick(tipo)} variant="primary">Editar</Button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -196,4 +192,4 @@ const OrigenDatoForm = () => {
     );
 };
 
-export default OrigenDatoForm;
+export default TipoDomicilioForm;

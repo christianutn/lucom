@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Select from '../../common/Select.js';
 import Card from '../../common/Card.js';
 import Spinner from '../../common/Spinner.js';
-import { getTiposNegocios, getOrigenesDatos } from '../../../services/api.js';
+import { getTiposNegocios } from '../../../services/api.js';
+import { getOrigenesDatos } from '../../../services/origenes_datos.js';
 import { SelectOption, InitialSelectionState } from '../../../types.js';
 
 interface InitialSelectionSectionProps {
@@ -26,7 +27,9 @@ const InitialSelectionSection: React.FC<InitialSelectionSectionProps> = ({ data,
           getOrigenesDatos()
         ]);
         setTiposNegocio(tiposNegocioRes);
-        setOrigenesDato(origenesDatoRes);
+        setOrigenesDato(
+          origenesDatoRes.filter(origen => origen.activo === 1).map(origen => ({ id: origen.id, descripcion: origen.descripcion, activo: origen.activo }))
+        );
       } catch (error) {
         console.error("Error fetching initial selection data:", error);
         // TODO: Show error notification to user

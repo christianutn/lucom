@@ -365,7 +365,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
               {data.telefonosPrincipales.length > 1 && <Button type="button" variant="danger" onClick={() => handleRemoveTelefonoPrincipal(index)} className="py-2 px-3 text-sm shrink-0">Eliminar</Button>}
             </div>
           ))}
-          <Button type="button" variant="secondary" onClick={handleAddTelefonoPrincipal} className="text-sm py-2">+ Añadir teléfono</Button>
+          {/* <Button type="button" variant="secondary" onClick={handleAddTelefonoPrincipal} className="text-sm py-2">+ Añadir teléfono</Button> */}
         </div>
 
         <Input label="Teléfono de contacto secundario (opcional)" id="telefonoSecundario" type="tel" value={data.telefonoSecundario}

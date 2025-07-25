@@ -473,3 +473,37 @@ export interface IAbonoUpdate {
   activo: 0 | 1;
   id: number;
 }
+
+
+/**
+ * Interface para OrigenDato.
+ * @property id ID del origen de dato
+ * @property descripcion Descripción del origen de dato
+ * @property activo Estado del origen de dato (1: activo, 0: inactivo)
+ * 
+ */
+export interface ITipoDomicilio {
+  id: number;
+  descripcion: string;
+  activo: 0 | 1;
+}
+
+/**
+ * Interface para crear un nuevo OrigenDato.
+ * @property descripcion Descripción del origen de dato
+ */
+export interface ITipoDomicilioCreate {
+  descripcion: string;
+}
+
+/**
+ * Interface para actualizar un OrigenDato.
+ * @property descripcion Descripción del origen de dato
+ * @property activo Estado del origen de dato (1: activo, 0: inactivo)
+ * 
+ */
+export interface ITipoDomicilioUpdate {
+  descripcion: string;
+  activo: 0 | 1;
+  id: number;
+}

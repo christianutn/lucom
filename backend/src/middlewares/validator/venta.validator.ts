@@ -11,18 +11,22 @@ import { validarAtributosTelefonosPrincipales } from './telefonos_principales.va
 import { validarAtributosDomicilio } from './domicilio.validator.js';
 import { validarAtributosBarrio } from './barrio.validator.js';
 import OrigenDato from "../../models/origen_dato.models.js";
+import { get } from 'http';
 
 // Asumimos que los IDs de negocio son conocidos.
 const STRATEGY_IDS = {
     PORTA:'1',
     BAF: '2',
-    BBOO: '3'
+    BBOO: '3',
+    BAF_CON_PORTA: '4'
 };
 
 // Obtenemos las reglas de la estrategia BAF una sola vez.
 const bafRules = getStrategy(parseInt(STRATEGY_IDS.BAF)).getValidationRules();
 const portaRules = getStrategy(parseInt(STRATEGY_IDS.PORTA)).getValidationRules();
 const bbooRules = getStrategy(parseInt(STRATEGY_IDS.BBOO)).getValidationRules();
+const bafConPortaRules = getStrategy(parseInt(STRATEGY_IDS.BAF_CON_PORTA)).getValidationRules();
+
 
 console.log('Reglas de validación de estrategia BAF:', bbooRules);
 
@@ -97,6 +101,9 @@ export const validarCreacionVenta = (): (ValidationChain | ((req: any, res: any,
 
         // --- Grupo 3: El manejador que procesa los resultados de todas las validaciones anteriores ---
         [body('datosVenta.tipo_negocio_id').equals(STRATEGY_IDS.BBOO), ...bbooRules],
+
+        // --- Grupo 4: El manejador que procesa los resultados de todas las validacioes de bafConPorta
+        [body('datosVenta.tipo_negocio_id').equals(STRATEGY_IDS.BAF_CON_PORTA), ...bafConPortaRules],
 
     ], {
         message: 'Los detalles proporcionados no son válidos o no corresponden con el tipo de negocio seleccionado.',
