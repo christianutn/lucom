@@ -176,8 +176,9 @@ export interface AppNotification {
 export interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
-  login: (employeeId: number | string, password_raw: string) => Promise<void>;
+  login: (employeeId: number | null, password_raw: string) => Promise<void>;
   logout: () => void;
+  user: User | null;
 }
 
 // DInterfaces para venta
@@ -506,4 +507,17 @@ export interface ITipoDomicilioUpdate {
   descripcion: string;
   activo: 0 | 1;
   id: number;
+}
+
+/**
+ * Interface para Usuario
+ * @property empleado_id 
+ */
+
+export interface User {
+  empleado_id: number;
+  rol: string;
+  nombre: string;
+  apellido: string;
+  correo_electronico: string;
 }

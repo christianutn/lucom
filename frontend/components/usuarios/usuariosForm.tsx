@@ -8,6 +8,7 @@ import { validarEmail } from "../../utils/validarDatosEntrada";
 import { formatName } from '../../utils/formatear';
 import Input from '../common/Input';
 import { getRoles } from '../../services/roles';
+import { Plus, Edit, Trash, Search, ArrowLeft } from 'lucide-react';
 
 const emptyUsuario: IUsuario = {
     empleado_id: 0,
@@ -190,14 +191,14 @@ const UsuariosForm = () => {
 
 
     return (
-        <div className="p-4 sm:p-6 lg:p-8 bg-slate-900 text-gray-300 min-h-screen">
+        <div className="p-4 sm:p-6 lg:p-8 bg-gray-900 text-gray-300 min-h-screen">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-2xl font-bold text-white mb-6">Gestión de Usuarios</h1>
+                <h1 className="text-3xl font-bold text-white mb-6">Gestión de Usuarios</h1>
 
                 {isLoading && <Spinner />}
 
                 {isFormVisible ? (
-                    <div className="bg-slate-800 p-6 rounded-lg shadow-lg">
+                    <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
                         <h2 className="text-xl font-semibold text-white mb-4">{isCreating ? 'Crear Nuevo Usuario' : 'Editar Usuario'}</h2>
                         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Columna 1 */}
@@ -207,7 +208,7 @@ const UsuariosForm = () => {
                                 )}
                                 <div>
                                     <label htmlFor="rol" className="block text-sm font-medium text-gray-400">Rol</label>
-                                    <select name="rol" id="rol" value={formData.rol} onChange={handleInputChange} className="mt-1 block w-full rounded-md bg-slate-700 border-slate-600 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    <select name="rol" id="rol" value={formData.rol} onChange={handleInputChange} className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                         <option value="" disabled>Seleccione un rol</option>
                                         {roles.map((rol) => (
                                             <option key={rol.codigo} value={rol.codigo}>{rol.descripcion}</option>
@@ -227,11 +228,11 @@ const UsuariosForm = () => {
                                     <Input label='Nueva Contraseña:' type="password" name="nuevaContrasena" value={formData.nuevaContrasena || ''} onChange={handleInputChange} />
                                 )}
                                 <div className="flex items-center pt-6 space-x-4">
-                                    <input type="checkbox" name="activo" id="activo" checked={formData.activo === 1} onChange={handleInputChange} className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-indigo-500 focus:ring-indigo-600 focus:ring-offset-slate-800" />
+                                    <input type="checkbox" name="activo" id="activo" checked={formData.activo === 1} onChange={handleInputChange} className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-600 focus:ring-offset-gray-800" />
                                     <label htmlFor="activo" className="ml-2 block text-sm text-gray-300">Activo</label>
                                     {!isCreating && (
                                         <>
-                                            <input type="checkbox" name="isNuevaContrasena" id="isNuevaContrasena" checked={formData.isNuevaContrasena === 1} onChange={handleInputChange} className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-indigo-500 focus:ring-indigo-600 focus:ring-offset-slate-800" />
+                                            <input type="checkbox" name="isNuevaContrasena" id="isNuevaContrasena" checked={formData.isNuevaContrasena === 1} onChange={handleInputChange} className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-600 focus:ring-offset-gray-800" />
                                             <label htmlFor="isNuevaContrasena" className="ml-2 block text-sm text-gray-300">Nueva Contraseña</label>
                                         </>
                                     )}
@@ -247,32 +248,44 @@ const UsuariosForm = () => {
                 ) : (
                     <>
                         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                            <Button onClick={handleCreateClick} variant="primary">Crear Nuevo Usuario</Button>
-                            <Button variant="secondary" onClick={() => window.history.back()}>Volver</Button>
+                            <Button onClick={handleCreateClick} variant="primary" className="flex items-center gap-2">
+                                <Plus size={20} />
+                                <span>Crear Nuevo Usuario</span>
+                            </Button>
+                            <Button variant="secondary" onClick={() => window.history.back()} className="flex items-center gap-2">
+                                <ArrowLeft size={20} />
+                                <span>Volver</span>
+                            </Button>
                         </div>
 
                         {/* Filtros */}
                         <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <Input
-                                label="Filtrar por Nombre o Apellido:"
-                                type="text"
-                                value={filtroNombre}
-                                onChange={(e) => setFiltroNombre(e.target.value)}
-                                placeholder="Buscar por nombre..."
-                            />
-                            <Input
-                                label="Filtrar por ID de Empleado:"
-                                type="text"
-                                value={filtroId}
-                                onChange={(e) => setFiltroId(e.target.value)}
-                                placeholder="Buscar por ID..."
-                            />
+                            <div className="relative">
+                                <Input
+                                    label="Filtrar por Nombre o Apellido:"
+                                    type="text"
+                                    value={filtroNombre}
+                                    onChange={(e) => setFiltroNombre(e.target.value)}
+                                    placeholder="Buscar por nombre..."
+                                    icon={<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />}
+                                />
+                            </div>
+                            <div className="relative">
+                                <Input
+                                    label="Filtrar por ID de Empleado:"
+                                    type="text"
+                                    value={filtroId}
+                                    onChange={(e) => setFiltroId(e.target.value)}
+                                    placeholder="Buscar por ID..."
+                                    icon={<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />}
+                                />
+                            </div>
                         </div>
 
-                        <div className="bg-slate-800 shadow-lg rounded-lg overflow-hidden">
+                        <div className="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
                             <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-slate-700">
-                                    <thead className="bg-slate-700/50">
+                                <table className="min-w-full divide-y divide-gray-700">
+                                    <thead className="bg-gray-700/50">
                                         <tr>
                                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID Empleado</th>
                                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Nombre Completo</th>
@@ -282,9 +295,9 @@ const UsuariosForm = () => {
                                             <th scope="col" className="relative px-6 py-3"><span className="sr-only">Editar</span></th>
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-slate-800 divide-y divide-slate-700">
+                                    <tbody className="bg-gray-800 divide-y divide-gray-700">
                                         {filteredUsuarios.map((usuario) => (
-                                            <tr key={usuario.empleado_id} className="hover:bg-slate-700/50">
+                                            <tr key={usuario.empleado_id} className="hover:bg-gray-700/50">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{usuario.empleado_id}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{`${usuario.empleado.nombre} ${usuario.empleado.apellido}`}</td>
                                                 <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-400">{usuario.empleado.correo_electronico}</td>
@@ -295,7 +308,10 @@ const UsuariosForm = () => {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <Button onClick={() => handleEditClick(usuario)} variant="primary">Editar</Button>
+                                                    <Button onClick={() => handleEditClick(usuario)} variant="primary" className="flex items-center gap-1">
+                                                        <Edit size={16} />
+                                                        <span>Editar</span>
+                                                    </Button>
                                                 </td>
                                             </tr>
                                         ))}

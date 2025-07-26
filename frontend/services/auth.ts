@@ -1,10 +1,10 @@
 interface User {
-    empleado_id: number | null,
+    empleado_id: number | string | null,
     contrasena: string
 }
 
 
-export const login = async (user: User) : Promise<string> => {
+export const login = async (user: User) : Promise<{ token: string }> => {
     try {
         const apiUrl = import.meta.env.VITE_API_URL;
         if (!apiUrl) {

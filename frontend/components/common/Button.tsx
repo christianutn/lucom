@@ -1,44 +1,34 @@
-
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'success';
+  variant?: 'primary' | 'secondary' | 'danger';
   fullWidth?: boolean;
+  children: React.ReactNode;
+  className?: string;
 }
 
-const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', fullWidth = false, className, ...props }) => {
-  let baseStyle = "font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-bg";
-
-  if (fullWidth) {
-    baseStyle += " w-full";
-  }
-
-  if (variant === 'primary') {
-    baseStyle += " bg-brand-blue hover:bg-blue-700 text-white focus:ring-brand-blue";
-  } else if (variant === 'secondary') {
-    baseStyle += " bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500";
-  } else if (variant === 'danger') {
-    baseStyle += " bg-red-600 hover:bg-red-700 text-white focus:ring-red-500";
-  } else if (variant === 'success') {
-    baseStyle += " bg-green-600 hover:bg-green-700 text-white focus:ring-green-500";
-  }
-
-
-  if (props.disabled) {
-    baseStyle += " opacity-50 cursor-not-allowed";
-  }
-
+const Button: React.FC<ButtonProps> = ({ 
+  variant = 'primary', 
+  fullWidth = false, 
+  children, 
+  className = '', 
+  ...props 
+}) => {
+  const baseClasses = 'font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-150';
+  const variantClasses = {
+    primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500',
+    secondary: 'bg-gray-600 text-gray-200 hover:bg-gray-700 focus:ring-gray-500',
+    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+  };
+  const widthClass = fullWidth ? 'w-full' : '';
 
   return (
-
-    <button
-      className={`${baseStyle} ${className}`}
+    <button 
+      className={`${baseClasses} ${variantClasses[variant]} ${widthClass} ${className}`}
       {...props}
     >
       {children}
     </button>
-
-
   );
 };
 

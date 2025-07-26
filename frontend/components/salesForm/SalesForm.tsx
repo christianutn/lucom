@@ -7,6 +7,7 @@ import Spinner from '../common/Spinner';
 import { useNotification } from '../../hooks/useNotification';
 import { InitialSelectionState, ClientDataState, InternetBafState, PortabilidadState, Cliente, ClientDataStateErrors, ConsultaBbooState } from '../../types';
 import { postVenta } from '../../services/api';
+import { Save } from 'lucide-react';
 
 const initialSelectionDefault: InitialSelectionState = {
   tipoNegocioId: '',
@@ -326,7 +327,7 @@ const SalesForm: React.FC = () => {
 
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 pb-24">
+    <form onSubmit={handleSubmit} className="space-y-8 p-4 sm:p-6 bg-gray-800 rounded-lg shadow-lg">
       {isSaving && <Spinner />}
 
       <InitialSelectionSection
@@ -361,9 +362,19 @@ const SalesForm: React.FC = () => {
         />
       )}
 
-      <div className="mt-8">
-        <Button type="submit" variant="primary" fullWidth disabled={isSaving}>
-          {isSaving ? 'Guardando...' : 'Guardar Venta'}
+      <div className="mt-10 flex justify-end">
+        <Button type="submit" variant="primary" fullWidth={false} disabled={isSaving} className="flex items-center gap-2">
+          {isSaving ? (
+            <>
+              <Spinner />
+              <span>Guardando...</span>
+            </>
+          ) : (
+            <>
+              <Save size={20} />
+              <span>Guardar Venta</span>
+            </>
+          )}
         </Button>
       </div>
     </form>

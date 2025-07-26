@@ -1,23 +1,29 @@
-
 import React from 'react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
+  id: string;
   error?: string;
+  icon?: React.ReactNode;
+  className?: string;
 }
 
-const Input: React.FC<InputProps> = ({ label, id, error, className, ...props }) => {
+const Input: React.FC<InputProps> = ({ label, id, error, icon, className = '', ...props }) => {
   return (
-    <div className="w-full">
-      <label htmlFor={id} className="block text-sm font-medium text-gray-300 mb-1">
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium text-gray-400">
         {label}
       </label>
-      <input
-        id={id}
-        className={`bg-dark-input border ${error ? 'border-red-500' : 'border-dark-border'} text-white placeholder-gray-500 text-sm rounded-md focus:ring-brand-blue focus:border-brand-blue block w-full p-3 ${className}`}
-        {...props}
-      />
-      {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
+      <div className="mt-1 relative rounded-md shadow-sm">
+        {icon}
+        <input
+          id={id}
+          name={id}
+          className={`block w-full pl-10 pr-3 py-2 rounded-md bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${error ? 'border-red-500' : ''} ${className}`}
+          {...props}
+        />
+      </div>
+      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
     </div>
   );
 };

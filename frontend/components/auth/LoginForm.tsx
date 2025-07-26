@@ -1,20 +1,19 @@
 
 import React, { useState, useContext, useEffect } from 'react';
-import { AuthContext } from '../../contexts/AuthContext.js';
-import Input from '../common/Input.js';
-import Button from '../common/Button.js';
-import Spinner from '../common/Spinner.js';
-import { useNotification } from '../../hooks/useNotification.js';
+import { AuthContext } from '../../contexts/AuthContext';
+import Input from '../common/Input';
+import Button from '../common/Button';
+import Spinner from '../common/Spinner';
+import { useNotification } from '../../hooks/useNotification';
+import { User, Lock } from 'lucide-react';
 
-// Removed: import Logo from '../../assets/logo.svg.js'; 
-// Use a direct path relative to the public root (where index.html is served)
-const logoPath = 'logo.png'; 
+const logoPath = 'logo.png';
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 60 * 1000; // 1 minute
 
 const LoginForm: React.FC = () => {
-  const [employeeId, setEmployeeId] = useState<number | string>('');
+  const [employeeId, setEmployeeId] = useState<number | null>(null);
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loginAttempts, setLoginAttempts] = useState(0);
@@ -25,16 +24,16 @@ const LoginForm: React.FC = () => {
   const { showNotification } = useNotification();
 
   useEffect(() => {
-    let timer: number | undefined; // Changed NodeJS.Timeout to number
+    let timer: number | undefined;
     if (isLoginDisabled && lockoutEndTime) {
       const remainingTime = lockoutEndTime - Date.now();
       if (remainingTime > 0) {
         timer = setTimeout(() => {
           setIsLoginDisabled(false);
           setLockoutEndTime(null);
-          setLoginAttempts(0); // Reset attempts after lockout
+          setLoginAttempts(0);
           showNotification("Puede intentar ingresar nuevamente.", "info");
-        }, remainingTime) as unknown as number; // Cast if necessary
+        }, remainingTime) as unknown as number;
       } else {
         setIsLoginDisabled(false);
         setLockoutEndTime(null);
@@ -52,9 +51,9 @@ const LoginForm: React.FC = () => {
 
     setIsLoading(true);
     try {
-      await auth.login(employeeId, password);
-      // Success notification and navigation are handled by AuthContext
-      setLoginAttempts(0); // Reset attempts on success
+      const employeeIdForLogin: number | null = employeeId;
+      await auth.login(employeeIdForLogin, password);
+      setLoginAttempts(0);
     } catch (error: any) {
       const currentAttempts = loginAttempts + 1;
       setLoginAttempts(currentAttempts);
@@ -74,33 +73,39 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-md p-8 space-y-8 bg-dark-card shadow-xl rounded-xl">
+    <div className="w-full max-w-md p-8 space-y-8 bg-gray-800 shadow-xl rounded-xl">
       {isLoading && <Spinner />}
       <div className="flex justify-center">
         <img src={logoPath} alt="Logo Empresa" className="mb-8 h-16 w-auto" />
       </div>
-      <h2 className="text-3xl font-bold text-center text-gray-100">Iniciar Sesión</h2>
+      <h2 className="text-3xl font-bold text-center text-white">Iniciar Sesión</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Input
-          label="ID del Empleado"
-          id="employeeId"
-          type="number"
-          value={employeeId}
-          onChange={(e) => setEmployeeId(e.target.value)}
-          placeholder="Ingrese su ID"
-          required
-          disabled={isLoginDisabled}
-        />
-        <Input
-          label="Contraseña"
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Ingrese su contraseña"
-          required
-          disabled={isLoginDisabled}
-        />
+        <div className="relative">
+          <Input
+            label="ID del Empleado"
+            id="employeeId"
+            type="number"
+            value={employeeId === null ? '' : employeeId}
+            onChange={(e) => setEmployeeId(e.target.value === '' ? null : Number(e.target.value))}
+            placeholder="Ingrese su ID"
+            required
+            disabled={isLoginDisabled}
+            icon={<User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />}
+          />
+        </div>
+        <div className="relative">
+          <Input
+            label="Contraseña"
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Ingrese su contraseña"
+            required
+            disabled={isLoginDisabled}
+            icon={<Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />}
+          />
+        </div>
         <Button type="submit" fullWidth disabled={isLoading || isLoginDisabled}>
           {isLoading ? 'Ingresando...' : 'Ingresar'}
         </Button>

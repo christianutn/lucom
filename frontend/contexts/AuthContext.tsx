@@ -2,8 +2,10 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login as apiLogin } from '../services/auth.js';
-import { AuthContextType } from '../types.js';
+import { AuthContextType, User } from '../types.js';
 import { useNotification } from '../hooks/useNotification.js';
+import {getMiUsuario} from '../services/usuarios.js';
+
 
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -11,6 +13,7 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [token, setToken] = useState<string | null>(localStorage.getItem('jwt'));
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!token);
+    const [user, setUser] = useState<User | null>(null);
     const navigate = useNavigate();
     const { showNotification } = useNotification();
 
@@ -18,9 +21,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (token) {
             localStorage.setItem('jwt', token);
             setIsAuthenticated(true);
+            const fetchUser = async () => {
+                try {
+                    const userData = await getMiUsuario();
+                    setUser(userData);
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                    // Optionally, log out the user if fetching user data fails
+                    logout();
+                }
+            };
+            fetchUser();
         } else {
             localStorage.removeItem('jwt');
             setIsAuthenticated(false);
+            setUser(null);
         }
     }, [token]);
 
@@ -43,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, [navigate, showNotification]);
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, token, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, token, login, logout, user }}>
             {children}
         </AuthContext.Provider>
     );

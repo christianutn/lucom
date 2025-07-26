@@ -153,5 +153,25 @@ export const eliminarUsuario = async (req: Request, res: Response, next: NextFun
 }
 
 
+export const getMiUsuario  = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        
+        const usuario = await Usuario.findByPk(req.user?.empleado_id)
+        const empleado = await Empleado.findByPk(req.user?.empleado_id)
+        
+        if (!usuario) throw new AppError('Usuario no encontrado', 404);
+        if (!empleado) throw new AppError('Empleado no encontrado', 404);
 
+        const data = {
+            empleado_id: empleado.id,
+            rol: usuario.rol,
+            nombre: empleado.nombre,
+            apellido: empleado.apellido,
+            correo_electronico: empleado.correo_electronico
+        }
 
+        res.status(200).json(data);
+    } catch (error) {
+        next(new AppError('Error al obtener el usuario', 500));
+    }
+}

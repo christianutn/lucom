@@ -1,33 +1,28 @@
+import React from 'react';
+import { X } from 'lucide-react';
 
-import React, { useEffect, useState } from 'react';
-import { AppNotification as NotificationProps } from '../../types.js';
+interface NotificationProps {
+  message: string;
+  type: 'success' | 'error' | 'info';
+  onClose?: () => void;
+}
 
-
-const Notification: React.FC<NotificationProps> = ({ message, type }) => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    if (message) {
-      setIsVisible(true);
-      // Auto-hide is handled by useNotification hook, this component just displays
-    } else {
-      setIsVisible(false);
-    }
-  }, [message]);
-
-  if (!isVisible || !message) return null;
-
-  let bgColor = 'bg-blue-500';
-  if (type === 'success') bgColor = 'bg-green-500';
-  if (type === 'error') bgColor = 'bg-red-500';
-  if (type === 'info') bgColor = 'bg-sky-500';
+const Notification: React.FC<NotificationProps> = ({ message, type, onClose }) => {
+  const baseClasses = 'p-4 rounded-md text-white flex items-center justify-between shadow-lg';
+  const typeClasses = {
+    success: 'bg-green-500',
+    error: 'bg-red-500',
+    info: 'bg-blue-500',
+  };
 
   return (
-    <div 
-      className={`fixed top-5 right-5 ${bgColor} text-white p-4 rounded-lg shadow-lg z-[100] transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-      role="alert"
-    >
-      {message}
+    <div className={`fixed top-5 left-1/2 transform -translate-x-1/2 z-50 ${baseClasses} ${typeClasses[type]}`}>
+      <span className="mr-4">{message}</span>
+      {onClose && (
+        <button onClick={onClose} className="text-white hover:text-gray-100 focus:outline-none">
+          <X size={20} />
+        </button>
+      )}
     </div>
   );
 };

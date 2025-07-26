@@ -3,7 +3,7 @@ import passport from 'passport';
 import autorizar from '../utils/autorizar.js';
 import { body, param, query } from 'express-validator';
 import manejarValidacionErrores from '../middlewares/manejarValidacionErrores.js';
-import { getUsuarios, createUsuario, getUsuarioPorId, actualizarUsuario, eliminarUsuario} from '../controllers/usuario.controller.js'
+import { getUsuarios, createUsuario, getUsuarioPorId, actualizarUsuario, eliminarUsuario, getMiUsuario} from '../controllers/usuario.controller.js'
 import Rol from "../models/rol.models.js";
 import Empleado from "../models/empleado.models.js";
 import Usuario from "../models/usuario.models.js";
@@ -12,6 +12,10 @@ import AppError from "../utils/appError.js";
 
 const router = Router();
 
+router.get('/mi-usuario',
+    passport.authenticate('jwt', { session: false }),
+    autorizar(['VEND', 'ADM']),
+    getMiUsuario);
 
 router.get('/',
     passport.authenticate('jwt', { session: false }),
@@ -96,5 +100,10 @@ router.delete('/:empleado_id',
     ],
     manejarValidacionErrores,
     eliminarUsuario);
+
+
+
+
+
 
 export default router;
