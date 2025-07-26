@@ -62,11 +62,9 @@ const LoginForm: React.FC = () => {
         showNotification("Ha superado el número máximo de intentos. Podrá reintentar en 1 minuto.", 'error');
         setIsLoginDisabled(true);
         setLockoutEndTime(Date.now() + LOCKOUT_DURATION_MS);
-      } else if (error.status === 401) {
+      } else  {
         showNotification(`ID de empleado o contraseña inválidos. Intentos restantes: ${MAX_LOGIN_ATTEMPTS - currentAttempts}.`, 'error');
-      } else {
-        showNotification(error.message || 'Error de inicio de sesión. Por favor, intente de nuevo.', 'error');
-      }
+      } 
     } finally {
       setIsLoading(false);
     }

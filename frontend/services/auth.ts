@@ -19,15 +19,12 @@ export const login = async (user: User) : Promise<{ token: string }> => {
             body: JSON.stringify(user)
         });
         const data = await response.json();
-        if (response.ok) {
-            return data;
-        } else {
-            if (response.status === 401) {
-                throw new Error('Usuario o contraseña incorrectos');
-            } else {
-                throw new Error('Se superó el limite de intentos, podrás reintentar al cabo de un minuto.');
-            }
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'No se pudo iniciar sesión');
         }
+        return data;
+        
     } catch (error) {
         throw error;
     }
