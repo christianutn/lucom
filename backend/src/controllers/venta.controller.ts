@@ -11,11 +11,9 @@ import { getStrategy } from "../services/strategies/venta_manager.strategy.js";
 import { IUserInRequest } from "../types/usuario.js"
 import { IClienteAttributes, IClienteCreate, IClienteUpdate } from "../types/cliente.js";
 import { IDomicilioAttributes, IDomicilioCreate, IDomicilioUpdate } from "../types/domicilio.js";
-import { ITelefonoPrincipalAttributes, ITelefonoPrincipalCreate, ITelefonoPrincipalUpdate } from "../types/telefono_principal.js";
 import { IBarrioAttributes, IBarrioCreate, IBarrioUpdate } from "../types/barrio.js";
 import Cliente from "../models/cliente.models.js";
 import Domicilio from "../models/domicilio.models.js";
-import TelefonoPrincipal from "../models/telefono_principal.models.js";
 import Barrio from "../models/barrio.models.js";
 
 
@@ -150,7 +148,6 @@ export const crearVentaConDetalles = async (req: Request, res: Response, next: N
     const cliente: IClienteAttributes = req.body.cliente;
     const domicilio: IDomicilioAttributes = req.body.domicilio;
     const barrio: IBarrioAttributes = req.body.barrio;
-    const telefonos_principales: ITelefonoPrincipalAttributes[] = req.body.telefonos_principales;
 
 
 
@@ -174,14 +171,13 @@ export const crearVentaConDetalles = async (req: Request, res: Response, next: N
 
         // 1. Creamos o actualizamos cliente
         await tratarCliente(cliente, t);
-        integrar_id_cliente(cliente, datosVenta, domicilio, telefonos_principales); // por si se carga nuevo cliente
+        integrar_id_cliente(cliente, datosVenta, domicilio); // por si se carga nuevo cliente
 
-        // 2. Creamos o actualizamos telefonos_principales
-        await tratarTelefonosPrincipales(telefonos_principales, t);
-
-        // 3. Creamos o actualizamos barrio. Primero el barrio ya que el domicilio necesita del id del barrio
-        await tratarBarrio(barrio, t);
-        integrar_id_barrio(barrio, domicilio);
+        // 3. Creamos o actualizamos barrio (En caso de enviarse el nombre de un barrio nuevo). Primero el barrio ya que el domicilio necesita del id del barrio
+        if (barrio.nombre) {
+            await tratarBarrio(barrio, t);
+            integrar_id_barrio(barrio, domicilio);
+        }
 
         // 4. Creamos o actualizamos domicilio
         await tratarDomicilio(domicilio, t);
@@ -204,7 +200,7 @@ export const crearVentaConDetalles = async (req: Request, res: Response, next: N
         //Cargar nueva fila en googlesheets
 
 
-        await strategy.cargar_nueva_fila(nuevaVenta, detalles, cliente, telefonos_principales, domicilio, barrio);
+        await strategy.cargar_nueva_fila(nuevaVenta, detalles, cliente, domicilio, barrio);
 
         const detallesCreados = await strategy.getDetails(nuevaVenta.id, t);
 
@@ -242,17 +238,22 @@ const tratarCliente = async (cliente: IClienteAttributes, t: Transaction): Promi
         // Si datosCliente.id es undifined o vacío, crear un nuevo cliente, caso contrario actualizarlo
         if (!cliente.id) {
 
-            const nuevoCliente = await Cliente.create({
+            const nuevoCliente : IClienteCreate = {
                 tipo_documento: cliente.tipo_documento,
                 numero_documento: cliente.numero_documento,
                 nombre: cliente.nombre,
                 apellido: cliente.apellido,
-                telefono_secundario: cliente.telefono_secundario,
                 correo_electronico: cliente.correo_electronico,
-                fecha_nacimiento: cliente.fecha_nacimiento
-            }, { transaction: t });
+                telefono_principal: cliente.telefono_principal,
+            }
 
-            cliente.id = nuevoCliente.id;
+            if (cliente.telefono_secundario) nuevoCliente.telefono_secundario = cliente.telefono_secundario;
+            if (cliente.fecha_nacimiento) nuevoCliente.fecha_nacimiento = cliente.fecha_nacimiento;
+
+
+            const nuevoClienteCreado = await Cliente.create(nuevoCliente, { transaction: t });
+
+            cliente.id = nuevoClienteCreado.id;
 
         } else {
 
@@ -281,64 +282,22 @@ const tratarCliente = async (cliente: IClienteAttributes, t: Transaction): Promi
 }
 
 
-
-const tratarTelefonosPrincipales = async (telefonos_principales: ITelefonoPrincipalAttributes[], t: Transaction): Promise<void> => {
-    try {
-        for (const telefono of telefonos_principales) {
-            if (!telefono.id) {
-
-
-                const nuevoTelefono: ITelefonoPrincipalCreate = {
-                    cliente_id: telefono.cliente_id,
-                    numero_telefono: telefono.numero_telefono,
-                    fecha_modificacion: DateTime.now().setZone('America/Argentina/Buenos_Aires').toJSDate()
-                };
-
-                const telefonoCreado = await TelefonoPrincipal.create(nuevoTelefono, { transaction: t });
-                telefono.id = telefonoCreado.id;
-            } else {
-                const telefonoActualizado: ITelefonoPrincipalUpdate = {
-                    cliente_id: telefono.cliente_id,
-                    numero_telefono: telefono.numero_telefono,
-                    fecha_modificacion: DateTime.now().setZone('America/Argentina/Buenos_Aires').toJSDate(),
-                };
-
-                await TelefonoPrincipal.update(telefonoActualizado, {
-                    where: { id: telefono.id },
-                    transaction: t
-                });
-            }
-
-            // Eliminamos en caso de exister todos aquellos telefonos del cliente que no vienen por la lista
-            await TelefonoPrincipal.destroy({
-                where: {
-                    id: {
-                        [Op.notIn]: telefonos_principales.map(telefono => telefono.id)
-                    },
-                    cliente_id: telefono.cliente_id
-                },
-                transaction: t
-            });
-        }
-    } catch (error) {
-        throw new AppError('Error al tratar los telefonos principales', 500);
-    }
-};
-
 const tratarDomicilio = async (domicilio: IDomicilioAttributes, t: Transaction): Promise<void> => {
     try {
 
-        const domObject : IDomicilioCreate = {
+        const domObject: IDomicilioCreate = {
             cliente_id: domicilio.cliente_id,
             nombre_calle: domicilio.nombre_calle,
             numero_calle: domicilio.numero_calle,
             entre_calle_1: domicilio.entre_calle_1,
             entre_calle_2: domicilio.entre_calle_2,
-            barrio_id: domicilio.barrio_id,
+            
         }
 
         if (domicilio.piso) domObject.piso = domicilio.piso;
         if (domicilio.departamento) domObject.departamento = domicilio.departamento;
+        if (domicilio.barrio_id) domObject.barrio_id = domicilio.barrio_id;
+
 
 
         if (!domicilio.id) {
@@ -385,13 +344,11 @@ const tratarBarrio = async (barrio: IBarrioAttributes, t: Transaction): Promise<
     }
 }
 
-const integrar_id_cliente = (cliente: IClienteAttributes, datosVenta: IVentaCreate, domicilio: IDomicilioAttributes, telefonos_principales: ITelefonoPrincipalAttributes[]) => {
+const integrar_id_cliente = (cliente: IClienteAttributes, datosVenta: IVentaCreate, domicilio: IDomicilioAttributes) => {
     try {
         datosVenta.cliente_id = cliente.id;
         domicilio.cliente_id = cliente.id;
-        for (const telefono of telefonos_principales) {
-            telefono.cliente_id = cliente.id;
-        }
+        
     } catch (error) {
         throw new AppError('Error al tratar el barrio', 500);
     }

@@ -3,7 +3,6 @@ import AppError from '../utils/appError.js';
 import { Op } from 'sequelize';
 import TipoDocumento from '../models/tipo_documento.models.js';
 import Domicilio from '../models/domicilio.models.js';
-import TelefonoPrincipal from '../models/telefono_principal.models.js';
 import Barrio from '../models/barrio.models.js';
 import { Request, Response, NextFunction } from 'express';
 import { WhereOptions } from 'sequelize';
@@ -46,7 +45,7 @@ export const getClientes = async (req: Request, res: Response, next: NextFunctio
                         { model: Barrio, as: 'barrio' }
                     ]
                 },
-                { model: TelefonoPrincipal, as: 'telefonosPrincipales' }
+                
             ]
         });
         
@@ -64,10 +63,13 @@ export const createCliente = async (req: Request, res: Response, next: NextFunct
         numero_documento: req.body.numero_documento,
         nombre: req.body.nombre,
         apellido: req.body.apellido,
-        telefono_secundario: req.body.telefono_secundario,
-        fecha_nacimiento: req.body.fecha_nacimiento,
+        telefono_principal: req.body.telefono_principal,
         correo_electronico: req.body.correo_electronico
+        
     };
+
+    if (req.body.telefono_secundario) nuevoClliente.telefono_secundario = req.body.telefono_secundario;
+    if (req.body.fecha_nacimiento) nuevoClliente.fecha_nacimiento = req.body.fecha_nacimiento
 
     try {
         const cliente = await Cliente.create(nuevoClliente);

@@ -30,7 +30,7 @@ class BbooStrategy implements IStrategyDetalleVenta {
         return DetalleBboo.findAll({ where: { venta_id }, transaction });
     }
 
-    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetalleBbooCreate, cliente: any, telefonos_principales: any, domicilio: any, barrio: any): Promise<any> {
+    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetalleBbooCreate, cliente: any, domicilio: any, barrio: any): Promise<any> {
         try {
 
             //Buscamos nombre empleado
@@ -50,9 +50,10 @@ class BbooStrategy implements IStrategyDetalleVenta {
 
             // Armamos string de contacto
 
-            const telefonosPrincipalesString = telefonos_principales.map((tel: any) => tel.numero_telefono.toString()).join(' - ');
+            const telefono_principal = cliente.telefono_principal;
 
-            const contacto = `Telefonos principales: ${telefonosPrincipalesString} / Secundario: ${cliente.telefono_secundario}`
+
+            const contacto = `Telefonoprincipal: ${telefono_principal} / Secundario: ${cliente.telefono_secundario}`
 
             // Armamos string para Vendedor
 
@@ -96,7 +97,7 @@ class BbooStrategy implements IStrategyDetalleVenta {
                 "Entre Calles": entreCallesString,
                 "Cliente Nombre y Apellido": `${cliente?.nombre.trim() || 'Nombre desconocido'}, ${cliente?.apellido.trim() || 'Apellido desconocido'}`,
                 "Cliente DNI (Incluir la sigla LC o LE si no es DNI)": numeroDocumentoString,
-                "Teléfono Cliente": `${telefonosPrincipalesString}`,
+                "Teléfono Cliente": `${telefono_principal}`,
                 "LINEA CLARO A CONSULTAR (Todas las líneas PosPago masivo, ahora aplican a Convergencia, EXCLUYE LINEA FIJA) ": `${detalles.linea_claro_a_consultar || 'Linea claro a consultar no ingresada'}`,
                 "PEDIDO RELLAMADO Ingresar DNI. Si es urgente agregar la palabra ALERTA": detalles.pedido_rellamado || 'Gigas desconocido',
             };
@@ -116,7 +117,7 @@ class BbooStrategy implements IStrategyDetalleVenta {
             body('detalles').notEmpty().withMessage('Los detalles son requeridos'),
 
             body('detalles.linea_claro_a_consultar')
-                .exists()
+                .optional({ checkFalsy: true })
                 .isString().trim()
                 .isLength({ max: 10, min: 10 })
                 .matches(/^\d{10}$/).withMessage('El campo linea_claro_a_consultar debe ser una cadena de texto formada por 10 dígitos'),

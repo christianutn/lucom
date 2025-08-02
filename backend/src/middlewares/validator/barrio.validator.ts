@@ -23,7 +23,7 @@ export const validarAtributosBarrio : ValidationChain[] = [
 
     body('barrio.nombre')
     .isString().withMessage('El campo "nombre" debe ser una cadena de texto.')
-    .isLength({ min: 1, max: 150 }).withMessage('El campo "nombre" debe tener un.maxcdn 150 caracteres.'),
+    .isLength({ min: 0, max: 150 }).withMessage('El campo "nombre" debe tener un.maxcdn 150 caracteres.'),
 
     
 ];

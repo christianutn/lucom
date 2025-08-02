@@ -104,9 +104,8 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     errors.apellido = '';
     onChange('email', client.correo_electronico || '');
     onChange('clienteId', client.id.toString());
-    const principalPhones = client.telefonosPrincipales?.filter(t => t.activo === 1).sort((a, b) => new Date(b.fecha_modificacion).getTime() - new Date(a.fecha_modificacion).getTime()).map(t => ({ numero: t.numero_telefono, id: t.id?.toString() || '' })) || [];
-    onChange('telefonosPrincipales', principalPhones.length > 0 ? principalPhones : [{ numero: '', id: '' }]);
-    errors.telefonosPrincipales = client.telefonosPrincipales?.length > 0 ? '' : 'El cliente debe tener al menos un teléfono principal.';
+    onChange('telefono_principal', client.telefono_principal || '');
+    errors.telefono_principal = client.telefono_principal ? '' : 'El cliente debe tener un teléfono principal.';
     onChange('telefonoSecundario', client.telefono_secundario || '');
     onChange('domicilioSeleccionadoId', '');
     onChange('fechaNacimiento', client.fecha_nacimiento || '');
@@ -148,21 +147,6 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     resetAddressFields();
     setIsDomicilioModalOpen(false);
     setShowAddressForm(true);
-  };
-
-  const handleAddTelefonoPrincipal = () => {
-
-    onChange('telefonosPrincipales', [...data.telefonosPrincipales, { numero: '', id: '' }]);
-  };
-
-  const handleRemoveTelefonoPrincipal = (index: number) => {
-    const newTelefonos = data.telefonosPrincipales.filter((_, i) => i !== index);
-    onChange('telefonosPrincipales', newTelefonos.length > 0 ? newTelefonos : [{ numero: '', id: '' }]);
-  };
-
-  const handleTelefonoPrincipalChange = (index: number, value: string) => {
-    const newTelefonos = data.telefonosPrincipales.map((tel, i) => i === index ? { ...tel, numero: value } : tel);
-    onChange('telefonosPrincipales', newTelefonos);
   };
 
   const handleBarrioChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -216,17 +200,17 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
 
   if (isLoading) {
     return (
-      <Card title="Datos del Cliente">
+      <Card>
         <div className="relative h-40">
-          <Spinner fullScreen={false} />
+          <Spinner/>
         </div>
       </Card>
     );
   }
 
   return (
-    <Card title="Datos del Cliente" className="mb-6">
-      {isSearching && <Spinner fullScreen={false} />}
+    <Card className="mb-6">
+      {isSearching && <Spinner />}
 
       {/* SECCIÓN DE BÚSQUEDA DE CLIENTE */}
       <div className="mb-6 p-4 border border-gray-700 rounded-lg bg-gray-800">
@@ -345,27 +329,20 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
             }
           }}
           error={errors.fechaNacimiento}
-          required
+          
         />
 
         <div className="md:col-span-2 space-y-3">
-          <label className="block text-sm font-medium text-gray-300 mb-1">Teléfono/s de contacto principal</label>
-          {data.telefonosPrincipales.map((tel, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <Input label="" id={`telPrincipal-${index}`} type="tel" value={tel.numero}
-                onChange={e => {
-                  handleTelefonoPrincipalChange(index, e.target.value)
-                  if (validarTelefono(e.target.value)) {
-                    onClientDataErrors({ ...errors, telefonosPrincipales: '' });
-                  } else {
-                    onClientDataErrors({ ...errors, telefonosPrincipales: 'Debes ingresar un teléfono válido. Debe tener 10 dígitos.' });
-                  }
-                }}
-                placeholder="Número principal" className="flex-grow" error={errors.telefonosPrincipales} required />
-              {data.telefonosPrincipales.length > 1 && <Button type="button" variant="danger" onClick={() => handleRemoveTelefonoPrincipal(index)} className="py-2 px-3 text-sm shrink-0">Eliminar</Button>}
-            </div>
-          ))}
-          {/* <Button type="button" variant="secondary" onClick={handleAddTelefonoPrincipal} className="text-sm py-2">+ Añadir teléfono</Button> */}
+          <Input label="Teléfono de contacto principal" id="telPrincipal" type="tel" value={data.telefono_principal}
+            onChange={e => {
+              onChange('telefono_principal', e.target.value)
+              if (validarTelefono(e.target.value)) {
+                onClientDataErrors({ ...errors, telefono_principal: '' });
+              } else {
+                onClientDataErrors({ ...errors, telefono_principal: 'Debes ingresar un teléfono válido. Debe tener 10 dígitos.' });
+              }
+            }}
+            placeholder="Número principal" className="flex-grow" error={errors.telefono_principal} required />
         </div>
 
         <Input label="Teléfono de contacto secundario (opcional)" id="telefonoSecundario" type="tel" value={data.telefonoSecundario}
@@ -444,7 +421,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
               }} />
 
               <div className="md:col-span-2">
-                <Select label="Barrio" id="barrio" options={allBarriosOptions} value={data.nuevoDomicilio.barrioId} onChange={handleBarrioChange} emptyOptionLabel="Seleccione un barrio" error={errors.nuevoDomicilio.nuevoBarrioNombre} required />
+                <Select label="Barrio" id="barrio" options={allBarriosOptions} value={data.nuevoDomicilio.barrioId} onChange={handleBarrioChange} emptyOptionLabel="Seleccione un barrio" error={errors.nuevoDomicilio.nuevoBarrioNombre} />
                 {data.nuevoDomicilio.barrioId === 'NUEVO_BARRIO' && (
                   <div className="mt-2 p-3 bg-gray-700 rounded">
                     <Input label="Nombre del nuevo barrio" id="nuevoBarrioNombre" value={data.nuevoDomicilio.nuevoBarrioNombre} onChange={e => onChange('nuevoDomicilio', { ...data.nuevoDomicilio, nuevoBarrioNombre: e.target.value })} onKeyDown={handleNuevoBarrioKeyDown} placeholder="Escriba el nombre y presione Enter" required />

@@ -32,7 +32,7 @@ class PortaStrategy implements IStrategyDetalleVenta {
         return DetallePorta.findAll({ where: { venta_id }, transaction });
     }
 
-    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetallePortaCreate, cliente: any, telefonos_principales: any, domicilio: any, barrio: any): Promise<any> {
+    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetallePortaCreate, cliente: any, domicilio: any, barrio: any): Promise<any> {
         try {
 
             //Buscamos nombre empleado
@@ -52,9 +52,9 @@ class PortaStrategy implements IStrategyDetalleVenta {
 
              // Armamos string de contacto
 
-            const telefonosPrincipalesString = telefonos_principales.map((tel: any) => tel.numero_telefono.toString()).join(' - ');
+            const telefono_principal = cliente.telefono_principal
 
-            const contacto = `Telefonos principales: ${telefonosPrincipalesString} / Secundario: ${cliente.telefono_secundario}`
+            const contacto = `Telefono principal: ${telefono_principal} / Secundario: ${cliente.telefono_secundario}`
 
             // Armamos string para Vendedor
 

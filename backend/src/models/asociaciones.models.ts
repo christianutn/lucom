@@ -11,7 +11,6 @@ import Empleado from './empleado.models.js';
 import Giga from './giga.models.js';
 import OrigenDato from './origen_dato.models.js';
 import Rol from './rol.models.js';
-import TelefonoPrincipal from './telefono_principal.models.js';
 import TipoConvergencia from './tipo_convergencia.models.js';
 import TipoDocumento from './tipo_documento.models.js';
 import TipoDomicilio from './tipo_domicilio.models.js';
@@ -82,9 +81,6 @@ Giga.hasMany(DetallePorta, { foreignKey: 'gigas', as: 'detallesPorta' });
 DetallePorta.belongsTo(Compania, { foreignKey: 'compania', as: 'companiaAsociada' });
 Compania.hasMany(DetallePorta, { foreignKey: 'compania', as: 'detallesPorta' });
 
-// TelefonoPrincipal - Cliente
-TelefonoPrincipal.belongsTo(Cliente, { foreignKey: 'cliente_id', as: 'cliente' });
-Cliente.hasMany(TelefonoPrincipal, { foreignKey: 'cliente_id', as: 'telefonosPrincipales' });
 
 // Usuario - Empleado
 Usuario.belongsTo(Empleado, { foreignKey: 'empleado_id', as: 'empleado' });
@@ -104,7 +100,6 @@ export default {
   Giga,
   OrigenDato,
   Rol,
-  TelefonoPrincipal,
   TipoConvergencia,
   TipoDocumento,
   TipoDomicilio,

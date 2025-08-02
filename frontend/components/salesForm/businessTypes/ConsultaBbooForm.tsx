@@ -40,7 +40,7 @@ const ConsultaBbooForm: React.FC<ConsultaBbooFormProps> = ({ data, onChange }) =
   }, [showNotification]);
 
   if (isLoading) {
-    return <div className="relative h-48"><Spinner fullScreen={false} /></div>;
+    return <div className="relative h-48"><Spinner /></div>;
   }
 
   return (

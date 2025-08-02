@@ -10,7 +10,6 @@ import DetallePorta from '../../models/detalle_porta.models.js';
 
 //Importamos interfaces
 import { IDatalleBafCreate } from '../../types/detalle_baf.js'
-import { ITelefonoPrincipalAttributes } from '../../types/telefono_principal.js';
 import { IDomicilioAttributes } from '../../types/domicilio.js';
 import { IBarrioAttributes } from '../../types/barrio.js';
 import { IVentaAttributes } from '../../types/venta.js';
@@ -133,7 +132,7 @@ class BafConPortaStrategy implements IStrategyDetalleVenta {
         ]
     }
 
-    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetalleBafPortaCreate, cliente: IClienteAttributes, telefonos_principales: ITelefonoPrincipalAttributes[], domicilio: IDomicilioAttributes, barrio: IBarrioAttributes): Promise<any> {
+    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetalleBafPortaCreate, cliente: IClienteAttributes, domicilio: IDomicilioAttributes, barrio: IBarrioAttributes): Promise<any> {
         try {
 
             const portaStrategy = new PortaStrategy();
@@ -145,9 +144,9 @@ class BafConPortaStrategy implements IStrategyDetalleVenta {
 
             // Ejecutamos la carga de fila para ambas partes de la venta
             venta.tipo_negocio_id = 1
-            await portaStrategy.cargar_nueva_fila(venta, detalles, cliente, telefonos_principales, domicilio, barrio);
+            await portaStrategy.cargar_nueva_fila(venta, detalles, cliente, domicilio, barrio);
             venta.tipo_negocio_id = 2
-            await bafStrategy.cargar_nueva_fila(venta, detalles, cliente, telefonos_principales, domicilio, barrio);
+            await bafStrategy.cargar_nueva_fila(venta, detalles, cliente, domicilio, barrio);
 
         } catch (error) {
             throw new AppError('Error al cargar la nueva fila', 500);

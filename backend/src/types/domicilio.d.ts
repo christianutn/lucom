@@ -31,7 +31,7 @@ export interface IDomicilioAttributes {
     numero_calle: string;
     entre_calle_1?: string;
     entre_calle_2?: string;
-    barrio_id: number;
+    barrio_id?: number;
     piso?: number;
     departamento?: string;
   }

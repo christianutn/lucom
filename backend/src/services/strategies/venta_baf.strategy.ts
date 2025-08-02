@@ -7,17 +7,10 @@ import AppError from '../../utils/appError.js';
 import { IDatalleBafCreate } from '../../types/detalle_baf.js'
 import { IVentaAttributes } from '../../types/venta.js';
 import { NuevaFilaBaf } from '../../types/googleSheets.js';
-import { DateTime } from 'luxon';
-import { ITelefonoPrincipalAttributes } from '../../types/telefono_principal.js';
 import { IBarrioAttributes } from '../../types/barrio.js';
 import { IDomicilioAttributes } from '../../types/domicilio.js';
-import Venta from "../../models/venta.models.js";
-import Cliente from "../../models/cliente.models.js";
-import Domicilio from "../../models/domicilio.models.js";
-import Barrio from "../../models/barrio.models.js";
 import Empleado from "../../models/empleado.models.js";
 import TipoDocumento from "../../models/tipo_documento.models.js";
-import TelefonoPrincipal from "../../models/telefono_principal.models.js";
 import Abono from "../../models/abono.models.js";
 import TipoDomicilio from "../../models/tipo_domicilio.models.js";
 import TipoConvergencia from "../../models/tipo_convergencia.models.js";
@@ -81,7 +74,7 @@ class BafStrategy implements IStrategyDetalleVenta {
         ]
     }
 
-    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDatalleBafCreate , cliente: IClienteAttributes, telefonos_principales: ITelefonoPrincipalAttributes[], domicilio: IDomicilioAttributes, barrio: IBarrioAttributes): Promise<any> {
+    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDatalleBafCreate , cliente: IClienteAttributes, domicilio: IDomicilioAttributes, barrio: IBarrioAttributes): Promise<any> {
         try {
             //Buscamos nombre empleado
             const empleado = await Empleado.findByPk(venta.empleado_id);
@@ -98,8 +91,8 @@ class BafStrategy implements IStrategyDetalleVenta {
             }
 
             //Armamos string con los numeros de teléfonos principales
-            const telefonosPrincipalesString = telefonos_principales.map((tel: any) => tel.numero_telefono.toString()).join(' - ');
-
+            const telefono_principal = cliente.telefono_principal;
+            
             //Buscamos abono
             const abono = await Abono.findByPk(detalles.abono_id);
 
@@ -151,7 +144,7 @@ class BafStrategy implements IStrategyDetalleVenta {
                 "Fecha Nacim.": `${fechaNacimientoString}`,
                 "Domicilio": `${domicilioString}`,
                 "Entre Calles": `${domicilio?.entre_calle_1 || 'Entre calles desconocidas'} / ${domicilio?.entre_calle_2 || 'Entre calles desconocidas'}`,
-                "Telefono1": `${telefonosPrincipalesString}`,
+                "Telefono1": `${telefono_principal}`,
                 "Telefono2 IMPORTANTE mejora contacto!": `${cliente?.telefono_secundario ? cliente.telefono_secundario : 'Telefono desconocido'}`,
                 "email": `${cliente?.correo_electronico || 'Correo electronico no cargado'}`,
                 "Abono": `${abono?.descripcion || 'Abono desconocido'}`,

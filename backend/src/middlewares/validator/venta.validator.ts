@@ -7,7 +7,6 @@ import TipoNegocio from '../../models/tipo_negocio.models.js';
 import Cliente from '../../models/cliente.models.js';
 import Domicilio from '../../models/domicilio.models.js';
 import {validarAtributosCliente}  from './cliente.validator.js';
-import { validarAtributosTelefonosPrincipales } from './telefonos_principales.validator.js';
 import { validarAtributosDomicilio } from './domicilio.validator.js';
 import { validarAtributosBarrio } from './barrio.validator.js';
 import OrigenDato from "../../models/origen_dato.models.js";
@@ -112,8 +111,6 @@ export const validarCreacionVenta = (): (ValidationChain | ((req: any, res: any,
     // Validamos para cliente:
     ...validarAtributosCliente,
 
-    // Validamos para telefonos_principales:
-    ...validarAtributosTelefonosPrincipales,
 
     // Validamos para domicilio del cliente
     ...validarAtributosDomicilio,

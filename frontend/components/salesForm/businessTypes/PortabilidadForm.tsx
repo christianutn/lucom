@@ -4,7 +4,7 @@ import Select from '../../common/Select.js';
 import Input from '../../common/Input.js';
 import Spinner from '../../common/Spinner.js';
 import { getGigas, getCompanias } from '../../../services/api.js';
-import { SelectOption, PortabilidadState, Cliente, TelefonoPrincipal } from '../../../types.js';
+import { SelectOption, PortabilidadState, Cliente } from '../../../types.js';
 import { useNotification } from '../../../hooks/useNotification.js';
 import { validarTelefono } from '@/utils/validarDatosEntrada.js';
 
@@ -44,16 +44,8 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, sel
   }, [showNotification]);
 
   useEffect(() => {
-    if (selectedClient && selectedClient.telefonosPrincipales && selectedClient.telefonosPrincipales.length > 0) {
-      let nimToPort = '';
-      const activePrincipalPhones = selectedClient.telefonosPrincipales
-        .filter(t => t.activo === 1)
-        .sort((a, b) => new Date(b.fecha_modificacion).getTime() - new Date(a.fecha_modificacion).getTime());
-      
-      if (activePrincipalPhones.length > 0) {
-        nimToPort = activePrincipalPhones[0].numero_telefono;
-      }
-      
+    if (selectedClient && selectedClient.telefono_principal) {
+      let nimToPort = selectedClient.telefono_principal;
       if (nimToPort) {
         onChange('nimAPortar', nimToPort);
         setErrorNim(''); // Clear error if a valid phone is set
@@ -67,7 +59,7 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, sel
 
 
   if (isLoading) {
-    return <div className="relative h-32"><Spinner fullScreen={false}/></div>;
+    return <div className="relative h-32"><Spinner/></div>;
   }
 
   return (

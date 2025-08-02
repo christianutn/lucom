@@ -14,6 +14,7 @@ class Cliente extends Model<IClienteAttributes, IClienteCreate> implements IClie
     public telefono_secundario!: string;
     public activo!: 1 | 0;
     public correo_electronico!: string;
+    public telefono_principal!: string;
 }
 
 /**
@@ -27,6 +28,7 @@ class Cliente extends Model<IClienteAttributes, IClienteCreate> implements IClie
  * @param telefono_secundario - Teléfono secundario del cliente
  * @param activo - Estado del cliente (1: activo, 0: inactivo)
  * @param correo_electronico - Correo electrónico del cliente
+ * @param telefono_principal - Telefono principal (OBligatorio)
  * 
  */
 
@@ -68,6 +70,10 @@ Cliente.init({
         type: DataTypes.TINYINT, 
         defaultValue: 1,  // Valor por defecto si no se especifica
         allowNull: true   // También permitimos que sea nulo explícitamente
+    },
+    telefono_principal: {
+        type: DataTypes.STRING(20),
+        allowNull: false
     }
 }, {
     sequelize,

@@ -76,7 +76,7 @@ export interface Cliente {
   activo: number;
   tipoDocumento?: TipoDocumento; // For display, associated by tipo_documento ID
   domicilios: Domicilio[];
-  telefonosPrincipales: TelefonoPrincipal[];
+  telefono_principal: string;
 }
 
 export interface ClientSearchFilters {
@@ -97,7 +97,7 @@ export interface ClientDataState {
   numeroDocumento: string;
   nombre: string;
   apellido: string;
-  telefonosPrincipales: Array<{ numero: string, id: string }>; // Kept simple for form inputs
+  telefono_principal: string;
   telefonoSecundario: string;
   email: string;
   domicilioSeleccionadoId: string; // ID of existing address or "NUEVO" or "" (nothing selected yet)
@@ -124,7 +124,7 @@ export interface ClientDataStateErrors {
   numeroDocumento: string;
   nombre: string;
   apellido: string;
-  telefonosPrincipales: string
+  telefono_principal: string
   telefonoSecundario: string;
   email: string;
   domicilioSeleccionadoId: string;
@@ -149,7 +149,7 @@ export interface InternetBafState {
   tipoDomicilioId: string;
   abonoId: string;
   tvhd: 'Sí' | 'No' | '';
-  cantidadDecos: string;
+  cantidadDecos: number | string;
   tipoConvergenciaId: string;
   lineaConvergente: string;
 }
@@ -334,7 +334,6 @@ export interface ITelefonoPrincipalAttributes {
  * @property datosVenta
  * @property detalles
  * @property cliente
- * @property telefonos_principales
  * @property domicilio
  * @property barrio
  */
@@ -343,7 +342,6 @@ export interface IVentaConDetalle {
   datosVenta: IVentaCreate;
   detalles: IDetallePortaCreate | IDatalleBafCreate;
   cliente: IClienteAttributes;
-  telefonos_principales: ITelefonoPrincipalAttributes[];
   domicilio: IDomicilioAttributes;
   barrio: IBarrioAttributes;
 }

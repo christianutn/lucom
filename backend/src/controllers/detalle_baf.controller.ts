@@ -11,7 +11,6 @@ import Domicilio from "../models/domicilio.models.js";
 import Barrio from "../models/barrio.models.js";
 import Empleado from "../models/empleado.models.js";
 import TipoDocumento from "../models/tipo_documento.models.js";
-import TelefonoPrincipal from "../models/telefono_principal.models.js";
 import Abono from "../models/abono.models.js";
 import TipoDomicilio from "../models/tipo_domicilio.models.js";
 import TipoConvergencia from "../models/tipo_convergencia.models.js";
@@ -61,10 +60,6 @@ export const getDetallesBaf = async (req: Request, res: Response, next: NextFunc
                                     as: 'tipoDocumento'
                                     
                                 },
-                                {
-                                    model: TelefonoPrincipal,
-                                    as: 'telefonosPrincipales'
-                                }
                             ]
                         }
                         

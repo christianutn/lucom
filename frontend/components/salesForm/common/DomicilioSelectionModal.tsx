@@ -25,7 +25,7 @@ const DomicilioSelectionModal: React.FC<DomicilioSelectionModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <Card title="Seleccionar Domicilio" className="w-full max-w-lg bg-dark-card shadow-xl">
+      <Card className="w-full max-w-lg bg-dark-card shadow-xl">
         <div className="max-h-60 overflow-y-auto mb-4 pr-2">
           {domicilios.map((dom) => (
             <div

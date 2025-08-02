@@ -19,7 +19,7 @@ const clientDataDefault: ClientDataState = {
   numeroDocumento: '',
   nombre: '',
   apellido: '',
-  telefonosPrincipales: [{ numero: '', id: '' }],
+  telefono_principal: '',
   telefonoSecundario: '',
   email: '',
   domicilioSeleccionadoId: '',
@@ -38,13 +38,13 @@ const clientDataErrorsDefault: ClientDataStateErrors = {
   numeroDocumento: 'El número de documento es requerido',
   nombre: 'El nombre es requerido',
   apellido: 'El apellido es requerido',
-  telefonosPrincipales: 'Al menos debe ingresarse un número de teléfono principal',
+  telefono_principal: 'El teléfono principal es requerido y debe tener 10 dígitos.',
   telefonoSecundario: '',
   email: '',
   domicilioSeleccionadoId: '',
   clienteId: '',
   nuevoDomicilio: {
-    calle: 'La calle es requerida', altura: 'La altura es requerida', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: 'Debes ingresar el nombre del barrio', piso: '', departamento: '',
+    calle: 'La calle es requerida', altura: 'La altura es requerida', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: '', piso: '', departamento: '',
   },
   horarioContacto: '',
   convergencia: '',
@@ -101,7 +101,7 @@ const obtenerErrores = (errores: ClientDataStateErrors): string[] => {
 }
 
 const internetBafDefault: InternetBafState = {
-  tipoDomicilioId: '', abonoId: '', tvhd: '', cantidadDecos: '', tipoConvergenciaId: '', lineaConvergente: '',
+  tipoDomicilioId: '', abonoId: '', tvhd: '', cantidadDecos: 0, tipoConvergenciaId: '', lineaConvergente: '',
 };
 
 const portabilidadDefault: PortabilidadState = {
@@ -145,8 +145,8 @@ const SalesForm: React.FC = () => {
       const newState = { ...prev, [field]: value };
       // Si el campo modificado es 'tvhd' y el nuevo valor es 'No',
       // reseteamos la cantidad de decos a '0'.
-      if (field === 'tvhd' && value === 'No') {
-        newState.cantidadDecos = '0';
+      if (field === 'tvhd' && (value === 'No' || value === '')) {
+        newState.cantidadDecos = 0;
       }
       return newState;
     });
@@ -186,13 +186,13 @@ const SalesForm: React.FC = () => {
       numeroDocumento: 'El número de documento es requerido',
       nombre: 'El nombre es requerido',
       apellido: 'El apellido es requerido',
-      telefonosPrincipales: 'Al menos debe ingresarse un número de teléfono principal',
+      telefono_principal: 'El telefono principal es requerido',
       telefonoSecundario: '',
       email: '',
       domicilioSeleccionadoId: '',
       clienteId: '',
       nuevoDomicilio: {
-        calle: 'La calle es requerida', altura: 'La altura es requerida', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: 'Debes ingresar el nombre del barrio', piso: '', departamento: '',
+        calle: 'La calle es requerida', altura: 'La altura es requerida', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: '', piso: '', departamento: '',
       },
       horarioContacto: '',
       convergencia: '',
@@ -273,14 +273,8 @@ const SalesForm: React.FC = () => {
         telefono_secundario: clientData.telefonoSecundario,
         correo_electronico: clientData.email,
         fecha_nacimiento: clientData.fechaNacimiento,
+        telefono_principal: clientData.telefono_principal,
       },
-      telefonos_principales: clientData.telefonosPrincipales
-        .filter(tel => tel.numero.trim() !== '') // Solo enviar teléfonos con número
-        .map(tel => ({
-          id: tel.id || "", // "" si es un campo nuevo
-          cliente_id: clientData.clienteId || "",
-          numero_telefono: tel.numero,
-        })),
       domicilio: {
 
         id: clientData.domicilioSeleccionadoId !== 'NUEVO' ? clientData.domicilioSeleccionadoId : "",
