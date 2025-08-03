@@ -35,13 +35,10 @@ export const validarCreacionVenta = (): (ValidationChain | ((req: any, res: any,
     // --- Grupo 1: Validaciones de campos comunes ---
     body('datosVenta').notEmpty().withMessage("El objeto 'datosVenta' es requerido."),
     body('datosVenta.comentario_horario_contacto')
-        .exists().withMessage('El comentario de horario de contacto es requerido.')
+        .optional({checkFalsy: true})
         .isString().trim().withMessage('El comentario debe ser texto.')
         .isLength({ min: 1, max: 150 }).withMessage('El comentario debe tener máximo 150 caracteres.'),
 
-    body('datosVenta.convergencia')
-        .exists().withMessage('El campo convergencia es requerido.')
-        .isIn([0, 1]).trim().withMessage('El campo convergencia debe ser 0 o 1.'),
 
     body('datosVenta.tipo_negocio_id')
         .exists().withMessage('El ID del tipo de negocio es requerido.')

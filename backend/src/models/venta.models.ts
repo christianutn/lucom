@@ -6,7 +6,6 @@ import { IVentaAttributes, IVentaCreate } from "../types/venta.js";
 class Venta extends Model<IVentaAttributes, IVentaCreate> implements IVentaAttributes {
     public id!: number;
     public comentario_horario_contacto!: string;
-    public convergencia!: 1 | 0;
     public tipo_negocio_id!: number;
     public fecha_realizacion!: Date;
     public activo!: 1 | 0;
@@ -25,10 +24,6 @@ Venta.init(
         },
         comentario_horario_contacto: {
             type: DataTypes.STRING,
-            allowNull: false,
-        },
-        convergencia: {
-            type: DataTypes.INTEGER,
             allowNull: false,
         },
         tipo_negocio_id: {

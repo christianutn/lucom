@@ -103,6 +103,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     onChange('apellido', client.apellido);
     errors.apellido = '';
     onChange('email', client.correo_electronico || '');
+    errors.email = client.correo_electronico ? '' : 'El cliente debe tener un correo electrónico.';
     onChange('clienteId', client.id.toString());
     onChange('telefono_principal', client.telefono_principal || '');
     errors.telefono_principal = client.telefono_principal ? '' : 'El cliente debe tener un teléfono principal.';
@@ -138,6 +139,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     errors.nuevoDomicilio.calle = '';
     errors.nuevoDomicilio.altura = '';
     errors.nuevoDomicilio.nuevoBarrioNombre = '';
+  
     setIsDomicilioModalOpen(false);
     setShowAddressForm(true);
   };
@@ -202,7 +204,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     return (
       <Card>
         <div className="relative h-40">
-          <Spinner/>
+          <Spinner />
         </div>
       </Card>
     );
@@ -252,7 +254,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
 
             if (e.target.value == "9" && !validarCuit(data.numeroDocumento)) {
               onClientDataErrors({ ...errors, numeroDocumento: 'El CUIT es invalido. Estos deben ser ingresado sin guiones.' });
-            } else if ( (e.target.value != "9" && data.numeroDocumento.length !== 8 && data.numeroDocumento.length !== 7 ) || !/^\d+$/.test(data.numeroDocumento)) {
+            } else if ((e.target.value != "9" && data.numeroDocumento.length !== 8 && data.numeroDocumento.length !== 7) || !/^\d+$/.test(data.numeroDocumento)) {
               console.log(data.numeroDocumento);
               onClientDataErrors({ ...errors, numeroDocumento: 'El número de documento debe tener entre 7 y 8 dígitos numéricos.' });
             } else {
@@ -329,21 +331,21 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
             }
           }}
           error={errors.fechaNacimiento}
-          
+
         />
 
-        <div className="md:col-span-2 space-y-3">
-          <Input label="Teléfono de contacto principal" id="telPrincipal" type="tel" value={data.telefono_principal}
-            onChange={e => {
-              onChange('telefono_principal', e.target.value)
-              if (validarTelefono(e.target.value)) {
-                onClientDataErrors({ ...errors, telefono_principal: '' });
-              } else {
-                onClientDataErrors({ ...errors, telefono_principal: 'Debes ingresar un teléfono válido. Debe tener 10 dígitos.' });
-              }
-            }}
-            placeholder="Número principal" className="flex-grow" error={errors.telefono_principal} required />
-        </div>
+        <Input label="Teléfono de contacto principal" id="telPrincipal" type="tel" value={data.telefono_principal}
+          onChange={e => {
+            onChange('telefono_principal', e.target.value)
+            if (validarTelefono(e.target.value)) {
+              onClientDataErrors({ ...errors, telefono_principal: '' });
+            } else {
+              onClientDataErrors({ ...errors, telefono_principal: 'Debes ingresar un teléfono válido. Debe tener 10 dígitos.' });
+            }
+          }}
+          placeholder="Número principal" className="flex-grow" error={errors.telefono_principal} required />
+
+      
 
         <Input label="Teléfono de contacto secundario (opcional)" id="telefonoSecundario" type="tel" value={data.telefonoSecundario}
           onChange={e => {
@@ -358,16 +360,17 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
           }}
           error={errors.telefonoSecundario}
         />
-        <Input label="Correo electrónico (opcional)" id="email" type="email" value={data.email}
+        <Input label="Correo electrónico" id="email" type="email" value={data.email}
           onChange={e => {
             onChange('email', e.target.value);
 
-            if (validarEmail(e.target.value) || e.target.value === '') {
+            if (validarEmail(e.target.value)) {
               onClientDataErrors({ ...errors, email: '' });
             } else {
               onClientDataErrors({ ...errors, email: 'Debes ingresar un correo electrónica válido.' });
             }
           }}
+
 
           error={errors.email} />
       </div>
@@ -435,38 +438,8 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
 
       {/* SECCIÓN DE CONVERGENCIA */}
       <div className="mt-6 pt-6 border-t border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Input label="Horario de contacto" id="horarioContacto" value={data.horarioContacto} onChange={e => onChange('horarioContacto', e.target.value)} placeholder="Ej: 9-12hs y 14-18hs" />
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">¿Convergencia?</label>
-          <div className="flex items-center space-x-4">
-            {(['Sí', 'No'] as const).map(option => (
-              <label key={option} className="flex items-center space-x-2 cursor-pointer">
-                <input type="radio" name="convergencia" value={option} checked={data.convergencia === option} onChange={e => onChange('convergencia', e.target.value as 'Sí' | 'No')} className="form-radio h-4 w-4 text-indigo-600 bg-gray-700 border-gray-600 focus:ring-indigo-500" />
-                <span className="text-gray-300">{option}</span>
-              </label>
-            ))}
-          </div>
-        </div>
+        <Input label="Observaciones" id="horarioContacto" value={data.horarioContacto} onChange={e => onChange('horarioContacto', e.target.value)} placeholder="Ingrese aquí tus observaciones" />
 
-        {data.convergencia === 'Sí' && (
-          <div className="md:col-span-2">
-            <label htmlFor="serviciosConvergentes" className="block text-sm font-medium text-gray-300 mb-1">Servicios Convergentes</label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 border border-gray-700 rounded-md bg-gray-800">
-              {serviciosConvergentes.map(servicio => (
-                <label key={servicio.id} className="flex items-center space-x-2 cursor-pointer">
-                  <input type="checkbox" value={servicio.id.toString()} checked={data.serviciosConvergentesIds.includes(servicio.id.toString())} onChange={e => {
-                    const id = e.target.value;
-                    const newIds = data.serviciosConvergentesIds.includes(id)
-                      ? data.serviciosConvergentesIds.filter(sid => sid !== id)
-                      : [...data.serviciosConvergentesIds, id];
-                    onChange('serviciosConvergentesIds', newIds);
-                  }} className="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500" />
-                  <span className="text-sm text-gray-300">{servicio.descripcion}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       <DomicilioSelectionModal

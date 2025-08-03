@@ -28,7 +28,6 @@ const clientDataDefault: ClientDataState = {
     calle: '', altura: '', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: '', piso: '', departamento: '',
   },
   horarioContacto: '',
-  convergencia: '',
   serviciosConvergentesIds: [],
   fechaNacimiento: '',
 };
@@ -40,14 +39,13 @@ const clientDataErrorsDefault: ClientDataStateErrors = {
   apellido: 'El apellido es requerido',
   telefono_principal: 'El teléfono principal es requerido y debe tener 10 dígitos.',
   telefonoSecundario: '',
-  email: '',
+  email: 'El correo electrónico del cliente es requerido',
   domicilioSeleccionadoId: '',
   clienteId: '',
   nuevoDomicilio: {
     calle: 'La calle es requerida', altura: 'La altura es requerida', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: '', piso: '', departamento: '',
   },
   horarioContacto: '',
-  convergencia: '',
   serviciosConvergentesIds: '',
   fechaNacimiento: '',
 };
@@ -101,7 +99,7 @@ const obtenerErrores = (errores: ClientDataStateErrors): string[] => {
 }
 
 const internetBafDefault: InternetBafState = {
-  tipoDomicilioId: '', abonoId: '', tvhd: '', cantidadDecos: 0, tipoConvergenciaId: '', lineaConvergente: '',
+  tipoDomicilioId: '', abonoId: '', tvhd: "No", cantidadDecos: 0, tipoConvergenciaId: '', lineaConvergente: '',
 };
 
 const portabilidadDefault: PortabilidadState = {
@@ -188,14 +186,13 @@ const SalesForm: React.FC = () => {
       apellido: 'El apellido es requerido',
       telefono_principal: 'El telefono principal es requerido',
       telefonoSecundario: '',
-      email: '',
+      email: 'El correo eléctronico del cliente es requerido',
       domicilioSeleccionadoId: '',
       clienteId: '',
       nuevoDomicilio: {
         calle: 'La calle es requerida', altura: 'La altura es requerida', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: '', piso: '', departamento: '',
       },
       horarioContacto: '',
-      convergencia: '',
       serviciosConvergentesIds: '',
       fechaNacimiento: '',
     });
@@ -257,7 +254,6 @@ const SalesForm: React.FC = () => {
     const ventaConDetalle: any = {
       datosVenta: {
         comentario_horario_contacto: clientData.horarioContacto,
-        convergencia: clientData.convergencia === 'Sí' ? 1 : 0,
         tipo_negocio_id: initialSelection.tipoNegocioId,
         cliente_id: clientData.clienteId || "", // Usa el ID del cliente seleccionado o "" si es nuevo
         domicilio_id: clientData.domicilioSeleccionadoId !== 'NUEVO' ? clientData.domicilioSeleccionadoId : "",

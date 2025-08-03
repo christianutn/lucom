@@ -92,7 +92,7 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, sel
       <Select
         label="Compañía Actual"
         id="companiaActual"
-        options={companiasOptions}
+        options={companiasOptions.sort((a, b) => a.descripcion.localeCompare(b.descripcion))}
         value={data.companiaActualId}
         onChange={e => onChange('companiaActualId', e.target.value)}
         emptyOptionLabel="Seleccione compañía actual"

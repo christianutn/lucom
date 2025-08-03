@@ -75,9 +75,16 @@ export const validarAtributosCliente = [
         .matches(/^\d+$/).withMessage('El campo telefono_secundario debe ser una cadena de texto formada por dígitos')
         .isLength({ min: 10, max: 10 }).withMessage('El campo telefono_secundario debe ser una cadena de texto formada por 10 dígitos'),
 
-    body('correo_electronico')
-        .optional()
-        .isEmail().trim().withMessage('El correo electronico debe ser valido')
+    body('cliente.correo_electronico')
+        .exists().withMessage('El correo electrónico es requerido.')
+        .isEmail().trim().withMessage('El correo electronico debe ser valido'),
+    
+    body('cliente.telefono_principal')
+        .exists().withMessage("El teléfono principal es requerido")
+        .isString().trim().withMessage('El comentario debe ser texto que contenga 10 dígitos.')
+        .matches(/^\d+$/).withMessage('El campo telefono_secundario debe ser una cadena de texto formada por dígitos')
+        .isLength({ min: 10, max: 10 }).withMessage('El campo telefono_secundario debe ser una cadena de texto formada por 10 dígitos')
+        
     
    
 ];

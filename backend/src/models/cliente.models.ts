@@ -64,7 +64,7 @@ Cliente.init({
     },
     correo_electronico: { 
         type: DataTypes.STRING(100),
-        allowNull: true   // Opcional, puede ser nulo
+        allowNull: false   // obligatorio
     },
     activo: { 
         type: DataTypes.TINYINT, 

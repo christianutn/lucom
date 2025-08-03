@@ -26,7 +26,6 @@ export const getVentas = async (req: Request, res: Response, next: NextFunction)
 
         if (req.query.hasOwnProperty('cliente_id')) where.cliente_id = parseInt(req.query.cliente_id as string);
         if (req.query.hasOwnProperty('activo')) where.activo = req.query.activo === '1' ? 1 : 0; // Convertir a entero
-        if (req.query.hasOwnProperty('convergencia')) where.convergencia = req.query.convergencia === '1' ? 1 : 0; // Convertir a entero
         if (req.query.hasOwnProperty('tipo_negocio_id')) where.tipo_negocio_id = parseInt(req.query.tipo_negocio_id as string);
         if (req.query.hasOwnProperty('empleado_id')) where.empleado_id = parseInt(req.query.empleado_id as string);
         if (req.query.hasOwnProperty('origen_dato_id')) where.origen_dato_id = parseInt(req.query.origen_dato_id as string);
@@ -71,7 +70,6 @@ export const createVenta = async (req: Request, res: Response, next: NextFunctio
         const ventaData: IVentaCreate = {
             fecha_realizacion: fecha_realizacion,
             comentario_horario_contacto: req.body.comentario_horario_contacto,
-            convergencia: req.body.convergencia,
             tipo_negocio_id: req.body.tipo_negocio_id,
             cliente_id: req.body.cliente_id,
             domicilio_id: req.body.domicilio_id,
@@ -96,7 +94,6 @@ export const actualizarVenta = async (req: Request, res: Response, next: NextFun
 
 
     try {
-        if (req.body.hasOwnProperty('convergencia')) objetoActualizado.convergencia = req.body.convergencia === '1' ? 1 : 0; // Convertir a entero
         if (req.body.hasOwnProperty('activo')) objetoActualizado.activo = req.body.activo == '1' ? 1 : 0; // Convertir a entero
         if (req.body.hasOwnProperty('tipo_negocio_id')) objetoActualizado.tipo_negocio_id = parseInt(req.body.tipo_negocio_id as string);
         if (req.body.hasOwnProperty('comentario_horario_contacto')) objetoActualizado.comentario_horario_contacto = req.body.comentario_horario_contacto
@@ -262,10 +259,14 @@ const tratarCliente = async (cliente: IClienteAttributes, t: Transaction): Promi
                 numero_documento: cliente.numero_documento,
                 nombre: cliente.nombre,
                 apellido: cliente.apellido,
-                telefono_secundario: cliente.telefono_secundario,
                 correo_electronico: cliente.correo_electronico,
-                fecha_nacimiento: cliente.fecha_nacimiento
+                telefono_principal: cliente.telefono_principal,
+                
             };
+
+            if (cliente.telefono_secundario) datosClienteParaActualizar.telefono_secundario = cliente.telefono_secundario;
+            if (cliente.fecha_nacimiento) datosClienteParaActualizar.fecha_nacimiento = cliente.fecha_nacimiento;
+
 
             await Cliente.update(datosClienteParaActualizar, {
                 where: {

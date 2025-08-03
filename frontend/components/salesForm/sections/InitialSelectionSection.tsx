@@ -54,16 +54,16 @@ const InitialSelectionSection: React.FC<InitialSelectionSectionProps> = ({ data,
 
   if (isLoading) {
     return (
-      <Card title="Selección Inicial">
+      <Card>
         <div className="relative h-24"> {/* Placeholder for height */}
-          <Spinner fullScreen={false}/>
+          <Spinner/>
         </div>
       </Card>
     );
   }
 
   return (
-    <Card title="Selección Inicial" className="mb-6">
+    <Card className="mb-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Select
           label="Tipo de Negocio"

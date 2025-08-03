@@ -54,7 +54,7 @@ const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => 
   }, [showNotification]);
 
   if (isLoading) {
-    return <div className="relative h-48"><Spinner fullScreen={false}/></div>;
+    return <div className="relative h-48"><Spinner/></div>;
   }
 
   return (
@@ -83,7 +83,10 @@ const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => 
             {(['Sí', 'No'] as const).map(option => (
                 <label key={option} className="flex items-center space-x-2 cursor-pointer">
                     <input type="radio" name="tvhd" value={option} checked={data.tvhd === option} 
-                           onChange={e => onChange('tvhd', e.target.value as 'Sí' | 'No')}
+                           onChange={e => {
+                            onChange('tvhd', e.target.value as 'Sí' | 'No')
+                            onChange('cantidadDecos', 1)
+                           }}
                            className="form-radio h-4 w-4 text-brand-blue bg-dark-input border-dark-border focus:ring-brand-blue"
                     />
                     <span className="text-gray-300">{option}</span>
@@ -97,6 +100,7 @@ const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => 
           id="cantidadDecos"
           type="number"
           min="0"
+          max="3"
           value={data.cantidadDecos}
           onChange={e => onChange('cantidadDecos', e.target.value)}
           required

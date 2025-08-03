@@ -19,7 +19,6 @@ router.get('/',
     [
         query('cliente_id').optional().isInt({ min: 1 }).withMessage('El id del cliente debe ser un entero positivo'),
         query('activo').optional().isIn([0, 1]).withMessage('El campo activo debe ser 0 o 1'),
-        query('convergencia').optional().isIn([0, 1]).withMessage('El campo convergencia debe ser 0 o 1'),
         query('tipo_negocio_id').optional().isInt({ min: 1 }).withMessage('El id del tipo de negocio debe ser un entero positivo'),
         query('empleado_id').optional().isInt({ min: 1 }).withMessage('El id del empleado debe ser un entero positivo'),
         query('origen_dato_id').optional().isInt({ min: 1 }).withMessage('El id del origen de dato debe ser un entero positivo'),
@@ -54,7 +53,6 @@ router.put('/:id',
     [
         param('id').exists().isInt({ min: 1 }).withMessage('El ID de venta debe ser un número entero positivo'),
         body('comentario_horario_contacto').optional().isString().isLength({ min: 1, max: 150 }).withMessage('El comentario de horario de contacto debe tener.maxcdn de 150 caracteres'),
-        body('convergencia').optional().isIn([0, 1]).withMessage('El campo convergencia debe ser 0 o 1'),
         body('tipo_negocio_id').optional().isInt({ min: 1 }).withMessage('El id del tipo de negocio debe ser un entero positivo')
             .custom(async (value, { req }) => {
 

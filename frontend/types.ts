@@ -113,7 +113,6 @@ export interface ClientDataState {
     departamento: string; // Stays string for form input
   };
   horarioContacto: string;
-  convergencia: 'Sí' | 'No' | '';
   serviciosConvergentesIds: string[];
   fechaNacimiento ?: string;
 }
@@ -140,7 +139,6 @@ export interface ClientDataStateErrors {
     departamento: string; // Stays string for form input
   };
   horarioContacto: string;
-  convergencia: string;
   serviciosConvergentesIds: string
   fechaNacimiento : string;
 }
@@ -232,7 +230,6 @@ export interface IDatalleBafCreate {
  */
 export interface IVentaCreate {
   comentario_horario_contacto: string;
-  convergencia: 1 | 0;
   tipo_negocio_id: number;
   fecha_realizacion: Date;
   cliente_id: number;
