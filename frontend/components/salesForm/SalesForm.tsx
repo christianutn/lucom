@@ -45,7 +45,6 @@ const clientDataErrorsDefault: ClientDataStateErrors = {
   nuevoDomicilio: {
     calle: 'La calle es requerida', altura: 'La altura es requerida', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: '', piso: '', departamento: '',
   },
-  horarioContacto: '',
   serviciosConvergentesIds: '',
   fechaNacimiento: '',
 };
@@ -95,11 +94,13 @@ const obtenerErrores = (errores: ClientDataStateErrors): string[] => {
     }
   }
 
+
+
   return mensajesDeError;
 }
 
 const internetBafDefault: InternetBafState = {
-  tipoDomicilioId: '', abonoId: '', tvhd: "No", cantidadDecos: 0, tipoConvergenciaId: '', lineaConvergente: '',
+  tipoDomicilioId: '', abonoId: '', tvhd: "No", cantidadDecos: 0, tipoConvergenciaId: '', lineaConvergente: '', horario_contacto: ""
 };
 
 const portabilidadDefault: PortabilidadState = {
@@ -128,6 +129,7 @@ const SalesForm: React.FC = () => {
 
   // Errores
   const [clientDataErrors, setClientDataErrors] = useState<ClientDataStateErrors>(clientDataErrorsDefault);
+  const [nimError, setNimError] = useState<string>('Debe ingresar un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX');
 
   const handleInitialSelectionChange = useCallback(<K extends keyof InitialSelectionState>(field: K, value: InitialSelectionState[K]) => {
     setInitialSelection(prev => ({ ...prev, [field]: value }));
@@ -192,7 +194,6 @@ const SalesForm: React.FC = () => {
       nuevoDomicilio: {
         calle: 'La calle es requerida', altura: 'La altura es requerida', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: '', piso: '', departamento: '',
       },
-      horarioContacto: '',
       serviciosConvergentesIds: '',
       fechaNacimiento: '',
     });
@@ -227,7 +228,7 @@ const SalesForm: React.FC = () => {
         abono_id: internetBafData.abonoId,
         TVHD: internetBafData.tvhd === 'Sí' ? 1 : 0,
         cantidad_decos: internetBafData.cantidadDecos,
-        horario_contacto: clientData.horarioContacto, // Este campo es común pero el backend lo espera en detalles BAF
+        horario_contacto: internetBafData.horario_contacto, // Este campo es común pero el backend lo espera en detalles BAF
         tipo_convergencia_id: internetBafData.tipoConvergenciaId,
       };
     } else if (initialSelection.tipoNegocioId === '3') { // Consulta BBOO
@@ -245,7 +246,7 @@ const SalesForm: React.FC = () => {
         abono_id: internetBafData.abonoId,
         TVHD: internetBafData.tvhd === 'Sí' ? 1 : 0,
         cantidad_decos: internetBafData.cantidadDecos,
-        horario_contacto: clientData.horarioContacto, // Este campo es común pero el backend lo espera en detalles BAF
+        horario_contacto: internetBafData.horario_contacto, // Este campo es común pero el backend lo espera en detalles BAF
         tipo_convergencia_id: internetBafData.tipoConvergenciaId,
       }
     }
@@ -297,11 +298,17 @@ const SalesForm: React.FC = () => {
 
       // Si los campos obligatorios son vacios, mostrar un aviso
       // Recorrer un objeto por clave
-      if (obtenerErrores(clientDataErrors).length > 0) {
+      if (obtenerErrores(clientDataErrors).length > 0  ) {
         const errorMessages = obtenerErrores(clientDataErrors).join(' - ');
         showNotification(`Faltan completar los siguientes campos: ${errorMessages}`, 'error');
         return;
       }
+
+      if(nimError != "" && initialSelection.tipoNegocioId == "1") {
+        showNotification("Debe ingresar un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX", 'error');
+        return
+      }
+
       await postVenta(ventaConDetalle);
       showNotification('Venta guardada exitosamente.', 'success');
       resetForm();
@@ -349,6 +356,9 @@ const SalesForm: React.FC = () => {
           selectedClient={selectedClient}
           consultaBbooData={consultaBbooData}
           onConsultaBbooChange={handleConsultaBbooChange}
+          setNimError={setNimError}
+          nimError={nimError}
+      
         />
       )}
 

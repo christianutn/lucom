@@ -45,6 +45,7 @@ const ConsultaBbooForm: React.FC<ConsultaBbooFormProps> = ({ data, onChange }) =
 
   return (
     <div className="space-y-6">
+      <h4 className="text-md font-semibold mb-3 text-gray-200">Consulta BBOO</h4>
       <Select
         label="Tipo de Domicilio"
         id="tipoDomicilioBaf"

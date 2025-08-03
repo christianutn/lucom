@@ -123,10 +123,10 @@ class BafConPortaStrategy implements IStrategyDetalleVenta {
                 .isInt({ min: 1 })
                 .withMessage('El tipo_convergencia_id debe ser un número entero positivo'),
             body('detalles.horario_contacto')
-                .exists()
+                .optional({ checkFalsy: true })
                 .isString()
                 .trim()
-                .isLength({ min: 1, max: 150 })
+                .isLength({ min: 0, max: 150 })
                 .withMessage('El comentario de horario de contacto debe tener.maxcdn de 150 caracteres'),
 
         ]

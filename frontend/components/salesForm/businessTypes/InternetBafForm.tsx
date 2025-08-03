@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Select from '../../common/Select.js';
 import Input from '../../common/Input.js';
 import Spinner from '../../common/Spinner.js';
-import { getTiposDomicilios,  getTiposConvergencias } from '../../../services/api.js';
+import { getTiposDomicilios, getTiposConvergencias } from '../../../services/api.js';
 import { getAbonos } from '../../../services/abonos.js';
 import { SelectOption, InternetBafState } from '../../../types.js';
 import { useNotification } from '../../../hooks/useNotification.js';
@@ -54,11 +54,12 @@ const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => 
   }, [showNotification]);
 
   if (isLoading) {
-    return <div className="relative h-48"><Spinner/></div>;
+    return <div className="relative h-48"><Spinner /></div>;
   }
 
   return (
     <div className="space-y-6">
+      <h4 className="text-md font-semibold mb-3 text-gray-200">Internet BAF</h4>
       <Select
         label="Tipo de Domicilio"
         id="tipoDomicilioBaf"
@@ -80,18 +81,22 @@ const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => 
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1">TVHD</label>
         <div className="flex items-center space-x-4">
-            {(['Sí', 'No'] as const).map(option => (
-                <label key={option} className="flex items-center space-x-2 cursor-pointer">
-                    <input type="radio" name="tvhd" value={option} checked={data.tvhd === option} 
-                           onChange={e => {
-                            onChange('tvhd', e.target.value as 'Sí' | 'No')
-                            onChange('cantidadDecos', 1)
-                           }}
-                           className="form-radio h-4 w-4 text-brand-blue bg-dark-input border-dark-border focus:ring-brand-blue"
-                    />
-                    <span className="text-gray-300">{option}</span>
-                </label>
-            ))}
+          {(['Sí', 'No'] as const).map(option => (
+            <label key={option} className="flex items-center space-x-2 cursor-pointer">
+              <input type="radio" name="tvhd" value={option} checked={data.tvhd === option}
+                onChange={e => {
+                  onChange('tvhd', e.target.value as 'Sí' | 'No')
+                  if (option === 'No') {
+                    onChange('cantidadDecos', 0);
+                  } else {
+                    onChange('cantidadDecos', 1);
+                  }
+                }}
+                className="form-radio h-4 w-4 text-brand-blue bg-dark-input border-dark-border focus:ring-brand-blue"
+              />
+              <span className="text-gray-300">{option}</span>
+            </label>
+          ))}
         </div>
       </div>
       {data.tvhd === 'Sí' && (
@@ -131,6 +136,11 @@ const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => 
         error={errorLineaConvergente}
         required
       />
+
+
+      <Input label="Observaciones / Horario de contacto" id="horarioContacto" value={data.horario_contacto} onChange={e => onChange('horario_contacto', e.target.value)} placeholder="Ingrese aquí tus observaciones" />
+
+
     </div>
   );
 };

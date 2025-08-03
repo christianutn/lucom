@@ -52,7 +52,6 @@ router.put('/:id',
     autorizar(['ADM']),
     [
         param('id').exists().isInt({ min: 1 }).withMessage('El ID de venta debe ser un número entero positivo'),
-        body('comentario_horario_contacto').optional().isString().isLength({ min: 1, max: 150 }).withMessage('El comentario de horario de contacto debe tener.maxcdn de 150 caracteres'),
         body('tipo_negocio_id').optional().isInt({ min: 1 }).withMessage('El id del tipo de negocio debe ser un entero positivo')
             .custom(async (value, { req }) => {
 

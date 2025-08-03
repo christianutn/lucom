@@ -15,6 +15,8 @@ interface AdditionalSaleDataSectionProps {
   selectedClient: Cliente | null;
   consultaBbooData: ConsultaBbooState;
   onConsultaBbooChange: <K extends keyof ConsultaBbooState>(field: K, value: ConsultaBbooState[K]) => void;
+  setNimError: (error: string) => void;
+  nimError: string;
 }
 
 const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
@@ -26,7 +28,9 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
   onPortabilidadChange,
   selectedClient,
   consultaBbooData,
-  onConsultaBbooChange
+  onConsultaBbooChange,
+  setNimError,
+  nimError,
 }) => {
 
   const renderFormBasedOnType = () => {
@@ -34,7 +38,7 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
       case "2": // BAF (Cambiado a ID 2 como en tu ejemplo)
         return <InternetBafForm data={internetBafData} onChange={onInternetBafChange} />;
       case "1": // Portabilidad
-        return <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} selectedClient={selectedClient} />;
+        return <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} selectedClient={selectedClient} setNimError={setNimError} nimError={nimError}/>;
       case "3": // Consulta BBOO
         return <ConsultaBbooForm data={consultaBbooData} onChange={onConsultaBbooChange} />;
       case "4": // Venta BAF + Porta
@@ -46,7 +50,7 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-200 mb-4 border-b border-gray-700 pb-2">Datos Portabilidad</h3>
-              <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} selectedClient={selectedClient} />
+              <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} selectedClient={selectedClient}  setNimError={setNimError} nimError={nimError}/>
             </div>
           </div>
         )
@@ -60,7 +64,7 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
     : "Datos Adicionales de la Venta";
 
   return (
-    <Card title={title} className="mb-6">
+    <Card  className="mb-6">
       {renderFormBasedOnType()}
     </Card>
   );

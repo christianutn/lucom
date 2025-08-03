@@ -26,7 +26,7 @@ router.get('/',
         // tipo_convergencia
         query('tipo_convergencia').optional().isInt({ min: 1 }).withMessage('El tipo_convergencia debe ser un número entero positivo'),
         // horario_contacto
-        query('horario_contacto').optional().isString().isLength({ min: 1, max: 150 }).withMessage('El comentario de horario de contacto debe tener.maxcdn de 150 caracteres'),
+        query('horario_contacto').optional().isString().isLength({ min: 0, max: 150 }).withMessage('El comentario de horario de contacto debe tener.maxcdn de 150 caracteres'),
     ],
     manejarValidacionErrores,
     getDetallesBaf);

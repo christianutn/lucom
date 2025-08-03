@@ -436,11 +436,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
         )}
       </div>
 
-      {/* SECCIÓN DE CONVERGENCIA */}
-      <div className="mt-6 pt-6 border-t border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Input label="Observaciones" id="horarioContacto" value={data.horarioContacto} onChange={e => onChange('horarioContacto', e.target.value)} placeholder="Ingrese aquí tus observaciones" />
-
-      </div>
+      
 
       <DomicilioSelectionModal
         isOpen={isDomicilioModalOpen}

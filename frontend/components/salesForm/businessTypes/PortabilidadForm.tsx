@@ -12,14 +12,16 @@ interface PortabilidadFormProps {
   data: PortabilidadState;
   onChange: <K extends keyof PortabilidadState>(field: K, value: PortabilidadState[K]) => void;
   selectedClient: Cliente | null;
+  setNimError: (error: string) => void;
+  nimError: string;
 }
 
-const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, selectedClient }) => {
+const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, selectedClient, setNimError, nimError }) => {
   const [gigasOptions, setGigasOptions] = useState<SelectOption[]>([]);
   const [companiasOptions, setCompaniasOptions] = useState<SelectOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { showNotification } = useNotification();
-  const [errorNim, setErrorNim] = useState('');
+ 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,7 +50,7 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, sel
       let nimToPort = selectedClient.telefono_principal;
       if (nimToPort) {
         onChange('nimAPortar', nimToPort);
-        setErrorNim(''); // Clear error if a valid phone is set
+        setNimError(''); // Clear error if a valid phone is set
       } else {
          onChange('nimAPortar', ''); // Clear if no suitable phone found
       }
@@ -64,6 +66,7 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, sel
 
   return (
     <div className="space-y-6">
+      <h4 className="text-md font-semibold mb-3 text-gray-200">Portabilidad</h4>
       <Input
         label="NIM a Portar"
         id="nimAPortar"
@@ -72,12 +75,12 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, sel
           onChange('nimAPortar', e.target.value)
 
           if (validarTelefono(e.target.value)) {
-            setErrorNim('');
+            setNimError('');
           } else {
-            setErrorNim('Debe ingresar un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX');
+            setNimError('Debe ingresar un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX');
           }
         }}
-        error={errorNim}
+        error={nimError}
         required
       />
       <Select

@@ -15,7 +15,7 @@ import Abono from "../../models/abono.models.js";
 import TipoDomicilio from "../../models/tipo_domicilio.models.js";
 import TipoConvergencia from "../../models/tipo_convergencia.models.js";
 import OrigenDato from '../../models/origen_dato.models.js';
-import {agregarFilaPorNombreColumnas} from "../../googleSheets/cargarDatosBAF.js";
+import { agregarFilaPorNombreColumnas } from "../../googleSheets/cargarDatosBAF.js";
 
 
 //Importamos interfaces
@@ -66,15 +66,15 @@ class BafStrategy implements IStrategyDetalleVenta {
                 .isInt({ min: 1 })
                 .withMessage('El tipo_convergencia_id debe ser un número entero positivo'),
             body('detalles.horario_contacto')
-                .exists()
+                .optional({ checkFalsy: true })
                 .isString()
                 .trim()
-                .isLength({ min: 1, max: 150 })
+                .isLength({ min: 0, max: 150 })
                 .withMessage('El comentario de horario de contacto debe tener.maxcdn de 150 caracteres'),
         ]
     }
 
-    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDatalleBafCreate , cliente: IClienteAttributes, domicilio: IDomicilioAttributes, barrio: IBarrioAttributes): Promise<any> {
+    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDatalleBafCreate, cliente: IClienteAttributes, domicilio: IDomicilioAttributes, barrio: IBarrioAttributes): Promise<any> {
         try {
             //Buscamos nombre empleado
             const empleado = await Empleado.findByPk(venta.empleado_id);
@@ -92,7 +92,7 @@ class BafStrategy implements IStrategyDetalleVenta {
 
             //Armamos string con los numeros de teléfonos principales
             const telefono_principal = cliente.telefono_principal;
-            
+
             //Buscamos abono
             const abono = await Abono.findByPk(detalles.abono_id);
 
@@ -135,10 +135,10 @@ class BafStrategy implements IStrategyDetalleVenta {
             //Formateamos desde AAAA-MM-DD a DD/MM/AAAA
             const fechaNacimientoString = cliente.fecha_nacimiento?.split('-').reverse().join('/') || 'Fecha de nacimiento desconocida';
 
-            
+
             const nuevaFila: NuevaFilaBaf = {
                 "Marca temporal": `${empleado?.nombre.trim() || 'Nombre desconocido'}, ${empleado?.apellido.trim() || 'Apellido desconocido'} - ${venta.fecha_realizacion || 'Fecha y horadesconocida'}`,
-                "Vendedor": `${empleado?.nombre|| 'Nombre desconocido'}, ${empleado?.apellido || 'Apellido desconocido'}`,
+                "Vendedor": `${empleado?.nombre || 'Nombre desconocido'}, ${empleado?.apellido || 'Apellido desconocido'}`,
                 "DNI (solo numeros, sin puntos. Si es CUIT anteponer CUIT al número)": `${tipoDocumento?.descripcion}:  ${cliente.numero_documento.trim() || 'Documento desconocido'}`,
                 "Apellido y Nombre": `${cliente?.apellido.trim() || 'Apellido desconocido'}, ${cliente?.nombre.trim() || 'Nombre desconocido'}`,
                 "Fecha Nacim.": `${fechaNacimientoString}`,
@@ -151,7 +151,7 @@ class BafStrategy implements IStrategyDetalleVenta {
                 "TVHD": `${detalles?.TVHD == 1 ? 'SI' : 'NO'}`,
                 "Cant. DECOS": `${detalles?.cantidad_decos || "Cant. de decos desconocido"}`,
                 "ZONA": `${barrio?.nombre || 'Barrio no cargado'}`,
-                "Horario Contacto / OBSERVACIONES": `${venta?.comentario_horario_contacto || 'Horario de contacto desconocido'}`,
+                "Horario Contacto / OBSERVACIONES": `${detalles?.horario_contacto || 'Horario de contacto desconocido'}`,
                 "Origen Dato": `${origenDato?.descripcion || 'Origen de datos desconocido'}`,
                 "PORTABILIDAD - CONVERGENCIA": `${tipoConvergencia?.descripcion || 'Tipo de convergencia desconocido'}`,
                 "TIPO DOMICILIO": `${tipoDomicilio?.descripcion}`,

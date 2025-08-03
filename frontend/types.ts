@@ -138,7 +138,6 @@ export interface ClientDataStateErrors {
     piso: string; // Stays string for form input
     departamento: string; // Stays string for form input
   };
-  horarioContacto: string;
   serviciosConvergentesIds: string
   fechaNacimiento : string;
 }
@@ -150,6 +149,7 @@ export interface InternetBafState {
   cantidadDecos: number | string;
   tipoConvergenciaId: string;
   lineaConvergente: string;
+  horario_contacto: string
 }
 
 export interface ConsultaBbooState {
