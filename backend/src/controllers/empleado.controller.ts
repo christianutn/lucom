@@ -44,7 +44,7 @@ export const  getEmpleadosPorId = async (req: Request, res: Response, next: Next
 
 export const createEmpleado= async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { nombre, apellido, correo_electronico } = req.body;
+        const { nombre, apellido, correo_electronico, alias } = req.body;
 
         // Validar campos obligatorios
         if ([nombre, apellido, correo_electronico].some(field => !field)) {
@@ -55,7 +55,8 @@ export const createEmpleado= async (req: Request, res: Response, next: NextFunct
             nombre,
             apellido,
             correo_electronico,
-            activo: 1
+            activo: 1,
+            alias
         };
 
         const domicilio = await Empleado.create(domicilioData);

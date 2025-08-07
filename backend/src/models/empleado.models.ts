@@ -9,6 +9,7 @@ class Empleado extends Model<IEmpleadoAttributes, IEmpleadoCreate> implements IE
     public apellido!: string;
     public correo_electronico!: string;
     public activo!: 1 | 0;
+    public alias!: string;
 }
 
 
@@ -37,6 +38,11 @@ Empleado.init(
             allowNull: false,
             defaultValue: 1, // 1 for active, 0 for inactive
         },
+        alias: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+
     },
     {
         sequelize,

@@ -5,6 +5,7 @@ export interface IEmpleadoAttributes {
     apellido: string;
     correo_electronico: string;
     activo: 1 | 0;
+    alias: string;
   }
 
   // Para crear un Empleado: name es obligatorio, isActive opcional (por defecto true, por ejemplo)
@@ -13,6 +14,7 @@ export interface IEmpleadoAttributes {
     apellido: string;
     correo_electronico: string;
     activo: 1 | 0;
+    alias?: string;
   }
 
   // Para actualizar: todo opcional (no siempre vas a actualizar todo)
@@ -21,6 +23,7 @@ export interface IEmpleadoAttributes {
     apellido?: string;
     correo_electronico?: string;
     activo?: 1 | 0;
+    alias?: string;
   }
 
   // Para filtros en el GET: podrías filtrar por nombre y estado
@@ -29,4 +32,6 @@ export interface IEmpleadoAttributes {
     apellido?: string;
     correo_electronico?: string;
     activo?: 1 | 0;
+    alias?: string;
+  
   }

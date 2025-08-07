@@ -21,9 +21,11 @@ const emptyUsuario: IUsuario = {
         apellido: '',
         correo_electronico: '',
         activo: 1,
+        alias: ""
     },
     nuevaContrasena: '',
     isNuevaContrasena: 0,
+    
 };
 
 const UsuariosForm = () => {
@@ -122,6 +124,11 @@ const UsuariosForm = () => {
                 valueToSet = value.trim().toLowerCase();
                 setErrorCorreo(validarEmail(value) ? '' : 'El correo electrónico es inválido');
                 break;
+            case "alias":
+                valueToSet = value;
+                break;
+            default:
+                break;
         }
 
         setFormData(prev => ({ ...prev, empleado: { ...prev.empleado, [name]: valueToSet } }));
@@ -149,6 +156,7 @@ const UsuariosForm = () => {
                     nombre: formData.empleado.nombre,
                     apellido: formData.empleado.apellido,
                     correo_electronico: formData.empleado.correo_electronico,
+                    alias: formData.empleado.alias,
                 };
                 await postUsuario(usuarioCreate);
                 showNotification('Usuario creado correctamente', 'success');
@@ -162,6 +170,7 @@ const UsuariosForm = () => {
                     correo_electronico: formData.empleado.correo_electronico,
                     isNuevaContrasena: formData.isNuevaContrasena,
                     nuevaContrasena: formData.nuevaContrasena || '',
+                    alias: formData.empleado.alias,
                 };
                 await putUsuarios(usuarioUpdate);
                 showNotification('Usuario actualizado correctamente', 'success');
@@ -215,15 +224,16 @@ const UsuariosForm = () => {
                                         ))}
                                     </select>
                                 </div>
-                                <Input label="Nombre:" type="text" name="nombre" value={formData.empleado.nombre} onChange={handleEmpleadoChange} error={errorNombre} />
+                                <Input  label="Nombre:" type="text" name="nombre" value={formData.empleado.nombre} onChange={handleEmpleadoChange} error={errorNombre} />
                                 {isCreating && (
-                                    <Input label='Contraseña:' type="password" name="contrasena" value={formData.contrasena} onChange={handleInputChange} />
+                                    <Input  label='Contraseña:' type="password" name="contrasena" value={formData.contrasena} onChange={handleInputChange} />
                                 )}
                             </div>
                             {/* Columna 2 */}
                             <div className="space-y-4">
                                 <Input label='Apellido:' type="text" name="apellido" value={formData.empleado.apellido} onChange={handleEmpleadoChange} error={errorApellido} />
                                 <Input label='Correo Electrónico:' type="email" name="correo_electronico" value={formData.empleado.correo_electronico} onChange={handleEmpleadoChange} error={errorCorreo} />
+                                <Input label='Alias:' type="text" name="alias" value={formData.empleado.alias} onChange={handleEmpleadoChange} error={errorCorreo} />
                                 {!isCreating && formData.isNuevaContrasena === 1 && (
                                     <Input label='Nueva Contraseña:' type="password" name="nuevaContrasena" value={formData.nuevaContrasena || ''} onChange={handleInputChange} />
                                 )}
@@ -292,6 +302,7 @@ const UsuariosForm = () => {
                                             <th scope="col" className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Correo Electrónico</th>
                                             <th scope="col" className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Rol</th>
                                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Alias</th>
                                             <th scope="col" className="relative px-6 py-3"><span className="sr-only">Editar</span></th>
                                         </tr>
                                     </thead>
@@ -307,6 +318,7 @@ const UsuariosForm = () => {
                                                         {usuario.activo ? 'Activo' : 'Inactivo'}
                                                     </span>
                                                 </td>
+                                                <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-400">{usuario.empleado.alias || "Sin alias"}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                     <Button onClick={() => handleEditClick(usuario)} variant="primary" className="flex items-center gap-1">
                                                         <Edit size={16} />

@@ -51,13 +51,15 @@ export const createUsuario = async (req: Request, res: Response, next: NextFunct
 
     const t = await sequelize.transaction();
     try {
+
         
 
         const empleadoData: IEmpleadoCreate = {
             nombre: req.body.nombre,
             apellido: req.body.apellido,
             correo_electronico: req.body.correo_electronico,
-            activo: 1
+            activo: 1,
+            alias: req.body.alias
         };
 
         const empleadoCreado = await Empleado.create(empleadoData, { transaction: t });
@@ -100,7 +102,8 @@ export const actualizarUsuario = async (req: Request, res: Response, next: NextF
     const updateEmpleado: IEmpleadoUpdate = {
         nombre: req.body.nombre,
         apellido: req.body.apellido,
-        correo_electronico: req.body.correo_electronico
+        correo_electronico: req.body.correo_electronico,
+        alias: req.body.alias
     };
 
     const t = await sequelize.transaction();

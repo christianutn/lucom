@@ -352,6 +352,7 @@ export interface IUsuario {
   nuevaContrasena?: string; // Optional for updates, required for creation
   isNuevaContrasena: 0 | 1; // Flag to indicate if a new password is being set
 
+
 }
 
 export interface IEmpleado {
@@ -360,6 +361,7 @@ export interface IEmpleado {
   apellido: string;
   correo_electronico: string;
   activo: 0 | 1;
+  alias: string
 }
 
 export interface IUsuarioUpdate {
@@ -371,6 +373,8 @@ export interface IUsuarioUpdate {
   correo_electronico: string;
   isNuevaContrasena: 0 | 1; // Flag to indicate if a new password is being set
   nuevaContrasena: string; // Optional for updates, required for creation
+  alias: string
+
 }
 
 /**
@@ -392,6 +396,7 @@ export interface IUsuarioCreate {
   apellido: string;
   correo_electronico: string;
   contrasena?: string; 
+  alias: string;
 }
 
 export interface IRol {
