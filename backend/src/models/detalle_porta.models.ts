@@ -18,7 +18,8 @@ DetallePorta.init({
     },
     NIM_a_portar: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        primaryKey: true
     },
   
     gigas: {

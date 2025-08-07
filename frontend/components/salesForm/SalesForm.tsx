@@ -104,7 +104,7 @@ const internetBafDefault: InternetBafState = {
 };
 
 const portabilidadDefault: PortabilidadState = {
-  nimAPortar: '', gigasId: '', companiaActualId: '',
+  nimAPortar: [], gigasId: '', companiaActualId: '',
 };
 
 
@@ -162,7 +162,7 @@ const SalesForm: React.FC = () => {
   const handleClientSelected = useCallback((client: Cliente | null) => {
     setSelectedClient(client);
     if (!client) {
-      setPortabilidadData(prev => ({ ...prev, nimAPortar: '' }));
+      setPortabilidadData(prev => ({ ...prev, nimAPortar: [] }));
     }
   }, []);
 
@@ -218,7 +218,7 @@ const SalesForm: React.FC = () => {
     let detallesPayload = {};
     if (initialSelection.tipoNegocioId === '1') { // Portabilidad
       detallesPayload = {
-        NIM_a_portar: portabilidadData.nimAPortar,
+        NIM_a_portar_lista: portabilidadData.nimAPortar,
         gigas: portabilidadData.gigasId,
         compania: portabilidadData.companiaActualId,
       };
@@ -239,7 +239,7 @@ const SalesForm: React.FC = () => {
       }
     } else if (initialSelection.tipoNegocioId === '4') { // Venta BAF + Porta
       detallesPayload = {
-        NIM_a_portar: portabilidadData.nimAPortar,
+        NIM_a_portar_lista: portabilidadData.nimAPortar,
         gigas: portabilidadData.gigasId,
         compania: portabilidadData.companiaActualId,
         tipos_domicilios_id: internetBafData.tipoDomicilioId,

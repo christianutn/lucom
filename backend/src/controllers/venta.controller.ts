@@ -4,7 +4,7 @@ import { DateTime } from "luxon";
 import { Request, Response, NextFunction } from "express";
 import { IVentaAttributes, IVentaCreate, IVentaUpdate } from "../types/venta.js";
 import { IDatalleBafCreate } from '../types/detalle_baf.js';
-import { IDetallePortaCreate } from '../types/detallePorta.js';
+import { IDetallePortaCreate, IDetallePortaParametro } from '../types/detallePorta.js';
 import { Op, WhereOptions, Transaction } from "sequelize";
 import sequelize from "../config/base_datos.js";
 import { getStrategy } from "../services/strategies/venta_manager.strategy.js";
@@ -140,7 +140,7 @@ export const eliminarVenta = async (req: Request, res: Response, next: NextFunct
 export const crearVentaConDetalles = async (req: Request, res: Response, next: NextFunction) => {
 
     // Cargamos los datos del body de la solicitud
-    const detalles: IDetallePortaCreate | IDatalleBafCreate = req.body.detalles;
+    const detalles: IDetallePortaParametro | IDatalleBafCreate = req.body.detalles;
     const datosVenta: IVentaCreate = req.body.datosVenta;
     const cliente: IClienteAttributes = req.body.cliente;
     const domicilio: IDomicilioAttributes = req.body.domicilio;

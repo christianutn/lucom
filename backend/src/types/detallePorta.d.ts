@@ -54,3 +54,21 @@ export interface IDetallePortaFilter {
   gigas?: number;
   compania?: number;
 }
+
+
+/**
+ * Interface para crear un nuevo DetallePorta.
+ * Todos los campos son obligatorios.
+ * @property venta_id ID de la venta asociada
+ * @property NIM_a_portar_lista Número de Identificación del Móvil (NIM) que se va a portar
+ * @property gigas Cantidad de gigas contratados
+ * @property compania ID de la compañía actual o destino
+ */
+
+
+export interface IDetallePortaParametro {
+  venta_id: number;
+  NIM_a_portar_lista: string[];
+  gigas: number;
+  compania: number;
+}

@@ -159,7 +159,7 @@ export interface ConsultaBbooState {
 }
 
 export interface PortabilidadState {
-  nimAPortar: string;
+  nimAPortar: string[];
   gigasId: string;
   companiaActualId: string;
 }

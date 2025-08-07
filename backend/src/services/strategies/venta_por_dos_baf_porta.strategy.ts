@@ -14,7 +14,7 @@ import { IDomicilioAttributes } from '../../types/domicilio.js';
 import { IBarrioAttributes } from '../../types/barrio.js';
 import { IVentaAttributes } from '../../types/venta.js';
 import { IClienteAttributes } from '../../types/cliente.js';
-import { IDetallePortaCreate } from '../../types/detallePorta.js';
+import { IDetallePortaCreate, IDetallePortaParametro } from '../../types/detallePorta.js';
 import { IDetalleBafPortaCreate } from "../../types/detalle_baf_con_porta.js"
 
 //Importamos strategy porta y baf
@@ -39,31 +39,24 @@ class BafConPortaStrategy implements IStrategyDetalleVenta {
             tipo_convergencia_id: detalles.tipo_convergencia_id,
         }
 
-        const detalleBafCreado = await DetalleBaf.create({
+        await DetalleBaf.create({
             ...detalleBafACrear
         }, { transaction });
 
         // Creamos Porta
-        const detallePortaACrear: IDetallePortaCreate = {
-            venta_id: detalles.venta_id,
-            gigas: detalles.gigas,
-            NIM_a_portar: detalles.NIM_a_portar,
-            compania: detalles.compania
+        for (const nim of detalles.NIM_a_portar_lista) {
+            const detallePortaACrear: IDetallePortaCreate = {
+                venta_id: detalles.venta_id,
+                NIM_a_portar: nim,
+                gigas: detalles.gigas,
+                compania: detalles.compania
+            }
+            await DetallePorta.create({
+                ...detallePortaACrear
+            }, { transaction });
         }
 
-        const detallePortaCreado = await DetallePorta.create({
-            ...detallePortaACrear
-        }, { transaction });
 
-        // Usamos .get({ plain: true }) para obtener un objeto de datos limpio sin metadatos de Sequelize.
-        const bafData =  detalleBafCreado.toJSON()
-        const portaData = detallePortaCreado.toJSON()
-
-
-        return {
-            ...portaData,
-            ...bafData
-        }
 
     }
 
@@ -81,12 +74,13 @@ class BafConPortaStrategy implements IStrategyDetalleVenta {
     public getValidationRules(): ValidationChain[] {
         return [
             body('detalles').notEmpty().withMessage('Los detalles son requeridos'),
-            body('detalles.NIM_a_portar')
-                .exists()
-                .trim()
-                .isString()
-                .isLength({ max: 15, min: 1 })
-                .withMessage('El NIM_a_portar debe contener entre 1 a 15 caracteres'),
+            body('detalles.NIM_a_portar_lista')
+                .isArray({ min: 1 })
+                .withMessage('Debe ser un array con al menos un NIM'),
+            body('detalles.NIM_a_portar_lista.*')
+                .isString().withMessage('Cada NIM debe ser un string')
+                .isLength({ min: 1, max: 15 }).withMessage('Cada NIM debe tener entre 1 y 15 caracteres')
+                .customSanitizer(value => value.trim()),
             body('detalles.gigas')
                 .exists()
                 .trim()
@@ -132,21 +126,25 @@ class BafConPortaStrategy implements IStrategyDetalleVenta {
         ]
     }
 
-    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetalleBafPortaCreate, cliente: IClienteAttributes, domicilio: IDomicilioAttributes, barrio: IBarrioAttributes): Promise<any> {
+    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetallePortaParametro | IDatalleBafCreate, cliente: IClienteAttributes, domicilio: IDomicilioAttributes, barrio: IBarrioAttributes): Promise<any> {
         try {
 
             const portaStrategy = new PortaStrategy();
             const bafStrategy = new BafStrategy();
 
             // Modificamos tipo_negocio_id de venta para porta y baf
-
-            
-
             // Ejecutamos la carga de fila para ambas partes de la venta
             venta.tipo_negocio_id = 1
-            await portaStrategy.cargar_nueva_fila(venta, detalles, cliente, domicilio, barrio);
+
+            if ("NIM_a_portar_lista" in detalles) {
+                await portaStrategy.cargar_nueva_fila(venta, detalles, cliente, domicilio, barrio);
+            }
+
             venta.tipo_negocio_id = 2
-            await bafStrategy.cargar_nueva_fila(venta, detalles, cliente, domicilio, barrio);
+
+            if ("abono_id" in detalles) {
+                await bafStrategy.cargar_nueva_fila(venta, detalles, cliente, domicilio, barrio);
+            }
 
         } catch (error) {
             throw new AppError('Error al cargar la nueva fila', 500);
