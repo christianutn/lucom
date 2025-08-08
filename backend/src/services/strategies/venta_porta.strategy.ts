@@ -97,10 +97,13 @@ class PortaStrategy implements IStrategyDetalleVenta {
                 // const buscamos origen de dato
                 const origenDato = await OrigenDato.findByPk(venta.origen_dato_id);
 
+                const fechaFormateada = new Date(venta.fecha_realizacion)
+                    .toLocaleString('es-AR', { hour12: false });
+
 
                 const nuevaFila: NuevaFilaPorta = {
-                    "Marca temporal": `${empleado?.nombre.trim() || 'Nombre desconocido'}, ${empleado?.apellido.trim() || 'Apellido desconocido'} ${venta.fecha_realizacion || 'Fecha y horadesconocida'}`,
-                    "Vendedor (Seleccione Vendedor)": vendedor,
+                    "Marca temporal": `${fechaFormateada}`,
+                    "Vendedor (Seleccione Vendedor)": empleado.alias,
                     "Nombre y Apellido Cliente": `${cliente?.nombre.trim() || 'Nombre desconocido'}, ${cliente?.apellido.trim() || 'Apellido desconocido'}`,
                     "DNI / LE / LC / CUIT (ingrese solo números)": numeroDocumentoString,
                     "Fecha Nacimiento Cliente": `${fechaNacimientoString}`,

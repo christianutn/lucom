@@ -131,7 +131,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
       altura: domicilio.numero_calle,
       entreCalle1: domicilio.entre_calle_1 || '',
       entreCalle2: domicilio.entre_calle_2 || '',
-      barrioId: domicilio.barrio_id.toString(),
+      barrioId: domicilio.barrio_id ? domicilio.barrio_id.toString() : '',
       nuevoBarrioNombre: domicilio.barrio?.nombre || '',
       piso: domicilio.piso?.toString() || '',
       departamento: domicilio.departamento || '',

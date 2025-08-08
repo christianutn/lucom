@@ -5,7 +5,6 @@ import { AuthContext } from '../../contexts/AuthContext';
 import UserProfileCard from '../common/UserProfileCard';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const authContext = useContext(AuthContext);
   const user = authContext ? authContext.user : null;
 
@@ -15,9 +14,6 @@ const Header = () => {
   return (
     <header className="flex items-center justify-between p-4 bg-gray-900 border-b border-gray-700">
       <div className="flex items-center flex-grow justify-center">
-        <button className="md:hidden mr-4" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
         <h1 className="text-xl font-bold">LUCOM</h1>
       </div>
       <div className="flex items-center space-x-4">

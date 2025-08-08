@@ -126,24 +126,34 @@ class BafStrategy implements IStrategyDetalleVenta {
 
             //Aramamos string del domicilio
 
-            const domicilioString = `${domicilio.nombre_calle?.trim() || 'Domicilio desconocido'} ${domicilio.numero_calle || 'Nro. de calle desconocido'}
-            Piso: ${domicilio.piso || 'No aplica'} Dpto: ${domicilio.departamento || 'No aplica'}
-            Entre calles: ${domicilio.entre_calle_1 || 'Entre calles desconocidas'} / ${domicilio.entre_calle_2 || 'Entre calles desconocidas'}
-            Barrio: ${barrio.nombre || 'Barrio no cargado'}
-            `
+            // const domicilioString = `${domicilio.nombre_calle?.trim() || 'Domicilio desconocido'} ${domicilio.numero_calle || 'Nro. de calle desconocido'}
+            // Piso: ${domicilio.piso || 'No aplica'} Dpto: ${domicilio.departamento || 'No aplica'}
+            // Entre calles: ${domicilio.entre_calle_1 || 'Entre calles desconocidas'} / ${domicilio.entre_calle_2 || 'Entre calles desconocidas'}
+            // Barrio: ${barrio.nombre || 'Barrio no cargado'}
+            // `
+
+            const piso = domicilio.piso ? ` - Piso: ${domicilio.piso}` : '';
+            const departamento = domicilio.departamento ? ` - Dpto: ${domicilio.departamento}` : '';
+            const entreCalles = domicilio.entre_calle_1 || domicilio.entre_calle_2 ? ` - Entre calles: ${domicilio.entre_calle_1 || 'No ingresada'} / ${domicilio.entre_calle_2 || 'No ingresada'}`  : '';
+            
+            const domicilioString = `${domicilio.nombre_calle?.trim() || 'Domicilio no ingresado'} ${domicilio.numero_calle || 'Nro. de calle no ingresado'}${piso}${departamento}${entreCalles}${barrio.nombre ? `Barrio: ${barrio.nombre}` : ''}`;
+
+
 
             //Formateamos desde AAAA-MM-DD a DD/MM/AAAA
             const fechaNacimientoString = cliente.fecha_nacimiento?.split('-').reverse().join('/') || 'Fecha de nacimiento desconocida';
 
+            const fechaFormateada = new Date(venta.fecha_realizacion)
+                    .toLocaleString('es-AR', { hour12: false });
 
             const nuevaFila: NuevaFilaBaf = {
-                "Marca temporal": `${empleado?.nombre.trim() || 'Nombre desconocido'}, ${empleado?.apellido.trim() || 'Apellido desconocido'} - ${venta.fecha_realizacion || 'Fecha y horadesconocida'}`,
-                "Vendedor": `${empleado?.nombre || 'Nombre desconocido'}, ${empleado?.apellido || 'Apellido desconocido'}`,
+                "Marca temporal": `${fechaFormateada}`,
+                "Vendedor": `${empleado.alias}`,
                 "DNI (solo numeros, sin puntos. Si es CUIT anteponer CUIT al número)": `${tipoDocumento?.descripcion}:  ${cliente.numero_documento.trim() || 'Documento desconocido'}`,
                 "Apellido y Nombre": `${cliente?.apellido.trim() || 'Apellido desconocido'}, ${cliente?.nombre.trim() || 'Nombre desconocido'}`,
                 "Fecha Nacim.": `${fechaNacimientoString}`,
                 "Domicilio": `${domicilioString}`,
-                "Entre Calles": `${domicilio?.entre_calle_1 || 'Entre calles desconocidas'} / ${domicilio?.entre_calle_2 || 'Entre calles desconocidas'}`,
+                "Entre Calles": `${entreCalles}`,
                 "Telefono1": `${telefono_principal}`,
                 "Telefono2 IMPORTANTE mejora contacto!": `${cliente?.telefono_secundario ? cliente.telefono_secundario : 'Telefono desconocido'}`,
                 "email": `${cliente?.correo_electronico || 'Correo electronico no cargado'}`,
