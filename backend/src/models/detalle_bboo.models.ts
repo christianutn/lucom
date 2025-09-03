@@ -20,11 +20,11 @@ DetalleBboo.init({
         allowNull: false
     },
     linea_claro_a_consultar: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(45),
         allowNull: false
     },
     pedido_rellamado: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(45),
         allowNull: false
     }
     

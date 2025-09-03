@@ -6,7 +6,7 @@ import Button from '../../common/Button';
 import Spinner from '../../common/Spinner';
 import DomicilioSelectionModal from '../common/DomicilioSelectionModal';
 import { getTiposDocumento, getClientes, getServiciosConvergentes, getBarrios } from '../../../services/api';
-import { TipoDocumento as TipoDocOption, Cliente, ClientDataState, ClientSearchFilters, Domicilio, Barrio, SelectOption, ClientDataStateErrors } from '../../../types';
+import { TipoDocumento as TipoDocOption, Cliente, ClientDataState, ClientSearchFilters, Domicilio, Barrio, SelectOption, ClientDataStateErrors, PaginationInfo, ITipoDocumento } from '../../../types';
 import { useNotification } from '../../../hooks/useNotification';
 import { formatName, formatearNombreCalle } from "../../../utils/formatear";
 import { validarNombreApellido, validarCuit, validarTelefono, validarEmail } from '../../../utils/validarDatosEntrada';
@@ -37,6 +37,10 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
 
   const [showAddressForm, setShowAddressForm] = useState(false);
 
+  // Estados de paginación
+  const [paginationInfo, setPaginationInfo] = useState<PaginationInfo | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
   // Lista de opciones para el select de barrios, incluyendo la opción de crear uno nuevo.
   const allBarriosOptions: SelectOption[] = [
     ...barriosOptions,
@@ -47,7 +51,14 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     setIsLoading(true);
     try {
       const [tdRes, scRes, bRes] = await Promise.all([getTiposDocumento(), getServiciosConvergentes(), getBarrios()]);
-      setTiposDocumento(tdRes);
+      setTiposDocumento(
+        tdRes
+          .filter((tipoDoc: ITipoDocumento) => tipoDoc.activo) // solo los activos
+          .map((tipoDoc: ITipoDocumento) => ({
+            id: tipoDoc.id,
+            descripcion: tipoDoc.descripcion
+          }))
+      );
       setServiciosConvergentes(scRes);
       setBarriosOptions(bRes.map((b: Barrio) => ({ id: b.id.toString(), descripcion: b.nombre, activo: b.activo })));
     } catch (error) {
@@ -68,19 +79,23 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     onChange('nuevoDomicilio', { calle: '', altura: '', entreCalle1: '', entreCalle2: '', barrioId: '', nuevoBarrioNombre: '', piso: '', departamento: '' });
   }, [onChange]);
 
-  const handleSearchClient = async () => {
+  const handleSearchClient = async (page = 1) => { // <-- Añade page = 1 como parámetro
     setIsSearching(true);
-    setSearchResults([]);
-    setSelectedClient(null);
-    onClientSelected(null);
-    onChange('domicilioSeleccionadoId', '');
-    resetAddressFields();
-    setShowAddressForm(false);
+    setCurrentPage(page); // <-- Añade esta línea para guardar la página actual
+
+    // No reseteamos los resultados si estamos cambiando de página
+    if (page === 1) {
+      setSearchResults([]);
+      setSelectedClient(null);
+      onClientSelected(null);
+    }
 
     try {
-      const results = await getClientes(searchFilters);
-      setSearchResults(results);
-      if (results.length === 0) {
+      const response = await getClientes(searchFilters, page); // <-- Cambiado: Pasa page a la API
+      setSearchResults(response.data); // <-- Cambiado: Usa response.data
+      setPaginationInfo(response.pagination); // <-- Añade esta línea
+
+      if (response.data.length === 0 && page === 1) { // <-- Cambiado: Verifica en page 1
         showNotification("No se encontraron clientes con los criterios de búsqueda.", "info");
       }
     } catch (error) {
@@ -91,27 +106,61 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     }
   };
 
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= (paginationInfo?.totalPages || 0)) {
+      handleSearchClient(newPage);
+    }
+  };
+
   const handleSelectClient = (client: Cliente) => {
     setSelectedClient(client);
     setSearchResults([]);
+    setPaginationInfo(null); // <-- Añade esto para limpiar la paginación
     onClientSelected(client);
+
+    // Actualiza los datos del formulario
     onChange('tipoDocumentoId', client.tipo_documento.toString());
     onChange('numeroDocumento', client.numero_documento);
-    errors.numeroDocumento = '';
     onChange('nombre', client.nombre);
-    errors.nombre = '';
     onChange('apellido', client.apellido);
-    errors.apellido = '';
     onChange('email', client.correo_electronico || '');
-    errors.email = client.correo_electronico ? '' : 'El cliente debe tener un correo electrónico.';
     onChange('clienteId', client.id.toString());
     onChange('telefono_principal', client.telefono_principal || '');
-    errors.telefono_principal = client.telefono_principal ? '' : 'El cliente debe tener un teléfono principal.';
     onChange('telefonoSecundario', client.telefono_secundario || '');
-    onChange('domicilioSeleccionadoId', '');
     onChange('fechaNacimiento', client.fecha_nacimiento || '');
+
+    // Resetea el domicilio y los errores
+    onChange('domicilioSeleccionadoId', '');
     resetAddressFields();
     setShowAddressForm(false);
+
+    // --- CORRECCIÓN CLAVE ---
+    // Llama al callback del padre para resetear el objeto de errores
+    onClientDataErrors(
+      {
+        tipoDocumentoId: "",// Store ID as string for select compatibility
+        numeroDocumento: "",
+        nombre: "",
+        apellido: "",
+        telefono_principal: client.telefono_principal ? "" : "El teléfono principal es requerido.",
+        telefonoSecundario: "",
+        email: client.correo_electronico ? "" : "El correo electrónico es requerido.",
+        domicilioSeleccionadoId: "",
+        clienteId: "",
+        nuevoDomicilio: {
+          calle: "",
+          altura: "",
+          entreCalle1: "",
+          entreCalle2: "",
+          barrioId: "", // ID of selected barrio or new barrio name if creating
+          nuevoBarrioNombre: "", // If adding a new barrio
+          piso: "", // Stays string for form input
+          departamento: "", // Stays string for form input
+        },
+        serviciosConvergentesIds: "",
+        fechaNacimiento: "",
+      }
+    );
   };
 
   const handleDomicilioButtonClick = () => {
@@ -139,7 +188,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
     errors.nuevoDomicilio.calle = '';
     errors.nuevoDomicilio.altura = '';
     errors.nuevoDomicilio.nuevoBarrioNombre = '';
-  
+
     setIsDomicilioModalOpen(false);
     setShowAddressForm(true);
   };
@@ -227,7 +276,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
           <Input label="Nombre" id="searchNombre" value={searchFilters.nombre} onChange={(e) => handleSearchChange('nombre', e.target.value)} />
 
         </div>
-        <Button onClick={handleSearchClient} variant="secondary" disabled={isSearching}>
+        <Button onClick={() => handleSearchClient()} variant="secondary" disabled={isSearching}>
           {isSearching ? 'Buscando...' : 'Buscar Cliente'}
         </Button>
       </div>
@@ -242,6 +291,27 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
               </li>
             ))}
           </ul>
+          {paginationInfo && paginationInfo.totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-between">
+              <Button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1 || isSearching}
+                variant="secondary"
+              >
+                Anterior
+              </Button>
+              <span className="text-sm text-gray-400">
+                Página {paginationInfo.currentPage} de {paginationInfo.totalPages}
+              </span>
+              <Button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === paginationInfo.totalPages || isSearching}
+                variant="secondary"
+              >
+                Siguiente
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
@@ -345,7 +415,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
           }}
           placeholder="Número principal" className="flex-grow" error={errors.telefono_principal} required />
 
-      
+
 
         <Input label="Teléfono de contacto secundario (opcional)" id="telefonoSecundario" type="tel" value={data.telefonoSecundario}
           onChange={e => {
@@ -436,7 +506,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
         )}
       </div>
 
-      
+
 
       <DomicilioSelectionModal
         isOpen={isDomicilioModalOpen}

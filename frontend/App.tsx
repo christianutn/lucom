@@ -11,6 +11,7 @@ import OrigenDatoForm from './components/origenesDatos/origenDatosForm';
 import AbonoForm from './components/abonos/abonosForm';
 import TiposDomicilioForm from './components/tiposDomicilios/tipoDomicilio';
 import Home from './components/home/home'
+import ConsultaBbooForm from './components/ConsultaBboo/ConsultForm';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const auth = useContext(AuthContext);
@@ -41,6 +42,8 @@ const App: React.FC = () => {
           <Route path="origenes-datos" element={<OrigenDatoForm />} />
           <Route path="abonos" element={<AbonoForm />} />
           <Route path="tipos-domicilios" element={<TiposDomicilioForm />} />
+          <Route path="consultas-bboo" element={<ConsultaBbooForm />} />
+          
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

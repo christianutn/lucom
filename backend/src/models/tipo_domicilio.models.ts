@@ -16,7 +16,7 @@ TipoDomicilio.init(
             autoIncrement: true,
         },
         descripcion: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(45),
             allowNull: false,
         },
         activo: {

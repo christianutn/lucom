@@ -45,10 +45,10 @@ export interface IClienteAttributes {
     numero_documento: string;
     nombre: string;
     apellido: string;
-    telefono_principal: string;
+    telefono_principal?: string;
     fecha_nacimiento?: string;
     telefono_secundario?: string;
-    correo_electronico: string;
+    correo_electronico?: string;
   }
   
   // Para actualizar: todo opcional (no siempre vas a actualizar todo)

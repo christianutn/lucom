@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, FileText, Users, TicketPercent , FilePenLine , Menu, X, HousePlus, User } from 'lucide-react';
+import { Home, FileText, Users, TicketPercent, FilePenLine, Menu, X, HousePlus } from 'lucide-react';
 import { useState, useContext } from 'react';
 import { AuthContext } from '../../contexts/AuthContext';
 
@@ -48,6 +48,10 @@ const Sidebar = () => {
               <FileText size={20} className="mr-3" />
               Formulario de Venta
             </NavLink>
+            <NavLink to="/consultas-bboo" className="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md" onClick={toggleSidebar}>
+              <HousePlus size={20} className="mr-3" />
+              Consulta BBOO
+            </NavLink>
             {user && user.rol === "ADM" && (
               <>
                 <NavLink to="/usuarios" className="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md" onClick={toggleSidebar}>
@@ -55,17 +59,18 @@ const Sidebar = () => {
                   Usuarios
                 </NavLink>
                 <NavLink to="/origenes-datos" className="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md" onClick={toggleSidebar}>
-                  <FilePenLine   size={20} className="mr-3" />
+                  <FilePenLine size={20} className="mr-3" />
                   Origenes de Datos
                 </NavLink>
                 <NavLink to="/abonos" className="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md" onClick={toggleSidebar}>
-                  <TicketPercent  size={20} className="mr-3" />
+                  <TicketPercent size={20} className="mr-3" />
                   Abonos
                 </NavLink>
                 <NavLink to="/tipos-domicilios" className="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md" onClick={toggleSidebar}>
                   <HousePlus size={20} className="mr-3" />
                   Tipos de Domicilios
                 </NavLink>
+
               </>
             )}
           </nav>

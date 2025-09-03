@@ -45,7 +45,6 @@ export const  getEmpleadosPorId = async (req: Request, res: Response, next: Next
 export const createEmpleado= async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { nombre, apellido, correo_electronico, alias } = req.body;
-
         // Validar campos obligatorios
         if ([nombre, apellido, correo_electronico].some(field => !field)) {
             return next(new AppError('Los campos nombre, apellido y correo_electronico son obligatorios', 400));

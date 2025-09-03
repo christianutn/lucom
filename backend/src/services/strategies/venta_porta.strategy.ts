@@ -84,14 +84,15 @@ class PortaStrategy implements IStrategyDetalleVenta {
 
                 //Aramamos string del domicilio
 
-                const domicilioString = `${domicilio.nombre_calle?.trim() || 'Domicilio desconocido'} ${domicilio.numero_calle || 'Nro. de calle desconocido'}
-            Piso: ${domicilio.piso || 'No aplica'} Dpto: ${domicilio.departamento || 'No aplica'}
-            Entre calles: ${domicilio.entre_calle_1 || 'Entre calles desconocidas'} / ${domicilio.entre_calle_2 || 'Entre calles desconocidas'}
-            Barrio: ${barrio.nombre || 'Barrio no cargado'}
-            `
+                const piso = domicilio.piso ? ` - Piso: ${domicilio.piso}` : '';
+                const departamento = domicilio.departamento ? ` - Dpto: ${domicilio.departamento}` : '';
+                const entreCalles = domicilio.entre_calle_1 || domicilio.entre_calle_2 ? ` - Entre calles: ${domicilio.entre_calle_1 || 'No ingresada'} / ${domicilio.entre_calle_2 || 'No ingresada'}` : '';
+
+                const domicilioString = `${domicilio.nombre_calle?.trim() || 'Domicilio no ingresado'} ${domicilio.numero_calle || 'Nro. de calle no ingresado'}${piso}${departamento}${entreCalles}${barrio.nombre ? `Barrio: ${barrio.nombre}` : ''}`;
+
 
                 //Formateamos desde AAAA-MM-DD a DD/MM/AAAA
-                const fechaNacimientoString = cliente.fecha_nacimiento?.split('-').reverse().join('/') || 'Fecha de nacimiento desconocida';
+                const fechaNacimientoString = cliente.fecha_nacimiento?.split('-').reverse().join('/') || '';
 
 
                 // const buscamos origen de dato

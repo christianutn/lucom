@@ -1,5 +1,6 @@
 
-import {  Cliente, ClientSearchFilters, ITipoDomicilio, IOrigenDato} from '../types.js';
+import {  Cliente, ClientSearchFilters, ITipoDomicilio, IOrigenDato, PagedResponse} from '../types.js';
+
 
 export const getTiposNegocios = async (): Promise<any> => {
     try {
@@ -77,17 +78,22 @@ export const getTiposDocumento = async (): Promise<any> => {
 }
 
 
-export const getClientes = async (searchFilters: ClientSearchFilters): Promise<Cliente[]> => {
+export const getClientes = async (searchFilters: ClientSearchFilters, page: number = 1, limit: number = 10): Promise<PagedResponse<Cliente>> => {
     try {
         const apiUrl = import.meta.env.VITE_API_URL;
         if (!apiUrl) {
             throw new Error('API URL no definida en el archivo .env');
         }
 
-        // 🔧 Crear los parámetros de búsqueda dinámicamente
-        const params = new URLSearchParams();
+        // --- CAMBIO: AÑADIR PARÁMETROS DE PAGINACIÓN ---
+        const params = new URLSearchParams({
+            page: page.toString(),
+            limit: limit.toString(),
+        });
+        
+        // Añadir filtros solo si tienen valor
         Object.entries(searchFilters).forEach(([key, value]) => {
-            if (value) params.append(key, value);
+            if (value) params.append(key, value as string);
         });
 
         const response = await fetch(`${apiUrl}/api/clientes?${params.toString()}`, {
@@ -101,15 +107,17 @@ export const getClientes = async (searchFilters: ClientSearchFilters): Promise<C
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.message || "No se encontraron clientes");
+            // Asume que el error del backend puede estar en data.message
+            throw new Error(data.message || "Error al buscar clientes");
         }
 
-        return data;
+        // --- CAMBIO: DEVUELVE EL OBJETO COMPLETO, NO SOLO LOS DATOS ---
+        return data as PagedResponse<Cliente>;
     } catch (error) {
-        throw error;
+        console.error("Error en getClientes API:", error);
+        throw error; // Re-lanza el error para que el componente lo maneje
     }
 }
-
 
 export const getServiciosConvergentes = async (): Promise<any> => {
     try {

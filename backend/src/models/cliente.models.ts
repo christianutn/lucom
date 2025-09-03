@@ -73,7 +73,7 @@ Cliente.init({
     },
     telefono_principal: {
         type: DataTypes.STRING(20),
-        allowNull: false
+        allowNull: false // obligatorio
     }
 }, {
     sequelize,

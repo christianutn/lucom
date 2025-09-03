@@ -39,3 +39,6 @@ temp/
 *.local
 # Ignorar el ejecutable del Cloud SQL Proxy
 cloud-sql-proxy.exe
+
+#Ignorar la carpeta de cargas
+cargas/

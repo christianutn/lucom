@@ -158,6 +158,9 @@ export interface ConsultaBbooState {
   pedidoRellamado: string;
 }
 
+
+
+
 export interface PortabilidadState {
   nimAPortar: string[];
   gigasId: string;
@@ -253,15 +256,17 @@ export interface IVentaCreate {
 
  */
 export interface IClienteAttributes {
-    id: number;
-    tipo_documento: number;
+    id?: number | string;
+    tipo_documento: number | string;
     numero_documento: string;
     nombre: string;
     apellido: string;
-    fecha_nacimiento: string;
-    telefono_secundario: string;
-    activo: 1 | 0;
+    fecha_nacimiento?: string | Date;
+    telefono_secundario?: string;
+    activo?: 1 | 0;
     correo_electronico: string;
+    telefono_principal: string;
+  
   }
 
   /**
@@ -277,15 +282,15 @@ export interface IClienteAttributes {
    * @property departamento
    */
   export interface IDomicilioAttributes {
-    id: number;
-    cliente_id: number;
+    id: number | string;
+    cliente_id: number | string;
     nombre_calle: string;
     numero_calle: string;
     entre_calle_1: string;
     entre_calle_2: string;
-    barrio_id: number;
-    activo: number;
-    piso: number;
+    barrio_id: number | string;
+    activo?: number;
+    piso?: number | string;
     departamento: string;
   }
 
@@ -298,10 +303,10 @@ export interface IClienteAttributes {
  */
   
 export interface IBarrioAttributes {
-    id: number;
+    id: number | string;
     nombre: string;
-    codigo_postal: string;
-    activo: 0 | 1;
+    codigo_postal?: string;
+    activo?: 0 | 1;
   }
   
 
@@ -520,4 +525,50 @@ export interface User {
   nombre: string;
   apellido: string;
   correo_electronico: string;
+}
+export interface IConsultaBbooAtributes {
+  tipos_domicilios_id: number | string;
+  linea_claro_a_consultar: string;
+  pedido_rellamado: string;
+  cliente_id: number | string;
+  domicilio_id: number | string;
+}
+
+/**
+ * Interface para consulta BBOO
+ * @property detalles: {
+ * linea_claro_a_consultar - string (opcional)
+ * pedido_rellamado - string (opcional)
+ * tipos_domicilios_id - int (obligatorio)
+ * cliente_id - int (opcional)
+ * domicilio_id - int (opcional)
+ * }
+ * @property domicilio 
+ * @property cliente
+ * @property barrio
+ */
+
+export interface IConsultaBbooCreate {
+  detalles:IConsultaBbooAtributes,
+  domicilio: IDomicilioAttributes,
+  cliente: IClienteAttributes,
+  barrio: IBarrioAttributes
+}
+
+export interface PaginationInfo {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}
+
+export interface PagedResponse<T> {
+  data: T[];
+  pagination: PaginationInfo;
+}
+
+export interface ITipoDocumento {
+  id: number;
+  descripcion: string;
+  activo: 0 | 1;
 }

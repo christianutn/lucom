@@ -23,7 +23,7 @@ Venta.init(
             autoIncrement: true,
         },
         comentario_horario_contacto: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(150),
             allowNull: false,
         },
         tipo_negocio_id: {

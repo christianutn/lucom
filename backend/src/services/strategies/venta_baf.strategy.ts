@@ -136,7 +136,7 @@ class BafStrategy implements IStrategyDetalleVenta {
             const departamento = domicilio.departamento ? ` - Dpto: ${domicilio.departamento}` : '';
             const entreCalles = domicilio.entre_calle_1 || domicilio.entre_calle_2 ? ` - Entre calles: ${domicilio.entre_calle_1 || 'No ingresada'} / ${domicilio.entre_calle_2 || 'No ingresada'}`  : '';
             
-            const domicilioString = `${domicilio.nombre_calle?.trim() || 'Domicilio no ingresado'} ${domicilio.numero_calle || 'Nro. de calle no ingresado'}${piso}${departamento}${entreCalles}${barrio.nombre ? `Barrio: ${barrio.nombre}` : ''}`;
+            const domicilioString = `${domicilio.nombre_calle?.trim() || 'Domicilio no ingresado'} ${domicilio.numero_calle || 'Nro. de calle no ingresado'}${piso}${departamento}${entreCalles}${barrio.nombre ? ` - Barrio: ${barrio.nombre}` : ''}`;
 
 
 

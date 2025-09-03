@@ -217,7 +217,7 @@ export const crearVentaConDetalles = async (req: Request, res: Response, next: N
 
 //Funciones axiliares a ventaController
 
-const tratarCliente = async (cliente: IClienteAttributes, t: Transaction): Promise<void> => {
+export const tratarCliente = async (cliente: IClienteAttributes, t: Transaction): Promise<void> => {
     try {
 
         const clienteEncontrado = await Cliente.findOne({
@@ -283,7 +283,7 @@ const tratarCliente = async (cliente: IClienteAttributes, t: Transaction): Promi
 }
 
 
-const tratarDomicilio = async (domicilio: IDomicilioAttributes, t: Transaction): Promise<void> => {
+export const tratarDomicilio = async (domicilio: IDomicilioAttributes, t: Transaction): Promise<void> => {
     try {
 
         const domObject: IDomicilioCreate = {
@@ -320,7 +320,7 @@ const tratarDomicilio = async (domicilio: IDomicilioAttributes, t: Transaction):
     }
 }
 
-const tratarBarrio = async (barrio: IBarrioAttributes, t: Transaction): Promise<void> => {
+export const tratarBarrio = async (barrio: IBarrioAttributes, t: Transaction): Promise<void> => {
     try {
 
         if (!barrio.id) {
@@ -345,7 +345,7 @@ const tratarBarrio = async (barrio: IBarrioAttributes, t: Transaction): Promise<
     }
 }
 
-const integrar_id_cliente = (cliente: IClienteAttributes, datosVenta: IVentaCreate, domicilio: IDomicilioAttributes) => {
+export const integrar_id_cliente = (cliente: IClienteAttributes, datosVenta: IVentaCreate, domicilio: IDomicilioAttributes) => {
     try {
         datosVenta.cliente_id = cliente.id;
         domicilio.cliente_id = cliente.id;
@@ -355,7 +355,7 @@ const integrar_id_cliente = (cliente: IClienteAttributes, datosVenta: IVentaCrea
     }
 }
 
-const integrar_id_domicilio = (domicilio: IDomicilioAttributes, datosVenta: IVentaCreate) => {
+export const integrar_id_domicilio = (domicilio: IDomicilioAttributes, datosVenta: IVentaCreate) => {
     try {
         datosVenta.domicilio_id = domicilio.id;
     } catch (error) {
@@ -363,7 +363,7 @@ const integrar_id_domicilio = (domicilio: IDomicilioAttributes, datosVenta: IVen
     }
 }
 
-const integrar_id_barrio = (barrio: IBarrioAttributes, domicilio: IDomicilioAttributes) => {
+export const integrar_id_barrio = (barrio: IBarrioAttributes, domicilio: IDomicilioAttributes) => {
     try {
         domicilio.barrio_id = barrio.id;
     } catch (error) {

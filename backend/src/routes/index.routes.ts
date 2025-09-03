@@ -19,6 +19,7 @@ import usuarioRouter from './usuario.routes.js';
 import ventaRouter from './venta.routes.js';
 import tipoDocumentoRouter from './tipo_documento.routes.js';
 import detalleBbooRouter from './detalle_bboo.routes.js';
+import consultaBbooRoutes from './consultas_bboo.routes.js';
 
 const router = Router();
 
@@ -42,5 +43,7 @@ router.use('/usuarios', usuarioRouter);
 router.use('/ventas', ventaRouter);
 router.use('/tipos-documentos', tipoDocumentoRouter);
 router.use('/detalles-bboo', detalleBbooRouter);
+router.use('/consultas-bboo', consultaBbooRoutes);
+
 
 export default router; 

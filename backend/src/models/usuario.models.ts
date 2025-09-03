@@ -21,7 +21,7 @@ Usuario.init(
             allowNull: false,
         },
         contrasena: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(255),
             allowNull: false,
         },
         activo: {

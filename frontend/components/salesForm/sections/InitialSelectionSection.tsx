@@ -68,7 +68,7 @@ const InitialSelectionSection: React.FC<InitialSelectionSectionProps> = ({ data,
         <Select
           label="Tipo de Negocio"
           id="tipoNegocio"
-          options={tiposNegocio}
+          options={tiposNegocio.filter(tn => tn.id !== 3)}
           value={data.tipoNegocioId}
           onChange={handleTipoNegocioChange}
           emptyOptionLabel="Seleccione un tipo de negocio"

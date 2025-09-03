@@ -11,8 +11,7 @@ class Rol extends Model<IRolAttributes, IRolCreate> implements IRolAttributes {
 Rol.init(
     {
         codigo: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
+            type: DataTypes.STRING(10),
             primaryKey: true,
         },
         descripcion: {

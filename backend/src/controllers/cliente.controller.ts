@@ -8,8 +8,19 @@ import { Request, Response, NextFunction } from 'express';
 import { WhereOptions } from 'sequelize';
 import { IClienteAttributes, IClienteCreate, IClienteFilter, IClienteUpdate } from '../types/cliente.d.js';
 
+
+
 export const getClientes = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // --- NUEVO: Capturar parámetros de paginación y ordenamiento ---
+        const page = parseInt(req.query.page as string, 10) || 1;
+        const limit = parseInt(req.query.limit as string, 10) || 25; // Default: 25 items por página
+        const sortBy = req.query.sortBy as string || 'apellido'; // Default: ordenar por apellido
+        const order = (req.query.order as string)?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC'; // Default: ASC
+
+        const offset = (page - 1) * limit;
+
+        // --- Lógica de filtrado (se mantiene igual) ---
         const where: WhereOptions<IClienteAttributes> = {};
 
         if (req.query.tipo_documento)
@@ -19,7 +30,7 @@ export const getClientes = async (req: Request, res: Response, next: NextFunctio
             where.activo = parseInt(req.query.activo as string, 10) as 0 | 1;
 
         if (req.query.numero_documento)
-            where.numero_documento = req.query.numero_documento as string;
+            where.numero_documento = { [Op.like]: `%${req.query.numero_documento}%` }; // Búsqueda por DNI también puede ser parcial
 
         if (req.query.nombre)
             where.nombre = { [Op.like]: `%${req.query.nombre}%` };
@@ -30,28 +41,38 @@ export const getClientes = async (req: Request, res: Response, next: NextFunctio
         if (req.query.correo_electronico)
             where.correo_electronico = { [Op.like]: `%${req.query.correo_electronico}%` };
 
-        const clientes = await Cliente.findAll({
+        // --- NUEVO: Usar findAndCountAll en lugar de findAll ---
+        // `findAndCountAll` es perfecto para paginación. Devuelve tanto los registros de la página
+        // como el conteo total de registros que coinciden con la cláusula 'where'.
+        const { count, rows } = await Cliente.findAndCountAll({
             where,
             include: [
-                {
-                    model: TipoDocumento,
-                    as: 'tipoDocumento',
-                    attributes: ['id', 'descripcion']
-                },
-                {
-                    model: Domicilio,
-                    as: 'domicilios',
-                    include: [
-                        { model: Barrio, as: 'barrio' }
-                    ]
-                },
-                
-            ]
+                { model: TipoDocumento, as: 'tipoDocumento', attributes: ['id', 'descripcion'] },
+                { model: Domicilio, as: 'domicilios', include: [{ model: Barrio, as: 'barrio' }] },
+                // ... otras inclusiones
+            ],
+            limit: limit,
+            offset: offset,
+            order: [[sortBy, order]],
+            distinct: true // Importante cuando usas 'include' para que 'count' sea preciso
         });
-        
-        res.status(200).json(clientes);
+
+        // --- NUEVO: Construir la respuesta con metadatos de paginación ---
+        const totalPages = Math.ceil(count / limit);
+
+        res.status(200).json({
+            data: rows, // Los registros de la página actual
+            pagination: {
+                totalItems: count,
+                totalPages: totalPages,
+                currentPage: page,
+                pageSize: limit
+            }
+        });
 
     } catch (error) {
+        // ... (el manejo de errores se mantiene igual)
+        console.error("Error al obtener clientes:", error);
         return next(new AppError('Error al obtener los clientes', 500));
     }
 };

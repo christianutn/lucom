@@ -21,15 +21,15 @@ Empleado.init(
             primaryKey: true,
         },
         nombre: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(50),
             allowNull: false,
         },
         apellido: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(50),
             allowNull: false,
         },
         correo_electronico: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(100),
             allowNull: false,
             unique: true,
         },
@@ -39,8 +39,8 @@ Empleado.init(
             defaultValue: 1, // 1 for active, 0 for inactive
         },
         alias: {
-            type: DataTypes.STRING,
-            allowNull: false,
+            type: DataTypes.STRING(45),
+            allowNull: true,
         },
 
     },
