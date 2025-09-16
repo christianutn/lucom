@@ -44,12 +44,12 @@ class BafConPortaStrategy implements IStrategyDetalleVenta {
         }, { transaction });
 
         // Creamos Porta
-        for (const nim of detalles.NIM_a_portar_lista) {
+        for (const nim of detalles.portabilidades) {
             const detallePortaACrear: IDetallePortaCreate = {
                 venta_id: detalles.venta_id,
-                NIM_a_portar: nim,
-                gigas: detalles.gigas,
-                compania: detalles.compania
+                NIM_a_portar: nim.nimAPortar,
+                gigas: nim.gigasId,
+                compania: nim.companiaId
             }
             await DetallePorta.create({
                 ...detallePortaACrear
@@ -74,23 +74,6 @@ class BafConPortaStrategy implements IStrategyDetalleVenta {
     public getValidationRules(): ValidationChain[] {
         return [
             body('detalles').notEmpty().withMessage('Los detalles son requeridos'),
-            body('detalles.NIM_a_portar_lista')
-                .isArray({ min: 1 })
-                .withMessage('Debe ser un array con al menos un NIM'),
-            body('detalles.NIM_a_portar_lista.*')
-                .isString().withMessage('Cada NIM debe ser un string')
-                .isLength({ min: 1, max: 15 }).withMessage('Cada NIM debe tener entre 1 y 15 caracteres')
-                .customSanitizer(value => value.trim()),
-            body('detalles.gigas')
-                .exists()
-                .trim()
-                .isInt({ min: 1 })
-                .withMessage('El id de gigas debe ser un número entero positivo'),
-            body('detalles.compania')
-                .exists()
-                .trim()
-                .isInt({ min: 1 })
-                .withMessage('El id de compania debe ser un número entero positivo'),
             body('detalles.tipos_domicilios_id')
                 .exists()
                 .trim()
@@ -122,11 +105,27 @@ class BafConPortaStrategy implements IStrategyDetalleVenta {
                 .trim()
                 .isLength({ min: 0, max: 150 })
                 .withMessage('El comentario de horario de contacto debe tener.maxcdn de 150 caracteres'),
-
+            body('detalles.portabilidades')
+                .isArray({ min: 1 })
+                .withMessage('Debe ser un array con al menos un NIM'),
+            body('detalles.*.nimAPortar')
+                .isString().withMessage('Cada NIM debe ser un string')
+                .isLength({ min: 1, max: 15 }).withMessage('Cada NIM debe tener entre 1 y 15 caracteres')
+                .customSanitizer(value => value.trim()),
+            body('detalles.*.gigasId')
+                .exists()
+                .trim()
+                .isInt({ min: 1 })
+                .withMessage('El id de gigas debe ser un número entero positivo'),
+            body('detalles.*.companiaId')
+                .exists()
+                .trim()
+                .isInt({ min: 1 })
+                .withMessage('El id de compania debe ser un número entero positivo')
         ]
     }
 
-    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetallePortaParametro | IDatalleBafCreate, cliente: IClienteAttributes, domicilio: IDomicilioAttributes, barrio: IBarrioAttributes): Promise<any> {
+    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetalleBafPortaCreate, cliente: IClienteAttributes, domicilio: IDomicilioAttributes, barrio: IBarrioAttributes): Promise<any> {
         try {
 
             const portaStrategy = new PortaStrategy();
@@ -136,14 +135,24 @@ class BafConPortaStrategy implements IStrategyDetalleVenta {
             // Ejecutamos la carga de fila para ambas partes de la venta
             venta.tipo_negocio_id = 1
 
-            if ("NIM_a_portar_lista" in detalles) {
-                await portaStrategy.cargar_nueva_fila(venta, detalles, cliente, domicilio, barrio);
+            if (Array.isArray(detalles.portabilidades)) {
+
+                await portaStrategy.cargar_nueva_fila(venta, detalles.portabilidades, cliente, domicilio, barrio);
+
             }
 
             venta.tipo_negocio_id = 2
 
             if ("abono_id" in detalles) {
-                await bafStrategy.cargar_nueva_fila(venta, detalles, cliente, domicilio, barrio);
+                await bafStrategy.cargar_nueva_fila(venta, {
+                    venta_id: detalles.venta_id,
+                    tipos_domicilios_id: detalles.tipos_domicilios_id,
+                    abono_id: detalles.abono_id,
+                    TVHD: detalles.TVHD,
+                    cantidad_decos: detalles.cantidad_decos,
+                    horario_contacto: detalles.horario_contacto,
+                    tipo_convergencia_id: detalles.tipo_convergencia_id,
+                }, cliente, domicilio, barrio);
             }
 
         } catch (error) {

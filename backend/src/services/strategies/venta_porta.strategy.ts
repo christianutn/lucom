@@ -4,7 +4,7 @@ import { Transaction } from 'sequelize';
 import DetallePorta from '../../models/detalle_porta.models.js';
 import { IStrategyDetalleVenta } from './IStrategyDetalleVenta.js';
 import AppError from '../../utils/appError.js';
-import { IDetallePortaCreate, IDetallePortaAttributes, IDetallePortaParametro } from '../../types/detallePorta.js'
+import { IDetallePortaCreate, IDetallePortaParametro } from '../../types/detallePorta.js'
 import { agregarFilaPorNombreColumnas } from "../../googleSheets/cargarDatosBAF.js";
 import { IVentaAttributes } from '../../types/venta.js';
 import { NuevaFilaPorta } from "../../types/googleSheets.js";
@@ -18,17 +18,17 @@ import OrigenDato from '../../models/origen_dato.models.js';
 
 class PortaStrategy implements IStrategyDetalleVenta {
 
-    public async createDetails(detalles: IDetallePortaParametro, transaction: Transaction): Promise<any> {
+    public async createDetails(detalles: IDetallePortaParametro[], transaction: Transaction): Promise<any> {
         if (!detalles) {
             throw new AppError('Los detalles para Portabilidad son requeridos.', 400);
         }
 
-        for (const nim of detalles.NIM_a_portar_lista) {
+        for (const nim of detalles) {
             const detallePortaACrear: IDetallePortaCreate = {
-                venta_id: detalles.venta_id,
-                NIM_a_portar: nim,
-                gigas: detalles.gigas,
-                compania: detalles.compania
+                venta_id: nim.venta_id,
+                NIM_a_portar: nim.nimAPortar,
+                gigas: nim.gigasId,
+                compania: nim.companiaId
             }
             await DetallePorta.create({
                 ...detallePortaACrear
@@ -40,10 +40,10 @@ class PortaStrategy implements IStrategyDetalleVenta {
         return DetallePorta.findAll({ where: { venta_id }, transaction });
     }
 
-    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetallePortaParametro, cliente: any, domicilio: any, barrio: any): Promise<any> {
+    public async cargar_nueva_fila(venta: IVentaAttributes, detalles: IDetallePortaParametro[], cliente: any, domicilio: any, barrio: any): Promise<any> {
         try {
 
-            for (const nim of detalles.NIM_a_portar_lista) {
+            for (const nim of detalles) {
                 //Buscamos nombre empleado
                 const empleado = await Empleado.findByPk(venta.empleado_id);
 
@@ -73,14 +73,14 @@ class PortaStrategy implements IStrategyDetalleVenta {
                 const numeroDocumentoString = `${tipoDocumento?.descripcion}:  ${cliente.numero_documento.trim() || 'Documento desconocido'}`
 
                 // Buscamos gigas
-                const gigas = await Giga.findByPk(detalles.gigas);
+                const gigas = await Giga.findByPk(nim.gigasId);
 
                 if (!gigas) {
                     throw new AppError('Gigas no encontrado', 404);
                 }
 
                 // Buscamos compania 
-                const compania = await Compania.findByPk(detalles.compania);
+                const compania = await Compania.findByPk(nim.companiaId);
 
                 //Aramamos string del domicilio
 
@@ -108,7 +108,7 @@ class PortaStrategy implements IStrategyDetalleVenta {
                     "Nombre y Apellido Cliente": `${cliente?.nombre.trim() || 'Nombre desconocido'}, ${cliente?.apellido.trim() || 'Apellido desconocido'}`,
                     "DNI / LE / LC / CUIT (ingrese solo números)": numeroDocumentoString,
                     "Fecha Nacimiento Cliente": `${fechaNacimientoString}`,
-                    "NIM a Portar (solo linea, no agregar otra info)": nim,
+                    "NIM a Portar (solo linea, no agregar otra info)": nim.nimAPortar,
                     "Correo Cliente": `${cliente?.correo_electronico || 'Correo electronico no cargado'}`,
                     "Gigas acordados con el cliente": gigas?.descripcion || 'Gigas desconocido',
                     "Compañía Actual": compania?.descripcion || 'Compañia desconocido',
@@ -131,27 +131,33 @@ class PortaStrategy implements IStrategyDetalleVenta {
 
     public getValidationRules(): ValidationChain[] {
         return [
-            body('detalles').notEmpty().withMessage('Los detalles son requeridos'),
-            body('detalles.NIM_a_portar_lista')
+            body('detalles')
                 .isArray({ min: 1 })
-                .withMessage('Debe ser un array con al menos un NIM'),
-            body('detalles.NIM_a_portar_lista.*')
+                .withMessage('Debe ser una lista con al menos un detalle'),
+
+            // Validar cada objeto dentro de la lista
+            body('detalles.*.nimAPortar')
+                .isArray({ min: 1 })
+                .withMessage('Cada detalle debe tener al menos un NIM'),
+
+            body('detalles.*.nimAPortar.*')
                 .isString().withMessage('Cada NIM debe ser un string')
                 .isLength({ min: 1, max: 15 }).withMessage('Cada NIM debe tener entre 1 y 15 caracteres')
                 .customSanitizer(value => value.trim()),
-            body('detalles.gigas')
-                .exists()
-                .trim()
+
+            body('detalles.*.gigasId')
+                .exists().withMessage('El campo gigas es requerido')
+                .bail()
                 .isInt({ min: 1 })
-                .withMessage('El id de gigas debe ser un número entero positivo'),
-            body('detalles.compania')
-                .exists()
-                .trim()
+                .withMessage('El id de gigas debe ser un número entero positivo'),
+
+            body('detalles.*.companiaId')
+                .exists().withMessage('El campo compania es requerido')
+                .bail()
                 .isInt({ min: 1 })
-                .withMessage('El id de compania debe ser un número entero positivo')
+                .withMessage('El id de compania debe ser un número entero positivo')
         ]
     }
-
 
 
     //Agregamos fila

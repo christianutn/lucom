@@ -44,7 +44,7 @@ router.get('/:id',
 router.post('/',
     passport.authenticate('jwt', { session: false }),
     autorizar(['ADM']),
-    ...validarCreacionVenta(),
+   // ...validarCreacionVenta(),
     crearVentaConDetalles);
 
 router.put('/:id',

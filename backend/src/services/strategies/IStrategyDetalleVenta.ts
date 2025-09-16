@@ -14,11 +14,11 @@ import { IDetalleBafPortaCreate } from '../../types/detalle_baf_con_porta.js'
 
 export interface IStrategyDetalleVenta {
 
-  createDetails(detalles: IDatalleBafCreate | IDetallePortaParametro | IDetalleBbooCreate | IDetalleBafPortaCreate , transaction: Transaction): Promise<any>;
+  createDetails(detalles: IDatalleBafCreate | IDetallePortaParametro[] | IDetalleBbooCreate | IDetalleBafPortaCreate , transaction: Transaction): Promise<any>;
   getDetails(venta_id: number, transaction: Transaction): Promise<any>;
   getValidationRules(): ValidationChain[];
   cargar_nueva_fila(venta: IVentaAttributes, 
-    detalles: IDatalleBafCreate | IDetallePortaParametro | IDetalleBbooCreate, 
+    detalles: IDatalleBafCreate | IDetallePortaParametro[] | IDetalleBbooCreate, 
     cliente: IClienteAttributes, 
     domicilio: IDomicilioAttributes, 
     barrio: IBarrioAttributes): Promise<any>;

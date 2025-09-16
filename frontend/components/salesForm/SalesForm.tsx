@@ -103,9 +103,13 @@ const internetBafDefault: InternetBafState = {
   tipoDomicilioId: '', abonoId: '', tvhd: "No", cantidadDecos: 0, tipoConvergenciaId: '', lineaConvergente: '', horario_contacto: ""
 };
 
-const portabilidadDefault: PortabilidadState = {
-  nimAPortar: [], gigasId: '', companiaActualId: '',
-};
+const portabilidadDefault: PortabilidadState[] = [
+  {
+    nimAPortar: "",
+    gigasId: "",
+    companiaId: ""
+  }
+]
 
 
 const consultaBbooStateDefault: ConsultaBbooState = {
@@ -120,7 +124,7 @@ const SalesForm: React.FC = () => {
   const [initialSelection, setInitialSelection] = useState<InitialSelectionState>(initialSelectionDefault);
   const [clientData, setClientData] = useState<ClientDataState>(clientDataDefault);
   const [internetBafData, setInternetBafData] = useState<InternetBafState>(internetBafDefault);
-  const [portabilidadData, setPortabilidadData] = useState<PortabilidadState>(portabilidadDefault);
+  const [portabilidadData, setPortabilidadData] = useState<PortabilidadState[]>(portabilidadDefault);
   const [consultaBbooData, setConsultaBbooData] = useState<ConsultaBbooState>(consultaBbooStateDefault);
   const [selectedClient, setSelectedClient] = useState<Cliente | null>(null);
   const [tipoNegocioDescripcion, setTipoNegocioDescripcion] = useState<string>('');
@@ -129,7 +133,6 @@ const SalesForm: React.FC = () => {
 
   // Errores
   const [clientDataErrors, setClientDataErrors] = useState<ClientDataStateErrors>(clientDataErrorsDefault);
-  const [nimError, setNimError] = useState<string>('Debe ingresar un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX');
 
   const handleInitialSelectionChange = useCallback(<K extends keyof InitialSelectionState>(field: K, value: InitialSelectionState[K]) => {
     setInitialSelection(prev => ({ ...prev, [field]: value }));
@@ -152,8 +155,24 @@ const SalesForm: React.FC = () => {
     });
   }, []);
 
-  const handlePortabilidadChange = useCallback(<K extends keyof PortabilidadState>(field: K, value: PortabilidadState[K]) => {
-    setPortabilidadData(prev => ({ ...prev, [field]: value }));
+  const handlePortabilidadChange = useCallback(<K extends keyof PortabilidadState>(
+    field: K,
+    index: number,
+    value: PortabilidadState[K]
+  ) => {
+    setPortabilidadData(prev => {
+      const newData = [...prev];
+      newData[index] = { ...newData[index], [field]: value };
+      return newData;
+    });
+  }, []);
+
+  const handleDeletePortabilidad = useCallback((index: number) => {
+    setPortabilidadData(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const handleAddPortabilidad = useCallback(() => {
+    setPortabilidadData(prev => [...prev, { nimAPortar: "", gigasId: "", companiaId: "" }]);
   }, []);
 
   const handleConsultaBbooChange = useCallback(<K extends keyof ConsultaBbooState>(field: K, value: ConsultaBbooState[K]) => {
@@ -161,9 +180,6 @@ const SalesForm: React.FC = () => {
   }, []);
   const handleClientSelected = useCallback((client: Cliente | null) => {
     setSelectedClient(client);
-    if (!client) {
-      setPortabilidadData(prev => ({ ...prev, nimAPortar: [] }));
-    }
   }, []);
 
   const handleClientDataErrors = useCallback((errors: ClientDataStateErrors) => {
@@ -217,11 +233,7 @@ const SalesForm: React.FC = () => {
     // 1. Construir el objeto de detalles basado en el tipo de negocio
     let detallesPayload = {};
     if (initialSelection.tipoNegocioId === '1') { // Portabilidad
-      detallesPayload = {
-        NIM_a_portar_lista: portabilidadData.nimAPortar,
-        gigas: portabilidadData.gigasId,
-        compania: portabilidadData.companiaActualId,
-      };
+      detallesPayload = portabilidadData;
     } else if (initialSelection.tipoNegocioId === '2') { // BAF
       detallesPayload = {
         tipos_domicilios_id: internetBafData.tipoDomicilioId,
@@ -239,17 +251,16 @@ const SalesForm: React.FC = () => {
       }
     } else if (initialSelection.tipoNegocioId === '4') { // Venta BAF + Porta
       detallesPayload = {
-        NIM_a_portar_lista: portabilidadData.nimAPortar,
-        gigas: portabilidadData.gigasId,
-        compania: portabilidadData.companiaActualId,
         tipos_domicilios_id: internetBafData.tipoDomicilioId,
         abono_id: internetBafData.abonoId,
         TVHD: internetBafData.tvhd === 'Sí' ? 1 : 0,
         cantidad_decos: internetBafData.cantidadDecos,
         horario_contacto: internetBafData.horario_contacto, // Este campo es común pero el backend lo espera en detalles BAF
         tipo_convergencia_id: internetBafData.tipoConvergenciaId,
+        portabilidades: portabilidadData,
       }
     }
+
 
     // 2. Construir el objeto principal 'ventaConDetalle'
     const ventaConDetalle: any = {
@@ -298,16 +309,12 @@ const SalesForm: React.FC = () => {
 
       // Si los campos obligatorios son vacios, mostrar un aviso
       // Recorrer un objeto por clave
-      if (obtenerErrores(clientDataErrors).length > 0  ) {
+      if (obtenerErrores(clientDataErrors).length > 0) {
         const errorMessages = obtenerErrores(clientDataErrors).join(' - ');
         showNotification(`Faltan completar los siguientes campos: ${errorMessages}`, 'error');
         return;
       }
 
-      if(nimError != "" && initialSelection.tipoNegocioId == "1") {
-        showNotification("Debe ingresar un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX", 'error');
-        return
-      }
 
       await postVenta(ventaConDetalle);
       showNotification('Venta guardada exitosamente.', 'success');
@@ -356,9 +363,9 @@ const SalesForm: React.FC = () => {
           selectedClient={selectedClient}
           consultaBbooData={consultaBbooData}
           onConsultaBbooChange={handleConsultaBbooChange}
-          setNimError={setNimError}
-          nimError={nimError}
-      
+          onDeletePortabilidad={handleDeletePortabilidad}
+          onAddPortabilidad={handleAddPortabilidad}
+
         />
       )}
 

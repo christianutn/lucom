@@ -42,8 +42,8 @@ export const getDetallePortaPorID = async (req: Request, res: Response, next: Ne
 
 export const createDetallePorta = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { venta_id, NIM_a_portar, abono_id, gigas, compania } = req.body;
-        const detalle_baf = await DetallePorta.create({ venta_id, NIM_a_portar, gigas, compania });
+        const { venta_id, nimAPortar, gigasId, companiaId } = req.body;
+        const detalle_baf = await DetallePorta.create({ venta_id: venta_id, NIM_a_portar: nimAPortar, gigas: gigasId, compania: companiaId });
         res.status(201).json(detalle_baf);
     } catch (error) {
         return next(new AppError('Error al crear el DetalleBaf', 500));

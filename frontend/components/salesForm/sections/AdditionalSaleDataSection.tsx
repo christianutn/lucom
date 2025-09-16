@@ -1,7 +1,7 @@
 import React from 'react';
 import Card from '../../common/Card.js';
 import InternetBafForm from '../businessTypes/InternetBafForm.js';
-import PortabilidadForm from '../businessTypes/PortabilidadForm.js';
+import PortabilidadForm from '../businessTypes/portabilidad/PortabilidadFormPrincipal.js';
 import ConsultaBbooForm from '../businessTypes/ConsultaBbooForm.js';
 import { InternetBafState, PortabilidadState, Cliente, ConsultaBbooState } from '../../../types.js';
 
@@ -10,13 +10,17 @@ interface AdditionalSaleDataSectionProps {
   tipoNegocioDescripcion: string;
   internetBafData: InternetBafState;
   onInternetBafChange: <K extends keyof InternetBafState>(field: K, value: InternetBafState[K]) => void;
-  portabilidadData: PortabilidadState;
-  onPortabilidadChange: <K extends keyof PortabilidadState>(field: K, value: PortabilidadState[K]) => void;
+  portabilidadData: PortabilidadState[];
+  onPortabilidadChange: <K extends keyof PortabilidadState>(
+    field: K,
+    index: number,
+    value: PortabilidadState[K]
+  ) => void;
   selectedClient: Cliente | null;
   consultaBbooData: ConsultaBbooState;
   onConsultaBbooChange: <K extends keyof ConsultaBbooState>(field: K, value: ConsultaBbooState[K]) => void;
-  setNimError: (error: string) => void;
-  nimError: string;
+  onDeletePortabilidad: (index: number) => void;
+  onAddPortabilidad: () => void;
 }
 
 const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
@@ -29,8 +33,8 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
   selectedClient,
   consultaBbooData,
   onConsultaBbooChange,
-  setNimError,
-  nimError,
+  onDeletePortabilidad,
+  onAddPortabilidad,
 }) => {
 
   const renderFormBasedOnType = () => {
@@ -38,7 +42,7 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
       case "2": // BAF (Cambiado a ID 2 como en tu ejemplo)
         return <InternetBafForm data={internetBafData} onChange={onInternetBafChange} />;
       case "1": // Portabilidad
-        return <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} selectedClient={selectedClient} setNimError={setNimError} nimError={nimError}/>;
+        return <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} onDeletePortabilidad={onDeletePortabilidad} onAddPortabilidad={onAddPortabilidad}/>;
       case "3": // Consulta BBOO
         return <ConsultaBbooForm data={consultaBbooData} onChange={onConsultaBbooChange} />;
       case "4": // Venta BAF + Porta
@@ -50,7 +54,7 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-200 mb-4 border-b border-gray-700 pb-2">Datos Portabilidad</h3>
-              <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} selectedClient={selectedClient}  setNimError={setNimError} nimError={nimError}/>
+              <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} onDeletePortabilidad={onDeletePortabilidad} onAddPortabilidad={onAddPortabilidad} />
             </div>
           </div>
         )
@@ -64,7 +68,7 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
     : "Datos Adicionales de la Venta";
 
   return (
-    <Card  className="mb-6">
+    <Card className="mb-6">
       {renderFormBasedOnType()}
     </Card>
   );

@@ -28,6 +28,19 @@ export interface IDetallePortaCreate {
 }
 
 /**
+ * @proporty venta_id  number
+ * @property nimAPortar string
+ * @property gigasId number
+ * @proporty companiaId
+ */
+export interface IDetallePortaParametro {
+  venta_id: number;
+  nimAPortar: string;
+  gigasId: number;
+  companiaId: number;
+}
+
+/**
  * Interface para actualizar un DetallePorta existente.
  * Todos los campos son opcionales, se puede actualizar uno o varios.
  * @property NIM_a_portar Nuevo número NIM a portar
@@ -66,9 +79,3 @@ export interface IDetallePortaFilter {
  */
 
 
-export interface IDetallePortaParametro {
-  venta_id: number;
-  NIM_a_portar_lista: string[];
-  gigas: number;
-  compania: number;
-}
