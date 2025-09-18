@@ -92,12 +92,9 @@ const SalesForm: React.FC = () => {
   const mensajesDeError: string[] = [];
 
   const clavesNoObligatorias = [
-    'tipoDocumentoId',
     'telefonoSecundario',
-    'email',
     'domicilioSeleccionadoId',
     'telefonoSecundario',
-    'email',
     'clienteId',
     'entreCalle1',
     'entreCalle2',
@@ -106,6 +103,7 @@ const SalesForm: React.FC = () => {
     'departamento',
     'convergencia',
     'serviciosConvergentesIds',
+    'fechaNacimiento',
   ];
   // Iterar sobre las propiedades de nivel superior del objeto de errores
   for (const key in errores) {

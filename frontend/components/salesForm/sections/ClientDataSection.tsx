@@ -272,8 +272,8 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
             handleSearchChange('numero_documento', e.target.value)
 
           } />
-          <Input label="Apellido" id="searchApellido" value={searchFilters.apellido} onChange={(e) => handleSearchChange('apellido', e.target.value)} />
-          <Input label="Nombre" id="searchNombre" value={searchFilters.nombre} onChange={(e) => handleSearchChange('nombre', e.target.value)} />
+          <Input label="Apellido" id="searchApellido" value={searchFilters.apellido} onChange={(e) => handleSearchChange('apellido', e.target.value)}/>
+          <Input label="Nombre" id="searchNombre" value={searchFilters.nombre} onChange={(e) => handleSearchChange('nombre', e.target.value)}/>
 
         </div>
         <Button onClick={() => handleSearchClient()} variant="secondary" disabled={isSearching}>
@@ -441,7 +441,7 @@ const ClientDataSection: React.FC<ClientDataSectionProps> = ({ data, onChange, o
             }
           }}
 
-
+          required
           error={errors.email} />
       </div>
 
