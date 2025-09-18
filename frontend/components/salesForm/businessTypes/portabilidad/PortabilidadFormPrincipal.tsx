@@ -19,14 +19,16 @@ interface PortabilidadFormProps {
 
     onDeletePortabilidad: (index: number) => void;
     onAddPortabilidad: () => void;
+    handleErrors: (field: string, message: string) => void;
 }
 
-const PortabilidadFormPrincipal: React.FC<PortabilidadFormProps> = ({ data, onChange, onDeletePortabilidad, onAddPortabilidad }) => {
+const PortabilidadFormPrincipal: React.FC<PortabilidadFormProps> = ({ data, onChange, onDeletePortabilidad, onAddPortabilidad, handleErrors }) => {
 
     const [gigasOptions, setGigasOptions] = useState<SelectOption[]>([]);
     const [companiasOptions, setCompaniasOptions] = useState<SelectOption[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const { showNotification } = useNotification();
+
 
 
     useEffect(() => {
@@ -37,7 +39,11 @@ const PortabilidadFormPrincipal: React.FC<PortabilidadFormProps> = ({ data, onCh
                     getGigas(),
                     getCompanias()
                 ]);
-                setGigasOptions(gigasRes);
+                setGigasOptions(
+                    gigasRes
+                        .filter((giga: SelectOption) => giga.activo === 1)
+                        .map((giga: SelectOption) => ({ id: giga.id, descripcion: giga.descripcion, activo: giga.activo }))
+                );
                 setCompaniasOptions(companiasRes);
             } catch (error) {
                 console.error("Error fetching Portabilidad form data:", error);
@@ -75,7 +81,6 @@ const PortabilidadFormPrincipal: React.FC<PortabilidadFormProps> = ({ data, onCh
                     onRemove={handleRemoveBlock}
                     gigasOptions={gigasOptions}
                     companiasOptions={companiasOptions}
-
                 />
             ))}
             <Button

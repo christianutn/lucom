@@ -41,7 +41,7 @@ export const  getGigaPorId = async (req: Request, res: Response, next: NextFunct
 export const createGiga= async (req: Request, res: Response, next: NextFunction) => {
     try {
         const descricionData: IGigaCreate = {
-            descripcion: req.body.descricion
+            descripcion: req.body.descripcion
         };
 
         const giga = await Giga.create(descricionData);
@@ -62,7 +62,7 @@ export const actualizarGiga= async (req: Request, res: Response, next: NextFunct
 
 
     try {
-        if (req.body.hasOwnProperty('descricion')) objetoActualizado.descripcion = req.body.descricion
+        if (req.body.hasOwnProperty('descripcion')) objetoActualizado.descripcion = req.body.descripcion
         if (req.body.hasOwnProperty('activo')) objetoActualizado.activo = req.body.activo
 
         if( Object.keys(objetoActualizado).length === 0) {

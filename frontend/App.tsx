@@ -12,6 +12,9 @@ import AbonoForm from './components/abonos/abonosForm';
 import TiposDomicilioForm from './components/tiposDomicilios/tipoDomicilio';
 import Home from './components/home/home'
 import ConsultaBbooForm from './components/ConsultaBboo/ConsultForm';
+import GigasForm from './components/gigas/GigasForm';
+
+
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const auth = useContext(AuthContext);
@@ -43,6 +46,7 @@ const App: React.FC = () => {
           <Route path="abonos" element={<AbonoForm />} />
           <Route path="tipos-domicilios" element={<TiposDomicilioForm />} />
           <Route path="consultas-bboo" element={<ConsultaBbooForm />} />
+          <Route path="gigas" element={<GigasForm />} />
           
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />

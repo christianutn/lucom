@@ -12,9 +12,10 @@ import { validarTelefono } from '@/utils/validarDatosEntrada.js';
 interface InternetBafFormProps {
   data: InternetBafState;
   onChange: <K extends keyof InternetBafState>(field: K, value: InternetBafState[K]) => void;
+  handleErrors: (field: string, message: string) => void;
 }
 
-const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => {
+const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange, handleErrors }) => {
   const [tiposDomicilio, setTiposDomicilio] = useState<SelectOption[]>([]);
   const [abonos, setAbonos] = useState<SelectOption[]>([]);
   const [tiposConvergencia, setTiposConvergencia] = useState<SelectOption[]>([]);
@@ -44,7 +45,6 @@ const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => 
         );
         setTiposConvergencia(tcRes);
       } catch (error) {
-        console.error("Error fetching Internet/BAF form data:", error);
         showNotification("Error al cargar datos para Internet/BAF.", "error");
       } finally {
         setIsLoading(false);
@@ -127,9 +127,11 @@ const InternetBafForm: React.FC<InternetBafFormProps> = ({ data, onChange }) => 
         onChange={e => {
           onChange('lineaConvergente', e.target.value)
           if (validarTelefono(e.target.value)) {
+            handleErrors('lineaConvergente', '');
             setErrorLineaConvergente("");
           } else {
             setErrorLineaConvergente("Debe ingresar un teléfono de 10 dígitos. Ejemplo: 351XXXXXXX");
+            handleErrors('lineaConvergente', 'Línea convergente inválida.');
           }
 
         }}

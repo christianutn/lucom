@@ -8,11 +8,14 @@ import { useNotification } from '../../hooks/useNotification';
 import { InitialSelectionState, ClientDataState, InternetBafState, PortabilidadState, Cliente, ClientDataStateErrors, ConsultaBbooState } from '../../types';
 import { postVenta } from '../../services/api';
 import { Save } from 'lucide-react';
+import { validarTelefono } from '@/utils/validarDatosEntrada';
 
 const initialSelectionDefault: InitialSelectionState = {
   tipoNegocioId: '',
   origenDatoId: '',
 };
+
+
 
 const clientDataDefault: ClientDataState = {
   tipoDocumentoId: '',
@@ -48,7 +51,44 @@ const clientDataErrorsDefault: ClientDataStateErrors = {
   serviciosConvergentesIds: '',
   fechaNacimiento: '',
 };
-const obtenerErrores = (errores: ClientDataStateErrors): string[] => {
+
+
+const internetBafDefault: InternetBafState = {
+  tipoDomicilioId: '', abonoId: '', tvhd: "No", cantidadDecos: 0, tipoConvergenciaId: '', lineaConvergente: '', horario_contacto: ""
+};
+
+const portabilidadDefault: PortabilidadState[] = [
+  {
+    nimAPortar: "",
+    gigasId: "",
+    companiaId: ""
+  }
+]
+
+
+const consultaBbooStateDefault: ConsultaBbooState = {
+  tipoDomicilioId: '',
+  lineaClaroAConsultar: '',
+  pedidoRellamado: '',
+}
+
+
+
+const SalesForm: React.FC = () => {
+  const [initialSelection, setInitialSelection] = useState<InitialSelectionState>(initialSelectionDefault);
+  const [clientData, setClientData] = useState<ClientDataState>(clientDataDefault);
+  const [internetBafData, setInternetBafData] = useState<InternetBafState>(internetBafDefault);
+  const [portabilidadData, setPortabilidadData] = useState<PortabilidadState[]>(portabilidadDefault);
+  const [consultaBbooData, setConsultaBbooData] = useState<ConsultaBbooState>(consultaBbooStateDefault);
+  const [selectedClient, setSelectedClient] = useState<Cliente | null>(null);
+  const [tipoNegocioDescripcion, setTipoNegocioDescripcion] = useState<string>('');
+  const [isSaving, setIsSaving] = useState(false);
+  const { showNotification } = useNotification();
+
+  // Errores
+  const [clientDataErrors, setClientDataErrors] = useState<ClientDataStateErrors>(clientDataErrorsDefault);
+
+  const obtenerErrores = (errores: ClientDataStateErrors): string[] => {
   const mensajesDeError: string[] = [];
 
   const clavesNoObligatorias = [
@@ -94,48 +134,43 @@ const obtenerErrores = (errores: ClientDataStateErrors): string[] => {
     }
   }
 
+  // Validar campos de telefonos en portabilidad
+
+  for (let i = 0; i < portabilidadData.length; i++) {
+    if(!validarTelefono(portabilidadData[i].nimAPortar)){
+      mensajesDeError.push(`El número a portar ${portabilidadData[i].nimAPortar} no es válido.`);
+    }
+  }
+
+  // Validar que esté cargada las direcciones
+
+  if(!clientData.nuevoDomicilio.calle || !clientData.nuevoDomicilio.altura ){
+    mensajesDeError.push("Debes ingresar una dirección válida. Al menos calle y altura");
+  } 
+
 
 
   return mensajesDeError;
 }
+  // Maneja errores reportados por el hijo
 
-const internetBafDefault: InternetBafState = {
-  tipoDomicilioId: '', abonoId: '', tvhd: "No", cantidadDecos: 0, tipoConvergenciaId: '', lineaConvergente: '', horario_contacto: ""
-};
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
 
-const portabilidadDefault: PortabilidadState[] = [
-  {
-    nimAPortar: "",
-    gigasId: "",
-    companiaId: ""
-  }
-]
+  const handleErrors = (field: string, message: string) => {
+    setErrors((prev) => ({
+      ...prev,
+      [field]: message,
+    }));
+  };
 
-
-const consultaBbooStateDefault: ConsultaBbooState = {
-  tipoDomicilioId: '',
-  lineaClaroAConsultar: '',
-  pedidoRellamado: '',
-}
-
-
-
-const SalesForm: React.FC = () => {
-  const [initialSelection, setInitialSelection] = useState<InitialSelectionState>(initialSelectionDefault);
-  const [clientData, setClientData] = useState<ClientDataState>(clientDataDefault);
-  const [internetBafData, setInternetBafData] = useState<InternetBafState>(internetBafDefault);
-  const [portabilidadData, setPortabilidadData] = useState<PortabilidadState[]>(portabilidadDefault);
-  const [consultaBbooData, setConsultaBbooData] = useState<ConsultaBbooState>(consultaBbooStateDefault);
-  const [selectedClient, setSelectedClient] = useState<Cliente | null>(null);
-  const [tipoNegocioDescripcion, setTipoNegocioDescripcion] = useState<string>('');
-  const [isSaving, setIsSaving] = useState(false);
-  const { showNotification } = useNotification();
-
-  // Errores
-  const [clientDataErrors, setClientDataErrors] = useState<ClientDataStateErrors>(clientDataErrorsDefault);
 
   const handleInitialSelectionChange = useCallback(<K extends keyof InitialSelectionState>(field: K, value: InitialSelectionState[K]) => {
     setInitialSelection(prev => ({ ...prev, [field]: value }));
+
+    // Reiniciar los errores
+    if(field == "tipoNegocioId"){
+      setErrors({})
+    }
   }, []);
 
   const handleClientDataChange = useCallback(<K extends keyof ClientDataState>(field: K, value: ClientDataState[K]) => {
@@ -194,6 +229,7 @@ const SalesForm: React.FC = () => {
     setPortabilidadData(portabilidadDefault);
     setSelectedClient(null);
     setTipoNegocioDescripcion('');
+    setErrors({});
   }, []);
 
   const restErrors = useCallback(() => {
@@ -315,11 +351,20 @@ const SalesForm: React.FC = () => {
         return;
       }
 
+      if (Object.values(errors).some(msg => msg !== '')) {
+        showNotification(
+          `Campos inválidos: ${Object.values(errors).filter(Boolean).join(' - ')}`,
+          'error'
+        );
+        return;
+      }
+
 
       await postVenta(ventaConDetalle);
       showNotification('Venta guardada exitosamente.', 'success');
       resetForm();
       restErrors();
+      setErrors({});
     } catch (error) {
       const errorMessage = 'Error al guardar la venta. Revise los datos del formulario.';
       showNotification(errorMessage, 'error');
@@ -365,6 +410,7 @@ const SalesForm: React.FC = () => {
           onConsultaBbooChange={handleConsultaBbooChange}
           onDeletePortabilidad={handleDeletePortabilidad}
           onAddPortabilidad={handleAddPortabilidad}
+          handleErrors={handleErrors}
 
         />
       )}

@@ -572,3 +572,36 @@ export interface ITipoDocumento {
   descripcion: string;
   activo: 0 | 1;
 }
+
+
+/* Interface para OrigenDato.
+ * @property id ID del origen de dato
+ * @property descripcion Descripción del origen de dato
+ * @property activo Estado del origen de dato (1: activo, 0: inactivo)
+ * 
+ */
+export interface IGiga {
+  id: number;
+  descripcion: string;
+  activo: 0 | 1;
+}
+
+/**
+ * Interface para crear un nuevo OrigenDato.
+ * @property descripcion Descripción del origen de dato
+ */
+export interface IGigaCreate {
+  descripcion: string;
+}
+
+/**
+ * Interface para actualizar un OrigenDato.
+ * @property descripcion Descripción del origen de dato
+ * @property activo Estado del origen de dato (1: activo, 0: inactivo)
+ * 
+ */
+export interface IGigaUpdate {
+  descripcion: string;
+  activo: 0 | 1;
+  id: number;
+}

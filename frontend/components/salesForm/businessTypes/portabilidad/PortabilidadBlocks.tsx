@@ -28,12 +28,19 @@ type FormData = {
   nimAPortar: string;
   gigasId: string;
   companiaId: string;
+
 };
 
 const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, index, onRemove, gigasOptions, companiasOptions }) => {
 
   const handleNimChange = (index: number, value: string) => {
     onChange('nimAPortar', index, value);
+    if (validarTelefono(value)) {
+      setErrorNim("");
+      
+    } else {
+      setErrorNim("El número ingresado no es válido, debe contener 10 dígitos. Ejemplo: 351XXXXXXX")
+    }
 
   }
 
@@ -41,6 +48,8 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, ind
     onRemove(index);
 
   }
+
+  const [errorNim, setErrorNim] = useState("Debe ingresar un número de teléfono válido.");
 
 
 
@@ -68,6 +77,7 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, ind
             value={data.nimAPortar}
             onChange={e => handleNimChange(index, e.target.value)}
             className="w-full lg:w-[20ch]"
+            error={errorNim}
             required
           />
 

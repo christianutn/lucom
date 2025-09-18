@@ -21,28 +21,28 @@ interface AdditionalSaleDataSectionProps {
   onConsultaBbooChange: <K extends keyof ConsultaBbooState>(field: K, value: ConsultaBbooState[K]) => void;
   onDeletePortabilidad: (index: number) => void;
   onAddPortabilidad: () => void;
+  handleErrors: (field: string, message: string) => void;
 }
 
 const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
   tipoNegocioId,
-  tipoNegocioDescripcion,
   internetBafData,
   onInternetBafChange,
   portabilidadData,
   onPortabilidadChange,
-  selectedClient,
   consultaBbooData,
   onConsultaBbooChange,
   onDeletePortabilidad,
   onAddPortabilidad,
+  handleErrors
 }) => {
 
   const renderFormBasedOnType = () => {
     switch (tipoNegocioId) {
       case "2": // BAF (Cambiado a ID 2 como en tu ejemplo)
-        return <InternetBafForm data={internetBafData} onChange={onInternetBafChange} />;
+        return <InternetBafForm data={internetBafData} onChange={onInternetBafChange} handleErrors={handleErrors}/>;
       case "1": // Portabilidad
-        return <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} onDeletePortabilidad={onDeletePortabilidad} onAddPortabilidad={onAddPortabilidad}/>;
+        return <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} onDeletePortabilidad={onDeletePortabilidad} onAddPortabilidad={onAddPortabilidad} handleErrors={handleErrors}/>;
       case "3": // Consulta BBOO
         return <ConsultaBbooForm data={consultaBbooData} onChange={onConsultaBbooChange} />;
       case "4": // Venta BAF + Porta
@@ -50,11 +50,11 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-200 mb-4 border-b border-gray-700 pb-2">Datos BAF/Internet</h3>
-              <InternetBafForm data={internetBafData} onChange={onInternetBafChange} />
+              <InternetBafForm data={internetBafData} onChange={onInternetBafChange} handleErrors={handleErrors}/>
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-200 mb-4 border-b border-gray-700 pb-2">Datos Portabilidad</h3>
-              <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} onDeletePortabilidad={onDeletePortabilidad} onAddPortabilidad={onAddPortabilidad} />
+              <PortabilidadForm data={portabilidadData} onChange={onPortabilidadChange} onDeletePortabilidad={onDeletePortabilidad} onAddPortabilidad={onAddPortabilidad} handleErrors={handleErrors} />
             </div>
           </div>
         )
@@ -62,10 +62,6 @@ const AdditionalSaleDataSection: React.FC<AdditionalSaleDataSectionProps> = ({
         return <p className="text-gray-400">Seleccione un tipo de negocio para ver campos adicionales.</p>;
     }
   };
-
-  const title = tipoNegocioDescripcion
-    ? `Datos Adicionales: ${tipoNegocioDescripcion}`
-    : "Datos Adicionales de la Venta";
 
   return (
     <Card className="mb-6">

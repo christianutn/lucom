@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, FileText, Users, TicketPercent, FilePenLine, Menu, X, HousePlus } from 'lucide-react';
+import { Home, FileText, Users, TicketPercent, FilePenLine, Menu, X, HousePlus, ClipboardList } from 'lucide-react';
 import { useState, useContext } from 'react';
 import { AuthContext } from '../../contexts/AuthContext';
 
@@ -69,6 +69,10 @@ const Sidebar = () => {
                 <NavLink to="/tipos-domicilios" className="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md" onClick={toggleSidebar}>
                   <HousePlus size={20} className="mr-3" />
                   Tipos de Domicilios
+                </NavLink>
+                <NavLink to="gigas" className="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md" onClick={toggleSidebar}>
+                  <ClipboardList size={20} className="mr-3" />
+                  Gigas
                 </NavLink>
 
               </>
