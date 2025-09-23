@@ -58,6 +58,8 @@ const PortabilidadFormPrincipal: React.FC<PortabilidadFormProps> = ({ data, onCh
 
     const handleRemoveBlock = (index: number) => {
         onDeletePortabilidad(index)
+        
+
     };
 
     const handleChange = <K extends keyof PortabilidadState>(

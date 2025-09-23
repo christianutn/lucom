@@ -51,6 +51,14 @@ const PortabilidadForm: React.FC<PortabilidadFormProps> = ({ data, onChange, ind
 
   const [errorNim, setErrorNim] = useState("Debe ingresar un número de teléfono válido.");
 
+  useEffect(() => {
+    // Sincronizamos el estado de error con el valor actual de la prop `data.nimAPortar`
+    if (validarTelefono(data.nimAPortar)) {
+      setErrorNim("");
+    } else {
+      setErrorNim("Debe ingresar un número de teléfono válido.");
+    }
+  }, [data.nimAPortar]); // Este efecto se ejecuta cada vez que el NIM cambia
 
 
   return (

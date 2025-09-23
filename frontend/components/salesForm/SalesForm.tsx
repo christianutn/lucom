@@ -135,7 +135,7 @@ const SalesForm: React.FC = () => {
   // Validar campos de telefonos en portabilidad
 
   for (let i = 0; i < portabilidadData.length; i++) {
-    if(!validarTelefono(portabilidadData[i].nimAPortar)){
+    if(!validarTelefono(portabilidadData[i].nimAPortar) && (initialSelection.tipoNegocioId == '1' || initialSelection.tipoNegocioId == '4')){
       mensajesDeError.push(`El número a portar ${portabilidadData[i].nimAPortar} no es válido.`);
     }
   }
@@ -247,6 +247,7 @@ const SalesForm: React.FC = () => {
       serviciosConvergentesIds: '',
       fechaNacimiento: '',
     });
+    
   }, []);
 
 
@@ -341,7 +342,6 @@ const SalesForm: React.FC = () => {
 
     try {
 
-      // Si los campos obligatorios son vacios, mostrar un aviso
       // Recorrer un objeto por clave
       if (obtenerErrores(clientDataErrors).length > 0) {
         const errorMessages = obtenerErrores(clientDataErrors).join(' - ');
